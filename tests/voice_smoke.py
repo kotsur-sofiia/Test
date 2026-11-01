@@ -25,7 +25,7 @@ with sync_playwright() as p:
  def end():page.evaluate('window.__speech.at(-1).end()')
  def phrase(root,text):
   root.locator('.voice-start').click();emit([{'text':text,'final':True}]);end()
- assert page.locator('.voice-card').count()==8
+ assert page.locator('.voice-card').count()==9
  assert page.evaluate('__speech.length')==0,'Microphone must never start automatically'
  sleep=widget('sleep');sleep.locator('.voice-editor').fill('Сегодня')
  sleep.locator('.voice-start').click()
@@ -109,7 +109,7 @@ with sync_playwright() as p:
  data=json.loads(Path(download.value.path()).read_text());assert len(data['voiceNotes'])==before+2
  assert all(isinstance(n['text'],str) and 'audio' not in n for n in data['voiceNotes'])
  ctx.set_offline(True);page.reload()
- assert page.locator('.voice-card').count()==8 and page.locator('#connection').inner_text()=='Без интернета'
+ assert page.locator('.voice-card').count()==9 and page.locator('#connection').inner_text()=='Без интернета'
  sleep=widget('sleep');assert 'Дополнение' in sleep.locator('.voice-history').inner_text()
  note_id=page.evaluate("state.voiceNotes.find(n=>n.section==='sleep').id")
  sleep.get_by_role('button',name=f'Удалить заметку {note_id}',exact=True).click();page.reload();sleep=widget('sleep');assert sleep.locator('.voice-note').count()==0

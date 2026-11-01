@@ -11,7 +11,7 @@ with sync_playwright() as p:
  bottom=page.get_by_role('navigation',name='Основная навигация',exact=True)
  assert bottom.evaluate('(e)=>getComputedStyle(e).position')=='fixed'
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Arial')
- assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Библиотека','Друзья']
+ assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Голосовая запись','Библиотека','Друзья']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
  assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Обо мне','⚙Настройки','◎Цели']
  page.locator('#profile-name').fill('Несохранённое имя')
@@ -54,4 +54,4 @@ with sync_playwright() as p:
   page.evaluate('window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')
   nav_top=bottom.bounding_box()['y'];notice=page.locator('.privacy-details>summary').bounding_box();assert notice['y']+notice['height']<=nav_top+1,(width,notice,nav_top)
  assert not errors,errors
- b.close();print('PASS: four main tabs, profile submenu, export settings, unsaved drafts and diary persistence, microphone cancellation, cycle restrictions, history/direct/offline routes, responsive safe bottom area')
+ b.close();print('PASS: five main tabs, profile submenu, export settings, unsaved drafts and diary persistence, microphone cancellation, cycle restrictions, history/direct/offline routes, responsive safe bottom area')

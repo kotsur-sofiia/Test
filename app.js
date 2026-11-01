@@ -97,12 +97,14 @@ const products=[
  {id:'salmon',name:'Лосось атлантический, запечённый',kcal:206,iron:.34,calcium:15,magnesium:30,potassium:384,zinc:.43,c:0,b12:2.8,folate:26},
  {id:'banana',name:'Банан, без кожуры',kcal:89,iron:.26,calcium:5,magnesium:27,potassium:358,zinc:.15,c:8.7,b12:0,folate:20},
  {id:'orange',name:'Апельсин, без кожуры',kcal:47,iron:.1,calcium:40,magnesium:10,potassium:181,zinc:.07,c:53.2,b12:0,folate:30},
- {id:'almonds',name:'Миндаль, сырой',kcal:579,iron:3.71,calcium:269,magnesium:270,potassium:733,zinc:3.12,c:0,b12:0,folate:44}
+ {id:'almonds',name:'Миндаль, сырой',kcal:579,iron:3.71,calcium:269,magnesium:270,potassium:733,zinc:3.12,c:0,b12:0,folate:44},
+ {id:'rice',name:'Рис белый, варёный без соли',kcal:130},
+ {id:'broccoli',name:'Брокколи, приготовленная без соли',kcal:35}
 ];
 const macroKeys=['kcal','protein','fat','carbs'];
 const macroLabels={kcal:'Калории, ккал',protein:'Белки, г',fat:'Жиры, г',carbs:'Углеводы, г'};
 const isKnown=v=>typeof v==='number'&&Number.isFinite(v)&&v>=0;
-const builtInMacros={oats:[13.15,6.52,67.7],egg:[12.58,10.61,1.12],lentils:[9.02,.38,20.13],spinach:[2.86,.39,3.63],yogurt:[3.47,3.25,4.66],salmon:[22.1,12.35,0],banana:[1.09,.33,22.84],orange:[.94,.12,11.75],almonds:[21.15,49.93,21.55]};
+const builtInMacros={rice:[2.69,.28,28.17],broccoli:[2.38,.41,7.18],oats:[13.15,6.52,67.7],egg:[12.58,10.61,1.12],lentils:[9.02,.38,20.13],spinach:[2.86,.39,3.63],yogurt:[3.47,3.25,4.66],salmon:[22.1,12.35,0],banana:[1.09,.33,22.84],orange:[.94,.12,11.75],almonds:[21.15,49.93,21.55]};
 for(const p of products){[p.protein,p.fat,p.carbs]=builtInMacros[p.id];p.source='Средние справочные данные USDA';}
 function allProducts(){return [...products,...state.products];}
 const referenceFiber={oats:10.1,egg:0,lentils:7.9,spinach:2.2,yogurt:0,salmon:0,banana:2.6,orange:2.4,almonds:12.5};
@@ -188,4 +190,4 @@ function connection(){$('#connection').textContent=navigator.onLine?'На свя
 let prompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;$('#install').hidden=false;});$('#install').onclick=async()=>{if(prompt){await prompt.prompt();prompt=null;$('#install').hidden=true;}};
 function updateNavigation(){window.LunaNavigation?.refresh();}window.addEventListener('hashchange',updateNavigation);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{$('#notice').textContent='Не удалось включить офлайн-режим. Попробуй обновить страницу с интернетом.';});
-function render(){renderCycle();renderProfile();renderSleep();renderFood();window.LunaNavigation?.refresh();window.LunaVoice?.refresh();}render();
+function render(){renderCycle();renderProfile();renderSleep();renderFood();window.LunaNavigation?.refresh();window.LunaVoice?.refresh();window.LunaCapture?.render();}render();
