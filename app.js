@@ -9,7 +9,7 @@ if(!Array.isArray(state.products))state.products=[];
 if(!Array.isArray(state.water))state.water=[];
 if(!Array.isArray(state.supplements))state.supplements=[];
 state.waterSettings={glass:250,bottle:500,container:'glass',...(state.waterSettings||{})};
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('#notice').textContent='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.';}render();}
+function save(){let persisted=true;try{localStorage.setItem(KEY,JSON.stringify(state));if($('#notice').textContent==='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.')$('#notice').textContent='';}catch{persisted=false;$('#notice').textContent='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.';}render();return persisted;}
 function localDate(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
 function parseDay(s){return new Date(s+'T12:00:00');}
 function dayIndex(s){const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)/86400000;}
@@ -188,4 +188,4 @@ function connection(){$('#connection').textContent=navigator.onLine?'На свя
 let prompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;$('#install').hidden=false;});$('#install').onclick=async()=>{if(prompt){await prompt.prompt();prompt=null;$('#install').hidden=true;}};
 window.addEventListener('hashchange',()=>{for(const a of document.querySelectorAll('nav a'))a.classList.toggle('active',a.hash===location.hash);});
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{$('#notice').textContent='Не удалось включить офлайн-режим. Попробуй обновить страницу с интернетом.';});
-function render(){renderCycle();renderProfile();renderSleep();renderFood();}render();
+function render(){renderCycle();renderProfile();renderSleep();renderFood();window.LunaVoice?.refresh();}render();
