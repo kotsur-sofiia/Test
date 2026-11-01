@@ -5,13 +5,13 @@
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
  const contexts=[
   {id:'profile-fill',name:'Мой профиль',mode:'profile',anchor:'#profile-form',before:true},
-  {id:'cycle',name:'Цикл',anchor:'#cycle'},
-  {id:'sleep',name:'Сон',anchor:'#sleep'},
-  {id:'food',name:'Питание',anchor:'#food-history',before:true,master:true,fields:[['local-product-search','Название для поиска в моих продуктах']]},
-  {id:'products',name:'Свои продукты',anchor:'#product-form',parent:true,fields:[['product-name','Название продукта']]},
-  {id:'catalog',name:'Поиск продуктов',anchor:'#catalog-form',parent:true,fields:[['catalog-query','Запрос в Open Food Facts']]},
-  {id:'supplements',name:'БАДы',anchor:'#supplements',master:true,fields:[['supplement-name','Название добавки']]},
-  {id:'water',name:'Вода',anchor:'.water-card',master:true}
+  {id:'cycle',name:'Цикл',anchor:'#cycle-form',before:true},
+  {id:'sleep',name:'Сон',anchor:'#sleep-form',before:true},
+  {id:'food',name:'Питание',anchor:'#food-form',before:true,master:true,fields:[['local-product-search','Название для поиска в моих продуктах']]},
+  {id:'products',name:'Свои продукты',anchor:'#product-form',before:true,fields:[['product-name','Название продукта']]},
+  {id:'catalog',name:'Поиск продуктов',anchor:'#catalog-form',before:true,fields:[['catalog-query','Запрос в Open Food Facts']]},
+  {id:'supplements',name:'БАДы',anchor:'#supplement-form',before:true,master:true,fields:[['supplement-name','Название добавки']]},
+  {id:'water',name:'Вода',anchor:'#water-form',before:true,master:true}
  ];
  const widgets=[];
  let active=null;
