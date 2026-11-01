@@ -38,4 +38,17 @@ assert.equal(parse('беременность не планирую').values.stat
 assert.equal(parse('планировала беременность').values.status,undefined);
 assert.equal(parse('пол не женский').values.sex,undefined);
 assert.equal(parse('Возраст:30лет; вес:42кг').values.age,30);
+assert.deepEqual(parse('София, 30 лет, 42 килограмма, не беременна').values,{age:30,weight:42,name:'София',status:'none',sex:'female'});
+assert.equal(parse('Здравствуйте, я София, 30 лет, 42 кг').values.name,'София');
+assert.equal(parse('Мне уже тридцать лет').values.age,30);
+assert.equal(parse('Мой вес составляет сорок два килограмма').values.weight,42);
+assert.equal(parse('Зовут меня София, возраст 30 лет').values.name,'София');
+assert.deepEqual(parse('Сыну 5 лет').values,{});
+assert.equal(LunaProfileParser.parseField('weight','сорок два с половиной').values.weight,42.5);
+assert.deepEqual(LunaProfileParser.parseField('age','35').values,{age:35});
+assert.deepEqual(LunaProfileParser.parseField('name','София').values,{name:'София'});
+assert.deepEqual(LunaProfileParser.parseField('sex','Женский').values,{sex:'female'});
+assert.deepEqual(LunaProfileParser.parseField('status','кормлю грудью').values,{status:'lactating'});
+assert.equal(parse('беременность нет').values.status,'none');
+assert.equal(parse('Возраст 30 килограммов').values.weight,undefined);
 console.log('PASS: labelled Russian profile parsing, example phrase, spoken numbers, decimal kilograms, status/negation, ambiguous values and no guessing sex from names');
