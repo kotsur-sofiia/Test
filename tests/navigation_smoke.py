@@ -1,4 +1,4 @@
-from profile_form import fill_birth_date
+from profile_form import fill_birth_date, open_about
 """Bottom navigation, contextual profile menu and preservation of existing diary state."""
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
@@ -14,14 +14,14 @@ with sync_playwright() as p:
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Arial')
  assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Голосовая запись','Библиотека','Друзья']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
- assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Обо мне','◉Аккаунт','⚙Настройки','◇Подписка']
- page.locator('#profile-name').fill('Несохранённое имя')
+ assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Аккаунт','⚙Настройки','◇Подписка']
+ page.locator('#profile-name').fill('Несохранённое имя');assert bottom.locator('[aria-current="page"]').inner_text()=='Дневник';bottom.get_by_role('link',name='Профиль',exact=True).click();expect(page.locator('#account')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#settings"]').click();expect(page.locator('#settings')).to_be_visible() and not page.locator('#profile').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
  with page.expect_download() as d:page.locator('#settings-export').click()
  data=json.loads(Path(d.value.path()).read_text());assert 'meals' in data and 'sleep' in data
  page.locator('[data-menu="profile"] a[href="#account"]').click();expect(page.locator('#account')).to_be_visible();page.locator('[data-menu="profile"] a[href="#subscription"]').click();expect(page.locator('#subscription')).to_be_visible()
- page.locator('[data-menu="profile"] a[href="#profile"]').click();assert page.locator('#profile-name').input_value()=='Несохранённое имя'
+ open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
  fill_birth_date(page,'1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
  bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
@@ -34,7 +34,7 @@ with sync_playwright() as p:
  bottom.get_by_role('link',name='Друзья',exact=True).click();expect(page.locator('#friends')).to_be_visible() and not page.locator('#library').is_visible()
  bottom.get_by_role('link',name='Дневник',exact=True).click();assert voice.locator('.voice-editor').input_value()=='Черновик дневника сна'
  assert page.locator('#food-calories').inner_text()=='379 ккал'
- bottom.get_by_role('link',name='Профиль',exact=True).click();assert page.locator('#profile-name').input_value()=='Несохранённое имя'
+ open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Clinical visibility survives routing: a male or lactating profile must not reveal cycle predictions.
  page.locator('#profile-sex').select_option('male');page.locator('#profile-form button').click();bottom.get_by_role('link',name='Дневник',exact=True).click()
  assert not page.locator('#cycle').is_visible() and not page.locator('[data-menu="diary"] a[href="#cycle"]').is_visible()

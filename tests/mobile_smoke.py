@@ -1,4 +1,4 @@
-from profile_form import fill_birth_date
+from profile_form import fill_birth_date, open_about
 """Phone navigation, touch forms, rotation, data retention and offline styles."""
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
@@ -59,7 +59,7 @@ with sync_playwright() as p:
  privacy=page.locator('.privacy-details>summary').bounding_box();assert privacy['y']+privacy['height']<=nav.bounding_box()['y']
  ctx.set_offline(True);page.reload();expect(page.locator('#food')).to_be_visible();layout()
  assert page.locator('#food-calories').inner_text()=='379 ккал' and page.locator('#water-total').inner_text()=='300 мл'
- nav.locator('[href="#profile"]').click();assert page.locator('#profile-name').input_value()=='София'
+ open_about(page);assert page.locator('#profile-name').input_value()=='София'
  assert not errors,errors
  browser.close()
  print('PASS: phone widths 320/375/390/430, touch landscape, large controls, single-section diary, saved sleep/food/water, drafts, microphone cancellation, desktop resize, offline mobile styles')

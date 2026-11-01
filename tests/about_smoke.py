@@ -1,4 +1,4 @@
-from profile_form import fill_birth_date
+from profile_form import fill_birth_date, open_about
 """About-me structure, DOB-derived norms, health context, optional device readings and persistence."""
 from playwright.sync_api import sync_playwright, expect
 from datetime import datetime,timezone
@@ -10,10 +10,15 @@ with sync_playwright() as p:
  page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null')
  assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='Понедельник, 2 ноября'
  assert page.locator('#profile h1').inner_text()=='Обо мне'
+ assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Дневник'
+ assert not page.locator('#home').is_visible() and not page.locator('#sleep').is_visible()
+ assert 'Общие данные' not in page.locator('#profile').inner_text() and 'Дополнительные данные' not in page.locator('#profile').inner_text()
+ styles=page.locator('#profile .about-label,#profile .profile-group>legend').evaluate_all('(els)=>els.map(e=>{const s=getComputedStyle(e);return [s.fontFamily,s.fontSize,s.fontWeight].join("|")})')
+ assert len(styles)==4 and len(set(styles))==1,styles
  assert 'НАЧНЁМ' not in page.locator('#profile').inner_text() and 'Справочные ориентиры учитывают возраст' not in page.locator('#profile').inner_text()
  assert page.locator('#profile-age').count()==0
- assert page.locator('#profile-form fieldset').first.locator('input:not([type=hidden])').count()==4
- assert page.locator('#profile-form fieldset legend').all_text_contents()==['Общие данные','Женское здоровье','Тело']
+ assert page.locator('.profile-basics input:not([type=hidden])').count()==4
+ assert page.locator('#profile-form fieldset legend').all_text_contents()==['Женское здоровье','Тело']
  page.locator('#profile-name').fill('София');fill_birth_date(page,'1996-11-02')
  def save():page.locator('#profile-form>button').click()
  save();assert page.evaluate('state.profile.age')==30 and page.evaluate('reference("iron")') is None
@@ -29,7 +34,7 @@ with sync_playwright() as p:
  assert page.evaluate('phaseAt(today)') is not None
  page.locator('.bottom-nav [href="#home"]').click();page.locator('[data-menu="diary"] [href="#cycle"]').click()
  page.locator('#period-start').fill('2026-10-20');page.locator('#cycle-length').fill('30');page.locator('#cycle-form button').click()
- page.locator('.bottom-nav [href="#profile"]').click();assert page.locator('#profile-cycleLength').input_value()=='30' and page.evaluate('state.profile.health.cycleLength')==30
+ open_about(page);assert page.locator('#profile-cycleLength').input_value()=='30' and page.evaluate('state.profile.health.cycleLength')==30
  for key,value in [('cyclePattern','irregular'),('menstrualStage','menopause'),('hormones','combined')]:
   page.locator('#profile-'+key).select_option(value);save();assert page.evaluate('phaseAt(today)') is None
   page.locator('#profile-'+key).select_option({'cyclePattern':'regular','menstrualStage':'menstruating','hormones':'none'}[key]);save()
