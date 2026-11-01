@@ -12,23 +12,23 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  keys=page.evaluate('nutrients.map(n=>n[0])')
- assert len(keys)==33 and len(set(keys))==33
- expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c','sodium','sulfur','chloride','fluoride','molybdenum','chromium','cobalt'}
+ assert len(keys)==37 and len(set(keys))==37
+ expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c','sodium','sulfur','chloride','fluoride','molybdenum','chromium','cobalt','unsaturated','ala','epa','dha'}
  assert set(keys)==expected
  groups=page.evaluate('nutrientGroups')
  grouped=[key for group in groups for key in group['keys']]
- assert len(grouped)==len(set(grouped))==33 and set(grouped)==expected
- assert page.locator('#nutrients details').count()==6
- assert page.locator('#product-micros fieldset').count()==6
- assert page.locator('#supplement-nutrient optgroup').count()==6
- assert page.locator('#nutrients [data-group="trace-minerals"] [data-nutrient="fluoride"]').count()==1
- assert page.locator('#nutrients [data-group="macro-minerals"] [data-nutrient="phosphorus"]').count()==1
+ assert len(grouped)==len(set(grouped))==37 and set(grouped)==expected
+ assert page.locator('#nutrients details').count()==4
+ assert page.locator('#product-micros fieldset').count()==4
+ assert page.locator('#supplement-nutrient optgroup').count()==4
+ assert page.locator('#nutrients [data-group="minerals"] [data-nutrient="fluoride"]').count()==1
+ assert page.locator('#nutrients [data-group="minerals"] [data-nutrient="phosphorus"]').count()==1
  for key in ['sulfur','cobalt']:
   assert '%' not in page.locator(f'#nutrients [data-nutrient="{key}"]').inner_text()
  # Collapsing one group must survive logging an entry, without hiding unrelated groups.
- page.locator('#nutrients [data-group="macro-minerals"] summary').click()
+ page.locator('#nutrients [data-group="minerals"] summary').click()
 
- assert page.locator('#product-micros input').count()==33
+ assert page.locator('#product-micros input').count()==37
  assert page.evaluate('state.water[0].ml')==250
  assert page.evaluate('state.periods[0]')=='2026-10-10'
  def row(key):return page.locator(f'#nutrients [data-nutrient="{key}"]')
@@ -36,8 +36,8 @@ with sync_playwright() as p:
   page.locator('#supplement-name').fill(name);page.locator('#supplement-nutrient').select_option(key);page.locator('#supplement-unit').select_option(unit);page.locator('#supplement-dose').fill(str(dose));page.locator('#supplement-form button').click()
  add('c',.1,'g','Витамин C')
  assert '100 / 75 мг · 133%' in row('c').inner_text()
- assert not page.locator('#nutrients [data-group="macro-minerals"]').evaluate('(e)=>e.open')
- page.locator('#nutrients [data-group="macro-minerals"] summary').click()
+ assert not page.locator('#nutrients [data-group="minerals"]').evaluate('(e)=>e.open')
+ page.locator('#nutrients [data-group="minerals"] summary').click()
  add('d',600,'iu','Витамин D3')
  assert '15 / 15 мкг · 100%' in row('d').inner_text()
  add('iron',1000,'mcg','Железо')
@@ -54,7 +54,7 @@ with sync_playwright() as p:
  assert page.evaluate('state.supplements.length')==7
  add('c',0,'mg')
  assert page.evaluate('state.supplements.length')==7
- print('PASS: 33 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
+ print('PASS: 37 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
  # Custom product with a known micronutrient, optional extended data, and food/supplement split.
  for key,val in [('name','Тестовый продукт'),('kcal','50'),('protein','2'),('fat','1'),('carbs','5')]:page.locator('#product-'+key).fill(val)
  page.locator('#product-form details').evaluate('(e)=>e.open=true')
@@ -88,6 +88,25 @@ with sync_playwright() as p:
  assert page.evaluate("fromOFF({code:'x',nutriments:{'vitamin-d_100g':.000015,'iodine_100g':.00015,'copper_100g':.0009,'omega-3-fat_100g':1.5,'fiber_100g':3}}).d")==15
  assert abs(page.evaluate("fromOFF({code:'x',nutriments:{'iodine_100g':.00015}}).iodine")-150)<1e-8
  assert page.evaluate("fromOFF({code:'x',nutriments:{'vitamin-a_100g':.0007}}).a") is None
+ # Omega-3 totals and constituent acids are independent; never add EPA/DHA again to total.
+ add('omega3',1000,'mg','Омега-3, общая масса')
+ add('epa',180,'mg','ЭПК в том же комплексе')
+ add('dha',120,'mg','ДГК в том же комплексе')
+ add('ala',500,'mg','АЛК')
+ add('unsaturated',3,'g','Ненасыщенные жиры')
+ assert '2 г' in row('omega3').inner_text()
+ assert '180 мг' in row('epa').inner_text()
+ assert '120 мг' in row('dha').inner_text()
+ assert '0,5 / 1.1 г · 45%' in row('ala').inner_text()
+ assert '3 г' in row('unsaturated').inner_text()
+ assert row('epa').get_by_role('meter').count()==0 and row('dha').get_by_role('meter').count()==0
+ off=page.evaluate("fromOFF({code:'test',nutriments:{'monounsaturated-fat_100g':4,'polyunsaturated-fat_100g':2,'eicosapentaenoic-acid_100g':.18,'docosahexaenoic-acid_100g':.12,'alpha-linolenic-acid_100g':.5}})")
+ assert off['unsaturated']==6 and off['epa']==180 and off['dha']==120 and off['ala']==.5
+ assert off['omega3'] is None, 'Do not fabricate total omega-3 from a subset of acids'
+ assert page.evaluate("fromOFF({code:'test',nutriments:{'monounsaturated-fat_100g':4}}).unsaturated") is None
+ assert page.evaluate('nutrientGroups.map(g=>g.name)')==['Минералы','Витамины','Жиры и жирные кислоты','Другие нутриенты']
+ assert not page.get_by_text('Микронутриенты — необязательно',exact=True).count()
+ print('PASS: simplified taxonomy, independent omega-3/EPA/DHA/ALA accounting, EPA/DHA mg, and qualified unsaturated fat import')
  for width in [390,768,1024]:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),width
  page.locator('#supplements').screenshot(path='/tmp/luna-check/supplements.png')
