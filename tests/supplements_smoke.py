@@ -12,10 +12,23 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  keys=page.evaluate('nutrients.map(n=>n[0])')
- assert len(keys)==26 and len(set(keys))==26
- expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c'}
+ assert len(keys)==33 and len(set(keys))==33
+ expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c','sodium','sulfur','chloride','fluoride','molybdenum','chromium','cobalt'}
  assert set(keys)==expected
- assert page.locator('#product-micros input').count()==26
+ groups=page.evaluate('nutrientGroups')
+ grouped=[key for group in groups for key in group['keys']]
+ assert len(grouped)==len(set(grouped))==33 and set(grouped)==expected
+ assert page.locator('#nutrients details').count()==6
+ assert page.locator('#product-micros fieldset').count()==6
+ assert page.locator('#supplement-nutrient optgroup').count()==6
+ assert page.locator('#nutrients [data-group="trace-minerals"] [data-nutrient="fluoride"]').count()==1
+ assert page.locator('#nutrients [data-group="macro-minerals"] [data-nutrient="phosphorus"]').count()==1
+ for key in ['sulfur','cobalt']:
+  assert '%' not in page.locator(f'#nutrients [data-nutrient="{key}"]').inner_text()
+ # Collapsing one group must survive logging an entry, without hiding unrelated groups.
+ page.locator('#nutrients [data-group="macro-minerals"] summary').click()
+
+ assert page.locator('#product-micros input').count()==33
  assert page.evaluate('state.water[0].ml')==250
  assert page.evaluate('state.periods[0]')=='2026-10-10'
  def row(key):return page.locator(f'#nutrients [data-nutrient="{key}"]')
@@ -23,6 +36,8 @@ with sync_playwright() as p:
   page.locator('#supplement-name').fill(name);page.locator('#supplement-nutrient').select_option(key);page.locator('#supplement-unit').select_option(unit);page.locator('#supplement-dose').fill(str(dose));page.locator('#supplement-form button').click()
  add('c',.1,'g','Витамин C')
  assert '100 / 75 мг · 133%' in row('c').inner_text()
+ assert not page.locator('#nutrients [data-group="macro-minerals"]').evaluate('(e)=>e.open')
+ page.locator('#nutrients [data-group="macro-minerals"] summary').click()
  add('d',600,'iu','Витамин D3')
  assert '15 / 15 мкг · 100%' in row('d').inner_text()
  add('iron',1000,'mcg','Железо')
@@ -39,7 +54,7 @@ with sync_playwright() as p:
  assert page.evaluate('state.supplements.length')==7
  add('c',0,'mg')
  assert page.evaluate('state.supplements.length')==7
- print('PASS: 26 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
+ print('PASS: 33 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
  # Custom product with a known micronutrient, optional extended data, and food/supplement split.
  for key,val in [('name','Тестовый продукт'),('kcal','50'),('protein','2'),('fat','1'),('carbs','5')]:page.locator('#product-'+key).fill(val)
  page.locator('#product-form details').evaluate('(e)=>e.open=true')
