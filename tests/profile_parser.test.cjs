@@ -52,3 +52,7 @@ assert.deepEqual(LunaProfileParser.parseField('status','кормлю грудь�
 assert.equal(parse('беременность нет').values.status,'none');
 assert.equal(parse('Возраст 30 килограммов').values.weight,undefined);
 console.log('PASS: labelled Russian profile parsing, example phrase, spoken numbers, decimal kilograms, status/negation, ambiguous values and no guessing sex from names');
+
+assert.equal(LunaProfileParser.parse('Имя София, дата рождения 2 ноября 1996, 42 килограмма, не беременна').values.weight,42);
+assert.equal(LunaProfileParser.parseField('birthDate','29 февраля 2000').values.birthDate,'2000-02-29');
+assert.equal(LunaProfileParser.parse('Дата рождения 31 февраля 2000').values.birthDate,undefined);

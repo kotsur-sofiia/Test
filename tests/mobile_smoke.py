@@ -25,10 +25,10 @@ with sync_playwright() as p:
    if field.is_visible():assert field.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=16
  for width in [320,375,390,430]:
   page.set_viewport_size({'width':width,'height':844});layout()
-  assert page.locator('#profile-age').bounding_box()['y']==page.locator('#profile-weight').bounding_box()['y']
+  assert page.locator('#profile-birthDate').bounding_box()['y']>page.locator('#profile-name').bounding_box()['y']
  page.set_viewport_size({'width':390,'height':844})
  page.locator('#profile-name').fill('София');page.locator('#profile-sex').select_option('female')
- page.locator('#profile-age').fill('30');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
+ page.locator('#profile-birthDate').fill('1996-01-01');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
  nav.locator('[href="#home"]').click();expect(page.locator('#home')).to_be_visible();assert not page.locator('#food').is_visible()
  diary('sleep');page.locator('#sleep-start').fill((datetime.now()-timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M'))
  page.locator('#sleep-end').fill(datetime.now().strftime('%Y-%m-%dT%H:%M'));page.locator('#sleep-form button').click()

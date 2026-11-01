@@ -12,7 +12,7 @@ with sync_playwright() as p:
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  def row(key):return page.locator(f'#nutrients [data-nutrient="{key}"]')
  assert page.locator('#profile-form').is_visible()
- assert 'Без профиля' in page.locator('#profile-summary').inner_text()
+ assert 'Без анкеты' in page.locator('#nutrition-profile-context').inner_text()
  assert '%' not in row('potassium').inner_text()
  keys=page.evaluate('nutrients.map(n=>n[0])')
  assert len(keys)==len(set(keys))==33
@@ -36,7 +36,7 @@ with sync_playwright() as p:
  assert page.locator('#profile-month').count()==0
  def profile(age,sex='female',status='none'):
   previous=page.evaluate('location.hash');page.evaluate('location.hash="profile"');page.wait_for_function('document.querySelector("#profile").hidden===false')
-  page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-age').fill(str(age));page.locator('#profile-age').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60')
+  page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-birthDate').fill(page.evaluate('(age)=>{const d=new Date();return `${d.getFullYear()-age}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}',age));page.locator('#profile-birthDate').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60')
   if sex=='female' and age>=10:
    page.locator('#profile-status').select_option(status)
   page.locator('#profile-form button').click()

@@ -17,6 +17,8 @@
   return integerWords(value);
  }
  function parse(text){const raw=String(text||'').trim();const lower=raw.toLowerCase().replaceAll('ё','е');const values={},warnings=[],found={};
+  const birthPattern=/(?:дата\s+рождения|родилась|родился)\s*[:—-]?\s*(?:(\d{4})-(\d{2})-(\d{2})|(\d{1,2})[./](\d{1,2})[./](\d{4})|(\d{1,2})\s+([а-я]+)\s+(\d{4}))/giu;
+  const numericRaw=raw.replace(birthPattern,m=>' '.repeat(m.length));
   const fields=/(^|[\s,;.!?])(меня\s+зовут|зовут\s+меня|зовут|имя|возраст|мне|вес|вешу|пол)(?=\s|[:—-]|\d|$)\s*[:—-]?\s*/giu;
   const markers=[...raw.matchAll(fields)];
   function candidate(key,value){if(value===null||value===undefined)return;(found[key]??=[]).push(value);}
@@ -32,7 +34,7 @@
   for(const [key,units]of [['age','лет|года|год'],['weight','килограммов|килограмма|килограмм|кило|кг']]){
    if(found[key]||warnings.some(w=>w.startsWith(key==='age'?'Возраст':'Вес')))continue;
    const pattern=new RegExp(String.raw`(?:^|[^\p{L}\d])(${numeric})\s*(?:${units})(?=$|[^\p{L}])`,'giu');
-   for(const m of raw.matchAll(pattern)){const before=lower.slice(Math.max(0,m.index-45),m.index+1);if(/(?:сыну|дочери|ребенку|мужу|жене|маме|папе|сестре|брату|минус|около|примерно)\s*$/u.test(before)||/[-−]\s*$/u.test(before))continue;if(key==='weight'&&/(?:возраст|мне)\s*$/u.test(before)||key==='age'&&/(?:вес|вешу)\s*$/u.test(before))continue;const n=number(m[1].replace(/([.,])\s+(?=\d)/gu,'$1'),key);if(n!==null&&(key==='age'?Number.isInteger(n)&&n>=0&&n<=120:n>=.1&&n<=500&&Math.abs(n*10-Math.round(n*10))<1e-8))candidate(key,n);}
+   for(const m of numericRaw.matchAll(pattern)){const before=lower.slice(Math.max(0,m.index-45),m.index+1);if(/(?:сыну|дочери|ребенку|мужу|жене|маме|папе|сестре|брату|минус|около|примерно)\s*$/u.test(before)||/[-−]\s*$/u.test(before))continue;if(key==='weight'&&/(?:возраст|мне)\s*$/u.test(before)||key==='age'&&/(?:вес|вешу)\s*$/u.test(before))continue;const n=number(m[1].replace(/([.,])\s+(?=\d)/gu,'$1'),key);if(n!==null&&(key==='age'?Number.isInteger(n)&&n>=0&&n<=120:n>=.1&&n<=500&&Math.abs(n*10-Math.round(n*10))<1e-8))candidate(key,n);}
   }
   if(!found.name&&(found.age||found.weight)){const intro=raw.match(/^(?:(?:здравствуйте|привет)[,!.]?\s*)?(?:я\s+)?([\p{L}]+(?:[-'’][\p{L}]+)*)(?=\s*[,;.]|\s+\d|\s+(?:мне|возраст|вес))/iu);const name=intro?.[1];if(name&&!word(name.toLowerCase(),'не|я|мой|меня|мне|имя|вес|возраст|пол|женщина|мужчина|женский|мужской|беременна|кормлю|планирую|готовлюсь|здравствуйте|привет'))candidate('name',name.split('-').map(part=>part[0].toLocaleUpperCase('ru')+part.slice(1).toLocaleLowerCase('ru')).join('-'));}
   const sexText=lower.replace(/не\s+(?:женский|мужской|женщина|мужчина)/gu,'');
@@ -50,8 +52,12 @@
   else status=positives[0]||(hasNone?'none':null);
   for(const [key,list]of Object.entries(found)){const unique=[...new Set(list)];if(unique.length===1)values[key]=unique[0];else warnings.push(`Поле «${{name:'Имя',age:'Возраст',weight:'Вес',sex:'Пол'}[key]}» указано несколько раз по-разному — проверь его вручную.`);}
   if(status!==null){if(values.sex==='male'){delete values.sex;warnings.push('Пол и физиологическое состояние противоречат друг другу. Эти поля не изменены.');}else if(found.sex&&new Set(found.sex).size>1){warnings.push('Состояние не применено из-за неоднозначного пола.');}else{values.status=status;if(!found.sex)values.sex='female';}}
+  const birthDates=[];const months=['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+
+  for(const m of lower.matchAll(birthPattern)){const y=Number(m[1]||m[6]||m[9]),month=Number(m[2]||m[5]||(months.indexOf(m[8])+1)),day=Number(m[3]||m[4]||m[7]);const d=new Date(Date.UTC(y,month-1,day));if(d.getUTCFullYear()===y&&d.getUTCMonth()===month-1&&d.getUTCDate()===day)birthDates.push(`${String(y).padStart(4,'0')}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`);else warnings.push('Проверь дату рождения.');}
+  if(new Set(birthDates).size===1)values.birthDate=birthDates[0];else if(birthDates.length)warnings.push('Дата рождения указана неоднозначно — проверь её вручную.');
   return {values,warnings:[...new Set(warnings)]};
  }
- function parseField(field,text){if(field==='all')return parse(text);const labels={name:'имя',age:'возраст',weight:'вес',sex:'пол'};let result=parse(text);if(result.values[field]===undefined&&labels[field])result=parse(`${labels[field]} ${text}`);if(field==='status')result=parse(text);const values={};if(result.values[field]!==undefined)values[field]=result.values[field];return {values,warnings:result.warnings};}
+ function parseField(field,text){if(field==='all')return parse(text);const labels={name:'имя',birthDate:'дата рождения',age:'возраст',weight:'вес',sex:'пол'};let result=parse(text);if(result.values[field]===undefined&&labels[field])result=parse(`${labels[field]} ${text}`);if(field==='status')result=parse(text);const values={};if(result.values[field]!==undefined)values[field]=result.values[field];return {values,warnings:result.warnings};}
  globalThis.LunaProfileParser=Object.freeze({parse,parseField});
 })();

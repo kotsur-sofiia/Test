@@ -12,32 +12,32 @@ with sync_playwright() as p:
  def emit(text,final=True):page.evaluate('(p)=>__speech.at(-1).emit(p.text,p.final)',{'text':text,'final':final})
  def end():page.evaluate('__speech.at(-1).end()')
  root.locator('.voice-start').click();assert page.evaluate('__speech.at(-1).continuous') is False
- emit('София, 30 лет, 42 килограмма, не беременна',False)
- assert page.locator('#profile-age').input_value()==''
+ emit('Имя София, дата рождения 2 ноября 1996, 42 килограмма, не беременна',False)
+ assert page.locator('#profile-birthDate').input_value()==''
  end()
- assert page.locator('#profile-name').input_value()=='София' and page.locator('#profile-age').input_value()=='30'
+ assert page.locator('#profile-name').input_value()=='София' and page.locator('#profile-birthDate').input_value()=='1996-11-02'
  assert page.locator('#profile-weight').input_value()=='42' and page.locator('#profile-status').input_value()=='none'
  assert 'не подтвердил' in root.locator('.voice-profile-result').inner_text()
  assert page.evaluate('typeof state.profile==="undefined" || state.profile===null')
  # A retry replaces the bad old phrase, with an explicit restore action.
  first=root.locator('.voice-editor').input_value();root.locator('.voice-start').click();assert root.locator('.voice-editor').input_value()==''
- emit('Возраст 31 год');end();assert page.locator('#profile-age').input_value()=='31'
- assert root.locator('.voice-editor').input_value()=='Возраст 31 год'
+ emit('Дата рождения 2 ноября 1995');end();assert page.locator('#profile-birthDate').input_value()=='1995-11-02'
+ assert root.locator('.voice-editor').input_value()=='Дата рождения 2 ноября 1995'
  root.locator('.voice-restore').click();assert root.locator('.voice-editor').input_value()==first
  # Some engines replace a final slot instead of extending the result list.
- root.locator('.voice-start').click();emit('Возраст тридцать');emit('Возраст тридцать два года');end()
- assert page.locator('#profile-age').input_value()=='32'
- assert root.locator('.voice-editor').input_value()=='Возраст тридцать два года'
+ root.locator('.voice-start').click();emit('Дата рождения 2 ноября 1996');emit('Дата рождения 2 ноября 1994');end()
+ assert page.locator('#profile-birthDate').input_value()=='1994-11-02'
+ assert root.locator('.voice-editor').input_value()=='Дата рождения 2 ноября 1994'
  # Stop without onend: watchdog must still use the captured text and fill the form.
  root.locator('.voice-start').click();emit('вес 43 килограмма');root.locator('.voice-start').click()
  page.wait_for_function('document.querySelector("#profile-weight").value==="43"')
  end();assert page.locator('#profile-weight').input_value()=='43'
  print('PASS: prefixed/non-iterable result list, single phrase, interim-only completion, replacement results, retry without mixing and stop watchdog fills fields')
- for field,spoken,expected in [('name','Ольга','Ольга'),('age','Тридцать пять','35'),('weight','Сорок два с половиной','42.5'),('sex','Женский','female'),('status','Кормлю грудью','lactating')]:
+ for field,spoken,expected in [('name','Ольга','Ольга'),('birthDate','2 ноября 1991','1991-11-02'),('weight','Сорок два с половиной','42.5'),('sex','Женский','female'),('status','Кормлю грудью','lactating')]:
   root.locator('.voice-profile-field').select_option(field);root.locator('.voice-start').click();emit(spoken);end()
   assert page.locator('#profile-'+field).input_value()==expected,field
  assert 'Возраст: 35' not in root.locator('.voice-profile-result').inner_text(), 'Only the selected field should be updated'
- assert page.locator('#profile-age').input_value()=='35'
+ assert page.locator('#profile-birthDate').input_value()=='1991-11-02'
  assert page.locator('#profile-weight').input_value()=='42.5'
  # API/network errors preserve a useful partial transcript without auto-applying it.
  root.locator('.voice-profile-field').select_option('weight');root.locator('.voice-start').click();emit('сорок четыре',False);page.evaluate("__speech.at(-1).error('network')")
@@ -59,9 +59,9 @@ with sync_playwright() as p:
  page.evaluate('()=>{webkitSpeechRecognition.prototype.start=window.__savedStart}')
  # Continuation is opt-in, not an accidental mixture with the previous recording.
  root.locator('.voice-profile-field').select_option('all');root.locator('.voice-editor').fill('Имя Ольга');root.locator('.voice-continue').check()
- root.locator('.voice-start').click();emit('возраст 36 лет');end()
- assert root.locator('.voice-editor').input_value()=='Имя Ольга возраст 36 лет'
- assert page.locator('#profile-age').input_value()=='36'
+ root.locator('.voice-start').click();emit('дата рождения 2 ноября 1990');end()
+ assert root.locator('.voice-editor').input_value()=='Имя Ольга дата рождения 2 ноября 1990'
+ assert page.locator('#profile-birthDate').input_value()=='1990-11-02'
  ctx.set_offline(True);page.reload();assert page.locator('#connection').inner_text()=='Без интернета'
  root=page.locator('[data-voice-section="profile-fill"]');root.evaluate('(d)=>d.open=true');root.locator('.voice-profile-field').select_option('weight');root.locator('.voice-editor').fill('45');root.locator('.voice-save').click();assert page.locator('#profile-weight').input_value()=='45'
  for width in [390,768,1024]:

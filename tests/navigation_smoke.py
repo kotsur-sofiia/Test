@@ -22,7 +22,7 @@ with sync_playwright() as p:
  page.locator('[data-menu="profile"] a[href="#goals"]').click();expect(page.locator('#goals')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#profile"]').click();assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
- page.locator('#profile-age').fill('35');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
+ page.locator('#profile-birthDate').fill('1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
  bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
  assert page.locator('[data-menu="diary"]').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
  page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
