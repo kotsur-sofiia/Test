@@ -1,35 +1,69 @@
-const storageKey = 'little-steps-tasks-v1';
-const initial = [{id:'first',text:'Выпить стакан воды',done:true},{id:'second',text:'Выйти на небольшую прогулку',done:false},{id:'third',text:'Сделать что-то приятное для себя',done:false}];
-let tasks;
-try { const stored = JSON.parse(localStorage.getItem(storageKey)); tasks = Array.isArray(stored) && stored.every(t => t && typeof t.id === 'string' && typeof t.text === 'string' && typeof t.done === 'boolean') ? stored : initial; } catch { tasks = initial; }
-const list = document.querySelector('#task-list');
-const notice = document.querySelector('#notice');
-document.querySelector('#date').textContent = new Intl.DateTimeFormat('ru', {weekday:'long',day:'numeric',month:'long'}).format(new Date()).toUpperCase();
-function save() { try { localStorage.setItem(storageKey,JSON.stringify(tasks)); } catch { notice.hidden=false; notice.textContent='Браузер не разрешает сохранение. Задачи доступны до закрытия страницы.'; } render(); }
-function render() {
-  list.replaceChildren();
-  for (const task of tasks) {
-    const item=document.createElement('li'); item.classList.toggle('done',task.done);
-    const label=document.createElement('label');
-    const check=document.createElement('input'); check.type='checkbox'; check.checked=task.done;
-    check.addEventListener('change',()=>{task.done=check.checked;save();});
-    const text=document.createElement('span'); text.textContent=task.text; label.append(check,text);
-    const remove=document.createElement('button'); remove.className='delete'; remove.textContent='×'; remove.setAttribute('aria-label',`Удалить: ${task.text}`);
-    remove.addEventListener('click',()=>{tasks=tasks.filter(t=>t.id!==task.id);save();});
-    item.append(label,remove);list.append(item);
-  }
-  const done=tasks.filter(t=>t.done).length;
-  document.querySelector('#counter').textContent=`${done} из ${tasks.length}`;
-  document.querySelector('#remaining').textContent=tasks.length?`Осталось: ${tasks.length-done}`:'Чистый лист';
-  document.querySelector('#progress').max=tasks.length||1;document.querySelector('#progress').value=done;
-  document.querySelector('#encouragement').textContent=tasks.length&&done===tasks.length?'Всё готово. Время отдохнуть ✨':'Каждый маленький шаг считается ✨';
+'use strict';
+const $ = s => document.querySelector(s);
+const KEY = 'luna-diary-v1';
+const defaults = { periods: [], cycleLength: 28, periodLength: 5, sleep: [], meals: [] };
+let state;
+try { const s=JSON.parse(localStorage.getItem(KEY)); state=s && Array.isArray(s.periods)&&Array.isArray(s.sleep)&&Array.isArray(s.meals)?s:structuredClone(defaults); } catch { state=structuredClone(defaults); }
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch{$('#notice').textContent='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.';}render();}
+function localDate(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
+function parseDay(s){return new Date(s+'T12:00:00');}
+function dayIndex(s){const [y,m,d]=s.split('-').map(Number);return Date.UTC(y,m-1,d)/86400000;}
+function dayDiff(a,b){return dayIndex(a)-dayIndex(b);}
+function addDays(s,n){const d=parseDay(s);d.setDate(d.getDate()+n);return localDate(d);}
+const today=localDate();let selected=today;let month=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+const fmtDay=s=>parseDay(s).toLocaleDateString('ru',{day:'numeric',month:'long'});
+const fmtTime=s=>new Date(s).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+const duration=m=>`${Math.floor(m/60)} ч ${Math.round(m%60)} мин`;
+$('#today').textContent=new Date().toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'});
+$('#period-start').max=today;$('#period-start').value=today;$('#food-date').value=today;
+$('#cycle-length').value=state.cycleLength;$('#period-length').value=state.periodLength;
+const phases={menstrual:{name:'Менструация',food:'Включай источники железа: бобовые, мясо, зелень. Витамин C помогает усвоению растительного железа.',move:'Прогулка, мягкая растяжка или привычная тренировка по самочувствию. Отдых тоже подходит.',care:'Замечай боль, интенсивность кровотечения и усталость. Сильная боль не должна становиться привычной.'},follicular:{name:'Фолликулярная фаза',food:'Разнообразный рацион: овощи, цельные злаки, белок и полезные жиры. Специальная диета по фазе не обязательна.',move:'Если энергии достаточно, постепенно увеличивай нагрузку. Выбирай то, что нравится.',care:'Отмечай изменения энергии и настроения — твой личный опыт полезнее универсального расписания.'},ovulation:{name:'Овуляция · ориентировочно',food:'Продолжай привычное сбалансированное питание и пей по жажде. Особые продукты для овуляции не нужны.',move:'Ориентируйся на восстановление и привычный уровень нагрузки. Фаза сама по себе не требует рекордов.',care:'Это только оценка по длине цикла, а не подтверждённая овуляция или надёжное «фертильное окно».'},luteal:{name:'Лютеиновая фаза',food:'Регулярные приёмы пищи, клетчатка и белок помогают насыщению. Допустимо учитывать изменения аппетита.',move:'При усталости снизь интенсивность, выбери ходьбу, йогу или отдых. Если чувствуешь себя хорошо, сохраняй обычную активность.',care:'Отмечай сон, настроение и симптомы ПМС. Если они мешают обычной жизни, обсуди это с врачом.'}};
+function phaseAt(date){const starts=state.periods.filter(s=>s<=date).sort();if(!starts.length)return null;const base=starts.at(-1);const elapsed=dayDiff(date,base);const day=elapsed%state.cycleLength+1;const ov=Math.max(state.periodLength+2,state.cycleLength-14);const key=day<=state.periodLength?'menstrual':day<ov-1?'follicular':day<=ov+1?'ovulation':'luteal';return {key,day,projected:elapsed>=state.cycleLength};}
+function textEl(tag,text,cls){const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;return el;}
+function removeButton(label,fn){const b=textEl('button','×');b.type='button';b.setAttribute('aria-label',label);b.onclick=fn;return b;}
+function renderCycle(){
+ $('#month-title').textContent=month.toLocaleDateString('ru',{month:'long',year:'numeric'});const calendar=$('#calendar');calendar.replaceChildren();
+ const offset=(month.getDay()+6)%7;for(let i=0;i<offset;i++)calendar.append(document.createElement('span'));
+ const count=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
+ for(let d=1;d<=count;d++){const date=localDate(new Date(month.getFullYear(),month.getMonth(),d));const phase=phaseAt(date);const button=textEl('button',String(d),'day'+(phase?' '+phase.key:'')+(date===today?' today':'')+(date===selected?' selected':''));button.setAttribute('aria-label',fmtDay(date)+(phase?`, ${phases[phase.key].name}, день ${phase.day}`:''));button.setAttribute('aria-pressed',String(date===selected));button.onclick=()=>{selected=date;renderCycle();};calendar.append(button);}
+ const phase=phaseAt(selected);$('#selected-date').textContent=fmtDay(selected).toUpperCase();$('#phase-tips').replaceChildren();
+ $('#phase-title').textContent=phase?phases[phase.key].name:'У каждого тела свой ритм';
+ $('#phase-description').textContent=phase?`День ${phase.day} цикла · ${phase.projected?'прогноз нового цикла, начало не отмечено':'оценка по последней отметке'}. Самочувствие важнее расчёта.`:'Добавь дату начала менструации. Затем выбери день в календаре, чтобы посмотреть ориентировочные подсказки.';
+ if(phase){for(const [icon,title,key]of[['♧','Питание','food'],['→','Движение','move'],['♡','На что обратить внимание','care']]){const tip=document.createElement('div');tip.className='tip';tip.append(textEl('span',icon));const body=document.createElement('div');body.append(textEl('b',title),textEl('p',phases[phase.key][key]));tip.append(body);$('#phase-tips').append(tip);}}
+ const current=phaseAt(today);$('#cycle-summary').textContent=current?`День ${current.day} цикла`:'Познакомимся?';$('#cycle-sub').textContent=current?phases[current.key].name:'Отметь начало последней менструации';
+ const history=$('#period-history');history.replaceChildren();for(const date of [...state.periods].sort().reverse()){const r=textEl('div',`Начало: ${fmtDay(date)} ${parseDay(date).getFullYear()}`,'record');r.append(removeButton(`Удалить отметку ${date}`,()=>{state.periods=state.periods.filter(d=>d!==date);save();}));history.append(r);}
 }
-document.querySelector('#task-form').addEventListener('submit',event=>{event.preventDefault();const input=document.querySelector('#task-input');const text=input.value.trim();if(!text)return;tasks.push({id:crypto.randomUUID(),text,done:false});input.value='';save();input.focus();});
-function connection(){const status=document.querySelector('#connection');status.textContent=navigator.onLine?'На связи':'Без интернета';status.classList.toggle('offline',!navigator.onLine);}
-window.addEventListener('online',connection);window.addEventListener('offline',connection);
-let installPrompt;const install=document.querySelector('#install');
-window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;install.hidden=false;document.querySelector('#install-hint').hidden=true;});
-install.addEventListener('click',async()=>{if(!installPrompt)return;await installPrompt.prompt();installPrompt=null;install.hidden=true;document.querySelector('#install-hint').hidden=false;});
-window.addEventListener('appinstalled',()=>{install.hidden=true;document.querySelector('#install-hint').hidden=true;});
-if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{notice.hidden=false;notice.textContent='Офлайн-режим пока недоступен. Обновите страницу при подключении к интернету.';});
-connection();render();
+$('#prev-month').onclick=()=>{month.setMonth(month.getMonth()-1);renderCycle();};$('#next-month').onclick=()=>{month.setMonth(month.getMonth()+1);renderCycle();};
+$('#cycle-form').onsubmit=e=>{e.preventDefault();const date=$('#period-start').value;const length=Number($('#cycle-length').value);const bleeding=Number($('#period-length').value);if(!date||date>today||length<21||length>45||bleeding<1||bleeding>10)return;state.cycleLength=length;state.periodLength=bleeding;if(!state.periods.includes(date))state.periods.push(date);selected=date;month=new Date(parseDay(date).getFullYear(),parseDay(date).getMonth(),1);save();};
+const minutes=s=>(new Date(s.end)-new Date(s.start))/60000;
+function sleepTotals(range){const start=addDays(today,-range+1);const totals={};for(const s of state.sleep){const date=localDate(new Date(s.end));if(date>=start&&date<=today)totals[date]=(totals[date]||0)+minutes(s);}return totals;}
+function renderSleep(){const range=Number($('#sleep-range').value);const totals=sleepTotals(range);const values=Object.values(totals);const sum=values.reduce((a,b)=>a+b,0);$('#sleep-average').textContent=values.length?duration(Math.round(sum/values.length)):'Нет записей';$('#sleep-average-note').textContent=`За ${range} дней · дней с записями: ${values.length} · всего: ${duration(Math.round(sum))}`;
+ const chart=$('#sleep-chart');chart.replaceChildren();const shown=Math.min(range,14);const max=Math.max(600,...Object.values(totals));for(let i=shown-1;i>=0;i--){const date=addDays(today,-i);const amount=totals[date]||0;const wrap=document.createElement('div');wrap.className='bar-wrap';wrap.title=`${fmtDay(date)}: ${amount?duration(Math.round(amount)):'нет записей'}`;const bar=document.createElement('div');bar.className='bar';bar.style.height=`${Math.max(2,amount/max*85)}px`;wrap.append(bar,textEl('small',String(parseDay(date).getDate())));chart.append(wrap);}
+ const recent=sleepTotals(7),recentValues=Object.values(recent);$('#sleep-summary').textContent=recentValues.length?duration(Math.round(recentValues.reduce((a,b)=>a+b,0)/recentValues.length)):'Время отдохнуть';$('#sleep-sub').textContent=recentValues.length?'В среднем за дни с записями · 7 дней':'Ночной сон и маленькие паузы днём';
+ const history=$('#sleep-history');history.replaceChildren();const start=addDays(today,-range+1);const records=state.sleep.filter(s=>localDate(new Date(s.end))>=start&&localDate(new Date(s.end))<=today).sort((a,b)=>b.end.localeCompare(a.end));if(!records.length)history.append(textEl('p','Пока нет записей за выбранный период.','empty'));for(const s of records){const r=textEl('div',`${s.type==='nap'?'Дневной':'Ночной'} · ${fmtTime(s.start)} → ${fmtTime(s.end)} · ${duration(Math.round(minutes(s)))}`,'record');r.append(removeButton(`Удалить сон ${s.id}`,()=>{state.sleep=state.sleep.filter(v=>v.id!==s.id);save();}));history.append(r);}}
+$('#sleep-range').onchange=renderSleep;
+$('#sleep-form').onsubmit=e=>{e.preventDefault();const start=$('#sleep-start').value,end=$('#sleep-end').value;const a=new Date(start),b=new Date(end);let error='';if(!start||!end||!Number.isFinite(+a)||!Number.isFinite(+b)||b<=a)error='Пробуждение должно быть позже засыпания.';else if(b>new Date())error='Нельзя записать ещё не завершившийся сон.';else if((b-a)>24*3600000)error='Запись должна быть не длиннее 24 часов. Проверь обе даты.';else if(state.sleep.some(s=>a<new Date(s.end)&&b>new Date(s.start)))error='Этот промежуток пересекается с уже записанным сном.';$('#sleep-error').textContent=error;if(error)return;state.sleep.push({id:crypto.randomUUID(),start:a.toISOString(),end:b.toISOString(),type:$('#sleep-type').value});save();};
+// Rounded generic USDA FoodData Central values per 100 g edible portion.
+const nutrients=[['iron','Железо','мг',18],['calcium','Кальций','мг',1000],['magnesium','Магний','мг',320],['potassium','Калий','мг',2600],['zinc','Цинк','мг',8],['c','Витамин C','мг',75],['b12','Витамин B12','мкг',2.4],['folate','Фолат','мкг DFE',400]];
+const products=[
+ {id:'oats',name:'Овсяные хлопья, сухие',kcal:379,iron:4.25,calcium:52,magnesium:138,potassium:362,zinc:3.64,c:0,b12:0,folate:32},
+ {id:'egg',name:'Яйцо куриное, варёное',kcal:155,iron:1.19,calcium:50,magnesium:10,potassium:126,zinc:1.05,c:0,b12:1.11,folate:44},
+ {id:'lentils',name:'Чечевица, варёная без соли',kcal:116,iron:3.33,calcium:19,magnesium:36,potassium:369,zinc:1.27,c:1.5,b12:0,folate:181},
+ {id:'spinach',name:'Шпинат, сырой',kcal:23,iron:2.71,calcium:99,magnesium:79,potassium:558,zinc:.53,c:28.1,b12:0,folate:194},
+ {id:'yogurt',name:'Йогурт натуральный цельномолочный',kcal:61,iron:.05,calcium:121,magnesium:12,potassium:155,zinc:.59,c:.5,b12:.37,folate:7},
+ {id:'salmon',name:'Лосось атлантический, запечённый',kcal:206,iron:.34,calcium:15,magnesium:30,potassium:384,zinc:.43,c:0,b12:2.8,folate:26},
+ {id:'banana',name:'Банан, без кожуры',kcal:89,iron:.26,calcium:5,magnesium:27,potassium:358,zinc:.15,c:8.7,b12:0,folate:20},
+ {id:'orange',name:'Апельсин, без кожуры',kcal:47,iron:.1,calcium:40,magnesium:10,potassium:181,zinc:.07,c:53.2,b12:0,folate:30},
+ {id:'almonds',name:'Миндаль, сырой',kcal:579,iron:3.71,calcium:269,magnesium:270,potassium:733,zinc:3.12,c:0,b12:0,folate:44}
+];
+for(const p of products){const option=textEl('option',p.name);option.value=p.id;$('#food-product').append(option);}
+function renderFood(){const date=$('#food-date').value;const entries=state.meals.filter(m=>m.date===date);const totals={kcal:0};for(const [key] of nutrients)totals[key]=0;for(const m of entries){const p=products.find(p=>p.id===m.product);if(!p)continue;for(const key of Object.keys(totals))totals[key]+=p[key]*m.grams/100;}
+ $('#food-calories').textContent=`${Math.round(totals.kcal)} ккал`;const daily=state.meals.filter(m=>m.date===today);$('#food-summary').textContent=daily.length?`Продуктов сегодня: ${daily.length}`:'Забота в тарелке';const container=$('#nutrients');container.replaceChildren();for(const [key,name,unit,norm]of nutrients){const percent=Math.round(totals[key]/norm*100);const row=document.createElement('div');row.className='nutrient';const label=document.createElement('div');label.className='nutrient-label';label.append(textEl('span',name),textEl('small',`${Number(totals[key].toFixed(1))} / ${norm} ${unit} · ${percent}%`));const track=document.createElement('div');track.className='track';track.setAttribute('role','meter');track.setAttribute('aria-label',`${name}: ${percent}% от ориентира`);track.setAttribute('aria-valuemin','0');track.setAttribute('aria-valuemax','100');track.setAttribute('aria-valuenow',String(Math.min(percent,100)));track.setAttribute('aria-valuetext',`${percent}%`);const fill=document.createElement('div');fill.className='fill';fill.style.width=`${Math.min(percent,100)}%`;track.append(fill);row.append(label,track);container.append(row);}
+ const history=$('#food-history');history.replaceChildren();if(!entries.length)history.append(textEl('p','Добавь первый продукт — здесь появятся записи за выбранный день.','empty'));for(const m of entries){const p=products.find(p=>p.id===m.product);const r=textEl('div',`${p?p.name:'Продукт'} · ${m.grams} г`,'record');r.append(removeButton(`Удалить продукт ${m.id}`,()=>{state.meals=state.meals.filter(v=>v.id!==m.id);save();}));history.append(r);}}
+$('#food-date').onchange=renderFood;$('#food-form').onsubmit=e=>{e.preventDefault();const grams=Number($('#food-grams').value),date=$('#food-date').value;if(!date||!Number.isFinite(grams)||grams<1||grams>3000)return;state.meals.push({id:crypto.randomUUID(),date,product:$('#food-product').value,grams});save();};
+$('#export-data').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`luna-diary-${today}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+function connection(){$('#connection').textContent=navigator.onLine?'На связи':'Без интернета';}window.addEventListener('online',connection);window.addEventListener('offline',connection);connection();
+let prompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;$('#install').hidden=false;});$('#install').onclick=async()=>{if(prompt){await prompt.prompt();prompt=null;$('#install').hidden=true;}};
+window.addEventListener('hashchange',()=>{for(const a of document.querySelectorAll('nav a'))a.classList.toggle('active',a.hash===location.hash);});
+if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{$('#notice').textContent='Не удалось включить офлайн-режим. Попробуй обновить страницу с интернетом.';});
+function render(){renderCycle();renderSleep();renderFood();}render();
