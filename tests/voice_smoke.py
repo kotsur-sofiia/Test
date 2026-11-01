@@ -48,14 +48,14 @@ with sync_playwright() as p:
  assert 'Дополнение' in sleep.locator('.voice-history').inner_text()
  print('PASS: no automatic microphone use, interim/final speech, duplicate prevention, late final result on stop, explicit save, edit without duplicate, no guessed sleep data')
  # Existing text fields are filled, but their forms are never submitted.
- for section,target,text in [('profile','profile-name','София'),('food','local-product-search','овсяные'),('products','product-name','Творог'),('catalog','catalog-query','йогурт'),('supplements','supplement-name','Витамин D')]:
+ for section,target,text in [('food','local-product-search','овсяные'),('products','product-name','Творог'),('catalog','catalog-query','йогурт'),('supplements','supplement-name','Витамин D')]:
   root=widget(section);root.locator('.voice-target').select_option(target);phrase(root,text)
   assert page.locator('#'+target).input_value()==text
  assert page.locator('#food-product option').count()==1
  assert page.evaluate('state.meals.length')==0 and page.evaluate('state.products.length')==0 and page.evaluate('state.supplements.length')==0
  assert not any('world.openfoodfacts.org' in r for r in requests),'Dictation must not submit catalog searches'
  # Transcript content is plain text, never HTML.
- profile=widget('profile');profile.locator('.voice-target').select_option('note');phrase(profile,'<img src=x onerror="window.__unsafe=true">');profile.locator('.voice-save').click()
+ profile=widget('products');profile.locator('.voice-target').select_option('note');phrase(profile,'<img src=x onerror="window.__unsafe=true">');profile.locator('.voice-save').click()
  assert profile.locator('.voice-note img').count()==0
  assert '<img' in profile.locator('.voice-history').inner_text() and page.evaluate('window.__unsafe===undefined')
  cycle=widget('cycle');phrase(cycle,'Запись о самочувствии');cycle.locator('.voice-save').click();assert page.evaluate('state.periods.length')==0

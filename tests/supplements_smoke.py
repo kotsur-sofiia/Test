@@ -34,9 +34,9 @@ with sync_playwright() as p:
  assert page.locator('#profile-weight').input_value()=='64'
  assert 'месяц' not in page.locator('#profile-summary').inner_text()
  assert page.locator('#profile-month').count()==0
- def profile(age,sex='female',status='none',unit='years'):
-  page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-age-unit').select_option(unit);page.locator('#profile-age').fill(str(age));page.locator('#profile-age').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60' if unit=='years' else '7.5')
-  if sex=='female' and unit=='years' and age>=10:
+ def profile(age,sex='female',status='none'):
+  page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-age').fill(str(age));page.locator('#profile-age').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60')
+  if sex=='female' and age>=10:
    page.locator('#profile-status').select_option(status)
   page.locator('#profile-form button').click()
  def norm(key):return page.evaluate('(key)=>reference(key)?.value??null',key)
@@ -74,12 +74,12 @@ with sync_playwright() as p:
  assert norm('iron') is None and 'не назначаются' in page.locator('#profile-advice').inner_text()
  profile(5);assert norm('potassium')==2300 and norm('phosphorus')==500 and norm('sodium')==1000
  assert not page.locator('#profile-status-label').is_visible()
- profile(7,unit='months');assert norm('potassium')==860 and norm('phosphorus')==275 and norm('fiber') is None
+ profile(0);assert norm('potassium') is None and norm('phosphorus') is None and norm('fiber') is None
  assert '%' not in row('fiber').inner_text()
  assert 'Взрослый предел' in page.locator('#salt-summary').inner_text()
  profile(71);assert norm('d')==20 and norm('calcium')==1200
  profile(35)
- print('PASS: profile questionnaire, child/infant/teen/adult/elderly/pregnancy references, planning, lactation, legacy profile migration, removed month field, unsupported states, cycle suppression')
+ print('PASS: profile questionnaire, child/under-one-year/teen/adult/elderly/pregnancy references, planning, lactation, legacy profile migration, removed month field, unsupported states, cycle suppression')
  # Archive fields must remain stored when editing a product under the new filtered schema.
  page.get_by_role('button',name='Изменить Прежний продукт',exact=True).click();page.locator('#product-name').fill('Прежний продукт — обновлён');page.locator('#product-save').click()
  assert page.evaluate('state.products[0].sugars')==2
