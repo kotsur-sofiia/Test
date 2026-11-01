@@ -11,3 +11,5 @@ button:disabled{opacity:.55;cursor:default}
 .nutrient-group{border-bottom:1px solid var(--border);padding:12px 0}.nutrient-group>summary{cursor:pointer;font-size:12px;color:#756082;font-weight:600;line-height:1.6}.nutrient-group>div{padding:2px 3px}.nutrient-group:focus-within{border-bottom-color:#b39bc3}#nutrients:focus-visible{outline:2px solid #866295;outline-offset:4px;border-radius:6px}#product-micros{display:block}.nutrient-fieldset{min-width:0;margin:15px 0;padding:15px 12px;border:1px solid #e6dfe9;border-radius:10px}.nutrient-fieldset legend{font-size:12px;padding:0 7px;color:#796487}.nutrient-fieldset .form-pair{margin-top:0!important}
 
 .nutrient-subtype{margin-left:12px;padding-left:12px;border-left:2px solid #e6deed}
+
+.nutrient-note{font-size:10px;color:#95869d;line-height:1.6;margin-top:6px}

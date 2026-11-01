@@ -12,15 +12,15 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  keys=page.evaluate('nutrients.map(n=>n[0])')
- assert len(keys)==37 and len(set(keys))==37
- expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c','sodium','sulfur','chloride','fluoride','molybdenum','chromium','cobalt','unsaturated','ala','epa','dha'}
+ assert len(keys)==50 and len(set(keys))==50
+ expected={'fiber','d','iodine','iron','a','calcium','b1','e','b2','b3','b5','b6','folate','b12','k','magnesium','phosphorus','potassium','zinc','copper','manganese','selenium','choline','omega3','omega6','c','sodium','sulfur','chloride','fluoride','molybdenum','chromium','cobalt','unsaturated','ala','epa','dha','inositol','biotin','betaCarotene','carnitine','sugars','addedSugars','starch','polyols','saturated','monounsaturated','polyunsaturated','trans','cholesterol'}
  assert set(keys)==expected
  groups=page.evaluate('nutrientGroups')
  grouped=[key for group in groups for key in group['keys']]
- assert len(grouped)==len(set(grouped))==37 and set(grouped)==expected
- assert page.locator('#nutrients details').count()==4
- assert page.locator('#product-micros fieldset').count()==4
- assert page.locator('#supplement-nutrient optgroup').count()==4
+ assert len(grouped)==len(set(grouped))==50 and set(grouped)==expected
+ assert page.locator('#nutrients details').count()==5
+ assert page.locator('#product-micros fieldset').count()==5
+ assert page.locator('#supplement-nutrient optgroup').count()==5
  assert page.locator('#nutrients [data-group="minerals"] [data-nutrient="fluoride"]').count()==1
  assert page.locator('#nutrients [data-group="minerals"] [data-nutrient="phosphorus"]').count()==1
  for key in ['sulfur','cobalt']:
@@ -28,7 +28,7 @@ with sync_playwright() as p:
  # Collapsing one group must survive logging an entry, without hiding unrelated groups.
  page.locator('#nutrients [data-group="minerals"] summary').click()
 
- assert page.locator('#product-micros input').count()==37
+ assert page.locator('#product-micros input').count()==50
  assert page.evaluate('state.water[0].ml')==250
  assert page.evaluate('state.periods[0]')=='2026-10-10'
  def row(key):return page.locator(f'#nutrients [data-nutrient="{key}"]')
@@ -54,7 +54,7 @@ with sync_playwright() as p:
  assert page.evaluate('state.supplements.length')==7
  add('c',0,'mg')
  assert page.evaluate('state.supplements.length')==7
- print('PASS: 37 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
+ print('PASS: 50 unique nutrients, additive migration, g/mg/mcg conversions, D in IU, unsupported forms excluded, percentages above 100 and omega no target')
  # Custom product with a known micronutrient, optional extended data, and food/supplement split.
  for key,val in [('name','Тестовый продукт'),('kcal','50'),('protein','2'),('fat','1'),('carbs','5')]:page.locator('#product-'+key).fill(val)
  page.locator('#product-form details').evaluate('(e)=>e.open=true')
@@ -104,9 +104,33 @@ with sync_playwright() as p:
  assert off['unsaturated']==6 and off['epa']==180 and off['dha']==120 and off['ala']==.5
  assert off['omega3'] is None, 'Do not fabricate total omega-3 from a subset of acids'
  assert page.evaluate("fromOFF({code:'test',nutriments:{'monounsaturated-fat_100g':4}}).unsaturated") is None
- assert page.evaluate('nutrientGroups.map(g=>g.name)')==['Минералы','Витамины','Жиры и жирные кислоты','Другие нутриенты']
+ assert page.evaluate('nutrientGroups.map(g=>g.name)')==['Минералы','Витамины','Жиры и жирные кислоты','Углеводы и клетчатка','Другие нутриенты']
  assert not page.get_by_text('Микронутриенты — необязательно',exact=True).count()
  print('PASS: simplified taxonomy, independent omega-3/EPA/DHA/ALA accounting, EPA/DHA mg, and qualified unsaturated fat import')
+ # OFF legacy API mass fields are normalized to grams; UI converts to each nutrient's unit.
+ imported=page.evaluate("fromOFF({code:'expanded',nutriments:{'inositol_100g':.35,'biotin_100g':.00003,'beta-carotene_100g':.002,'carnitine_100g':.02,'cholesterol_100g':.055,'sugars_100g':10,'added-sugars_100g':3,'starch_100g':4,'polyols_100g':1,'saturated-fat_100g':2,'monounsaturated-fat_100g':3,'polyunsaturated-fat_100g':2,'trans-fat_100g':0}})")
+ for key,value in {'inositol':350,'biotin':30,'betaCarotene':2000,'carnitine':20,'cholesterol':55,'sugars':10,'addedSugars':3,'starch':4,'polyols':1,'saturated':2,'monounsaturated':3,'polyunsaturated':2,'trans':0,'unsaturated':5}.items():
+  assert abs(imported[key]-value)<1e-8,(key,imported[key])
+ absent=page.evaluate("fromOFF({code:'no-data',nutriments:{}})")
+ assert all(absent[k] is None for k in ['inositol','biotin','betaCarotene','carnitine','cholesterol','addedSugars'])
+ for key,val in [('name','Расширенный тестовый продукт'),('kcal','100'),('protein','1'),('fat','3'),('carbs','8')]:page.locator('#product-'+key).fill(val)
+ page.locator('#product-form details').evaluate('(e)=>e.open=true')
+ page.locator('#product-inositol').fill('25');page.locator('#product-biotin').fill('10');page.locator('#product-sugars').fill('2');page.locator('#product-addedSugars').fill('1')
+ page.locator('#product-save').click();page.locator('#food-grams').fill('100');page.locator('#food-form button').click()
+ macros_before=page.locator('#macros').inner_text()
+ add('inositol',.5,'g','Инозитол')
+ add('biotin',.03,'mg','Биотин')
+ assert '525 мг' in row('inositol').inner_text() and '%' not in row('inositol').inner_text()
+ assert row('inositol').get_by_role('meter').count()==0
+ assert '40 / 30 мкг · 133%' in row('biotin').inner_text()
+ assert page.locator('#macros').inner_text()==macros_before
+ assert '2 г' in row('sugars').inner_text() and '1 г' in row('addedSugars').inner_text()
+ for key in ['cholesterol','saturated','trans','betaCarotene','carnitine','sugars','addedSugars','polyols','starch']:
+  assert row(key).get_by_role('meter').count()==0
+ page.reload()
+ assert '525 мг' in row('inositol').inner_text() and '40 / 30 мкг · 133%' in row('biotin').inner_text()
+ assert page.locator('#macros').inner_text()==macros_before
+ print('PASS: expanded catalog mapping, unknown data, inositol without invented target, biotin AI, food + supplements, no duplicate macro accounting, offline persistence')
  for width in [390,768,1024]:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),width
  page.locator('#supplements').screenshot(path='/tmp/luna-check/supplements.png')
