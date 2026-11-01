@@ -33,7 +33,7 @@ with sync_playwright() as p:
   page.locator('#sleep-range').select_option(period);assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин'
  page.locator('#food-product').select_option('oats');page.locator('#food-grams').fill('200');page.locator('#food-form button').click()
  assert page.locator('#food-calories').inner_text()=='758 ккал'
- assert '8.5 / 18 мг · 47%' in page.locator('#nutrients').inner_text()
+ assert '8,5 / 18 мг · 47%' in page.locator('#nutrients').inner_text()
  page.locator('#food-date').fill(day(-1));page.locator('#food-date').dispatch_event('change');assert page.locator('#food-calories').inner_text()=='0 ккал'
  page.locator('#food-date').fill(day(0));page.locator('#food-date').dispatch_event('change');assert page.locator('#food-calories').inner_text()=='758 ккал'
  print('PASS: overnight sleep, naps, mean by recorded days, overlap and invalid-range rejection, 7/30/365 days, food gram scaling and daily isolation')
