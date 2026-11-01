@@ -10,7 +10,7 @@ with sync_playwright() as p:
  # Existing v1 user records must survive the additive migration.
  ctx.add_init_script("""if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({profile:{name:'Тест',sex:'female',age:35,ageUnit:'years',weight:60,status:'none',month:null},periods:['2026-10-10'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'legacy',date:new Date().toLocaleDateString('en-CA'),product:'oats',grams:100}]}));""")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
+ page.goto(URL.split('#')[0]+'#food');page.wait_for_function('navigator.serviceWorker.controller !== null')
  assert page.locator('#food-calories').inner_text()=='379 ккал'
  assert '13,2' in page.locator('#macros').inner_text()
  assert page.locator('#period-history .record').count()==1

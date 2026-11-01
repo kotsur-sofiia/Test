@@ -11,7 +11,8 @@ with sync_playwright() as p:
  ctx.add_init_script("""if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({profile:{name:'Прежнее имя',age:35,ageUnit:'years',weight:60,sex:'female',status:'none'},periods:['2026-10-10'],cycleLength:28,periodLength:5,sleep:[],meals:[],voiceNotes:[{id:'old-profile',section:'profile',date:'2026-10-01',text:'Прежняя заметка'}]}));""")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  assert page.locator('nav a').first.get_attribute('href')=='#profile'
- assert 'Мой профиль' in page.locator('nav a').first.inner_text()
+ assert 'Обо мне' in page.locator('[data-menu="profile"] a').first.inner_text()
+ assert page.locator('.bottom-nav a').first.inner_text()=='Профиль'
  assert page.locator('#profile-age-unit').count()==0
  assert page.get_by_label('Имя',exact=True).count()==1 and page.get_by_label('Имя или обращение',exact=True).count()==0
  assert page.locator('[data-voice-section="profile"]').count()==0
@@ -60,10 +61,10 @@ with sync_playwright() as p:
  assert page.evaluate('state.profile.legacyAge.age')==7 and page.evaluate('reference("potassium")') is None
  assert page.evaluate('state.periods.length')==1 and page.evaluate('state.voiceNotes[0].id')=='old-profile'
  # Navigation destinations are distinct; the day link no longer points to the profile container.
- page.locator('nav a[href="#home"]').click();assert page.evaluate('location.hash')=='#home'
+ page.locator('.bottom-nav a[href="#home"]').click();assert page.evaluate('location.hash')=='#home'
  assert page.locator('#home').evaluate('(e)=>e.tagName')=='SECTION'
- page.locator('nav a[href="#profile"]').click();assert page.evaluate('location.hash')=='#profile'
- assert page.locator('nav a[href="#profile"]').evaluate('(e)=>e.classList.contains("active")')
+ page.locator('.bottom-nav a[href="#profile"]').click();assert page.evaluate('location.hash')=='#profile'
+ page.wait_for_function('document.body.dataset.view==="profile"');assert page.locator('.bottom-nav a[href="#profile"]').evaluate('(e)=>e.classList.contains("active")')
  ctx.set_offline(True);page.reload();assert page.locator('#connection').inner_text()=='Без интернета'
  root=page.locator('[data-voice-section="profile-fill"]');root.evaluate('(d)=>d.open=true');root.locator('.voice-editor').fill('Имя София, возраст 30 лет, не беременна, вес 42 килограмма');root.locator('.voice-save').click();page.locator('#profile-form button').click()
  assert page.evaluate('state.profile.age')==30 and page.evaluate('state.profile.weight')==42

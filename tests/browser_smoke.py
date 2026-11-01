@@ -12,6 +12,7 @@ with sync_playwright() as p:
  assert page.locator('#cycle-summary').inner_text()=='Познакомимся?'
  today=datetime.strptime(page.evaluate('today'),'%Y-%m-%d')
  day=lambda n:(today+timedelta(days=n)).strftime('%Y-%m-%d')
+ page.evaluate('location.hash="cycle"');page.wait_for_function('document.body.dataset.view==="diary"')
  page.locator('#period-start').fill(day(-20));page.get_by_role('button',name='Отметить начало',exact=True).click()
  assert page.locator('#cycle-summary').inner_text()=='День 21 цикла'
  for offset,key in [(0,'menstrual'),(5,'follicular'),(13,'ovulation'),(20,'luteal'),(28,'menstrual')]:

@@ -19,6 +19,7 @@ with sync_playwright() as p:
  requests=[];page.on('request',lambda r:requests.append(r.url))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  def widget(section):
+  page.evaluate('(hash)=>location.hash=hash', 'sleep' if section=='sleep' else 'cycle' if section=='cycle' else 'food');page.wait_for_function('document.body.dataset.view==="diary"')
   root=page.locator(f'[data-voice-section="{section}"]');root.evaluate('(d)=>d.open=true');return root
  def emit(parts):page.evaluate('(parts)=>window.__speech.at(-1).result(parts)',parts)
  def end():page.evaluate('window.__speech.at(-1).end()')
@@ -119,13 +120,13 @@ with sync_playwright() as p:
  ctx.close()
  # Unsupported browser: readable fallback, no microphone request, keyboard text still saved.
  unsupported=browser.new_context();unsupported.add_init_script('window.SpeechRecognition=undefined;window.webkitSpeechRecognition=undefined;')
- page=unsupported.new_page();page.goto(URL);root=page.locator('[data-voice-section="sleep"]');root.evaluate('(d)=>d.open=true')
+ page=unsupported.new_page();page.goto(URL.split('#')[0]+'#sleep');root=page.locator('[data-voice-section="sleep"]');root.evaluate('(d)=>d.open=true')
  assert root.locator('.voice-start').is_disabled() and 'клавиатуры' in root.locator('.voice-status').inner_text()
  root.locator('.voice-editor').fill('Текст с клавиатуры');root.locator('.voice-save').click();assert root.locator('.voice-note').count()==1
  unsupported.close()
  # Safari-style prefixed API path and synchronous start denial.
  prefixed=browser.new_context();prefixed.add_init_script(MOCK+'window.webkitSpeechRecognition=FakeSpeech;window.SpeechRecognition=undefined;')
- page=prefixed.new_page();page.goto(URL);root=page.locator('[data-voice-section="sleep"]');root.evaluate('(d)=>d.open=true');root.locator('.voice-start').click()
+ page=prefixed.new_page();page.goto(URL.split('#')[0]+'#sleep');root=page.locator('[data-voice-section="sleep"]');root.evaluate('(d)=>d.open=true');root.locator('.voice-start').click()
  page.evaluate("__speech.at(-1).result([{text:'Проверка префикса',final:true}]);__speech.at(-1).end()")
  assert root.locator('.voice-editor').input_value()=='Проверка префикса'
  page.evaluate("()=>{window.__FakeSpeech.prototype.start=function(){throw new DOMException('denied','NotAllowedError')}}")

@@ -35,29 +35,33 @@ with sync_playwright() as p:
  assert 'месяц' not in page.locator('#profile-summary').inner_text()
  assert page.locator('#profile-month').count()==0
  def profile(age,sex='female',status='none'):
+  previous=page.evaluate('location.hash');page.evaluate('location.hash="profile"');page.wait_for_function('document.querySelector("#profile").hidden===false')
   page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-age').fill(str(age));page.locator('#profile-age').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60')
   if sex=='female' and age>=10:
    page.locator('#profile-status').select_option(status)
   page.locator('#profile-form button').click()
+  if previous and previous!='#profile':
+   page.evaluate('(hash)=>location.hash=hash',previous);page.wait_for_function('document.body.dataset.view==="diary"')
  def norm(key):return page.evaluate('(key)=>reference(key)?.value??null',key)
  profile(35)
  assert norm('potassium')==2600 and norm('phosphorus')==700 and norm('iron')==18
  assert 'консультация' in page.locator('#profile-advice').inner_text()
+ page.evaluate('location.hash="food"');page.wait_for_function('document.body.dataset.view==="diary"')
  page.locator('#food-product').select_option('oats');page.locator('#food-form button').click()
  assert '362 / 2600 мг · 14%' in row('potassium').inner_text()
  assert '410 / 700 мг · 59%' in row('phosphorus').inner_text()
  profile(35,'male');assert norm('potassium')==3400 and norm('iron')==8
- assert not page.locator('#cycle').is_visible()
+ assert page.locator('#cycle').get_attribute('data-available')=='false'
  profile(35,status='planning');assert norm('folate')==400
  assert 'до беременности' in page.locator('#profile-advice').inner_text()
  profile(35,status='pregnant')
  assert norm('potassium')==2900 and norm('magnesium')==360 and norm('iron')==27 and norm('folate')==600
- assert not page.locator('#cycle').is_visible() and page.evaluate('phaseAt(today)') is None
+ assert page.locator('#cycle').get_attribute('data-available')=='false' and page.evaluate('phaseAt(today)') is None
  assert page.evaluate('!Object.hasOwn(state.profile,"month")')
  profile(35,status='lactating')
  assert norm('potassium')==2800 and norm('iron')==9 and norm('iodine')==290 and norm('choline')==550 and norm('folate')==500
  assert 'Лактация' in page.locator('#profile-advice').inner_text() and 'консультация' in page.locator('#profile-advice').inner_text()
- assert not page.locator('#cycle').is_visible() and page.evaluate('phaseAt(today)') is None
+ assert page.locator('#cycle').get_attribute('data-available')=='false' and page.evaluate('phaseAt(today)') is None
  assert page.locator('#profile-month').count()==0
  page.reload()
  assert page.locator('#profile-status').input_value()=='lactating' and norm('potassium')==2800
