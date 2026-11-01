@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict');
 require('../norms.js');
-const p=(age,sex='female',status='none',ageUnit='years')=>({age,sex,status,ageUnit,weight:60,month:3});
+const p=(age,sex='female',status='none',ageUnit='years')=>({age,sex,status,ageUnit,weight:60});
 const value=(key,profile)=>LunaDRI.get(key,profile)?.value??null;
 // Selected independent DRI reference cases and boundary regressions.
 assert.equal(value('potassium',p(35)),2600);
@@ -44,4 +44,11 @@ for(const key of LunaDRI.keys){
  assert.deepEqual(LunaDRI.get(key,{...p(35,'female','pregnant'),month:1}),LunaDRI.get(key,{...p(35,'female','pregnant'),month:9}));
  assert.deepEqual(LunaDRI.get(key,{...p(35),weight:45}),LunaDRI.get(key,{...p(35),weight:90}));
 }
-console.log('PASS: DRI reference cases, children and infant boundaries, sex, pregnancy, planning, unsupported profiles, no fabricated month/weight scaling');
+// Lactation has its own references, never a fallback to pregnancy or nonpregnant adults.
+const nursing=p(35,'female','lactating');
+for(const [key,expected]of Object.entries({potassium:2800,phosphorus:700,iron:9,iodine:290,choline:550,folate:500,biotin:35,a:1300,e:19,c:120,magnesium:320,chromium:45}))assert.equal(value(key,nursing),expected,key);
+assert.equal(value('magnesium',p(25,'female','lactating')),310);
+for(const [key,expected]of Object.entries({calcium:1300,magnesium:360,potassium:2500,phosphorus:1250,iron:10,c:115,a:1200,chromium:44}))assert.equal(value(key,p(17,'female','lactating')),expected,key);
+for(const profile of [p(13,'female','lactating'),p(51,'female','lactating'),p(35,'male','lactating'),p(35,'female','unknown')])assert.equal(value('iron',profile),null);
+for(const key of LunaDRI.keys){assert.ok(LunaDRI.get(key,nursing)?.value>0,key);assert.deepEqual(LunaDRI.get(key,nursing),LunaDRI.get(key,{...nursing,month:9}));}
+console.log('PASS: DRI reference cases, age and sex boundaries, pregnancy, lactation, unsupported states, legacy month ignored, no weight scaling');

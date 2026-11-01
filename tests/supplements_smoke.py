@@ -27,11 +27,17 @@ with sync_playwright() as p:
  for key in ['ala','la','omega6','epa','dha']:
   assert page.locator(f'#supplement-nutrient option[value="{key}"]').count()==0
  assert page.locator('#supplement-nutrient option[value="omega3"]').count()==1
- def profile(age,sex='female',status='none',month=None,unit='years'):
+ assert page.locator('#profile-month').count()==0
+ page.evaluate("state.profile={name:'Прежний профиль',sex:'female',age:35,ageUnit:'years',weight:64,status:'pregnant',month:3};save()")
+ page.reload()
+ assert page.locator('#profile-status').input_value()=='pregnant'
+ assert page.locator('#profile-weight').input_value()=='64'
+ assert 'месяц' not in page.locator('#profile-summary').inner_text()
+ assert page.locator('#profile-month').count()==0
+ def profile(age,sex='female',status='none',unit='years'):
   page.locator('#profile-name').fill('Тестовый профиль');page.locator('#profile-age-unit').select_option(unit);page.locator('#profile-age').fill(str(age));page.locator('#profile-age').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60' if unit=='years' else '7.5')
   if sex=='female' and unit=='years' and age>=10:
    page.locator('#profile-status').select_option(status)
-   if status=='pregnant':page.locator('#profile-month').select_option(str(month))
   page.locator('#profile-form button').click()
  def norm(key):return page.evaluate('(key)=>reference(key)?.value??null',key)
  profile(35)
@@ -44,15 +50,27 @@ with sync_playwright() as p:
  assert not page.locator('#cycle').is_visible()
  profile(35,status='planning');assert norm('folate')==400
  assert 'до беременности' in page.locator('#profile-advice').inner_text()
- profile(35,status='pregnant',month=3)
+ profile(35,status='pregnant')
  assert norm('potassium')==2900 and norm('magnesium')==360 and norm('iron')==27 and norm('folate')==600
  assert not page.locator('#cycle').is_visible() and page.evaluate('phaseAt(today)') is None
- first=page.evaluate('LunaDRI.keys.map(key=>reference(key))')
- profile(35,status='pregnant',month=9)
- assert first==page.evaluate('LunaDRI.keys.map(key=>reference(key))')
- profile(17,status='pregnant',month=2)
+ assert page.evaluate('!Object.hasOwn(state.profile,"month")')
+ profile(35,status='lactating')
+ assert norm('potassium')==2800 and norm('iron')==9 and norm('iodine')==290 and norm('choline')==550 and norm('folate')==500
+ assert 'Лактация' in page.locator('#profile-advice').inner_text() and 'консультация' in page.locator('#profile-advice').inner_text()
+ assert not page.locator('#cycle').is_visible() and page.evaluate('phaseAt(today)') is None
+ assert page.locator('#profile-month').count()==0
+ page.reload()
+ assert page.locator('#profile-status').input_value()=='lactating' and norm('potassium')==2800
+ profile(17,status='lactating')
+ assert norm('potassium')==2500 and norm('calcium')==1300 and norm('iron')==10
+ profile(13,status='lactating')
+ assert norm('iron') is None and 'не назначаются' in page.locator('#profile-advice').inner_text()
+ profile(35,'male')
+ assert not page.locator('#profile-status-label').is_visible() and page.evaluate('state.profile.status')=='none'
+
+ profile(17,status='pregnant')
  assert norm('phosphorus')==1250 and norm('calcium')==1300 and norm('magnesium')==400
- profile(13,status='pregnant',month=2)
+ profile(13,status='pregnant')
  assert norm('iron') is None and 'не назначаются' in page.locator('#profile-advice').inner_text()
  profile(5);assert norm('potassium')==2300 and norm('phosphorus')==500 and norm('sodium')==1000
  assert not page.locator('#profile-status-label').is_visible()
@@ -61,7 +79,7 @@ with sync_playwright() as p:
  assert 'Взрослый предел' in page.locator('#salt-summary').inner_text()
  profile(71);assert norm('d')==20 and norm('calcium')==1200
  profile(35)
- print('PASS: profile questionnaire, child/infant/teen/adult/elderly/pregnancy references, planning, month-independent DRI, unsupported pregnancy ages, cycle suppression')
+ print('PASS: profile questionnaire, child/infant/teen/adult/elderly/pregnancy references, planning, lactation, legacy profile migration, removed month field, unsupported states, cycle suppression')
  # Archive fields must remain stored when editing a product under the new filtered schema.
  page.get_by_role('button',name='Изменить Прежний продукт',exact=True).click();page.locator('#product-name').fill('Прежний продукт — обновлён');page.locator('#product-save').click()
  assert page.evaluate('state.products[0].sugars')==2
@@ -100,13 +118,14 @@ with sync_playwright() as p:
  page.locator('#supplement-nutrient').select_option('d');page.locator('#supplement-dose').fill('600');page.locator('#supplement-unit').select_option('iu');page.locator('#supplement-form button').click()
  assert '15 / 15 мкг · 100%' in row('d').inner_text()
  assert page.locator('#supplement-history .record').count()==3
+ profile(35,status='lactating')
  with page.expect_download() as download:page.locator('#export-data').click()
  data=json.loads(Path(download.value.path()).read_text())
- assert data['profile']['age']==35 and len(data['supplements'])==4
+ assert data['profile']['age']==35 and data['profile']['status']=='lactating' and 'month' not in data['profile'] and len(data['supplements'])==4
  assert data['supplements'][0]['id']=='old-omega6'
  ctx.set_offline(True);page.reload()
  assert page.locator('#connection').inner_text()=='Без интернета'
- assert norm('potassium')==2600 and page.locator('#profile-name').input_value()=='Тестовый профиль'
+ assert norm('potassium')==2800 and page.locator('#profile-status').input_value()=='lactating' and page.locator('#profile-name').input_value()=='Тестовый профиль'
  assert page.locator('#supplement-history .record').count()==3
  page.locator('#supplement-history .record').first.locator('button').click()
  assert '0 / 1.1 г' in row('ala').inner_text() or 'Нет данных' in row('ala').inner_text()
