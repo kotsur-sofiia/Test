@@ -1,3 +1,4 @@
+from profile_form import fill_birth_date
 """Bottom navigation, contextual profile menu and preservation of existing diary state."""
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
@@ -13,16 +14,16 @@ with sync_playwright() as p:
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Arial')
  assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Голосовая запись','Библиотека','Друзья']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
- assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Обо мне','⚙Настройки','◎Цели']
+ assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Обо мне','◉Аккаунт','⚙Настройки','◇Подписка']
  page.locator('#profile-name').fill('Несохранённое имя')
  page.locator('[data-menu="profile"] a[href="#settings"]').click();expect(page.locator('#settings')).to_be_visible() and not page.locator('#profile').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
  with page.expect_download() as d:page.locator('#settings-export').click()
  data=json.loads(Path(d.value.path()).read_text());assert 'meals' in data and 'sleep' in data
- page.locator('[data-menu="profile"] a[href="#goals"]').click();expect(page.locator('#goals')).to_be_visible()
+ page.locator('[data-menu="profile"] a[href="#account"]').click();expect(page.locator('#account')).to_be_visible();page.locator('[data-menu="profile"] a[href="#subscription"]').click();expect(page.locator('#subscription')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#profile"]').click();assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
- page.locator('#profile-birthDate').fill('1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
+ fill_birth_date(page,'1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
  bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
  assert page.locator('[data-menu="diary"]').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
  page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'

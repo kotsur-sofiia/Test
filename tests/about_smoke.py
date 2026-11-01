@@ -1,3 +1,4 @@
+from profile_form import fill_birth_date
 """About-me structure, DOB-derived norms, health context, optional device readings and persistence."""
 from playwright.sync_api import sync_playwright, expect
 from datetime import datetime,timezone
@@ -11,9 +12,9 @@ with sync_playwright() as p:
  assert page.locator('#profile h1').inner_text()=='Обо мне'
  assert 'НАЧНЁМ' not in page.locator('#profile').inner_text() and 'Справочные ориентиры учитывают возраст' not in page.locator('#profile').inner_text()
  assert page.locator('#profile-age').count()==0
- assert page.locator('#profile-form fieldset').first.locator('input').count()==2
+ assert page.locator('#profile-form fieldset').first.locator('input:not([type=hidden])').count()==4
  assert page.locator('#profile-form fieldset legend').all_text_contents()==['Общие данные','Женское здоровье','Тело']
- page.locator('#profile-name').fill('София');page.locator('#profile-birthDate').fill('1996-11-02')
+ page.locator('#profile-name').fill('София');fill_birth_date(page,'1996-11-02')
  def save():page.locator('#profile-form>button').click()
  save();assert page.evaluate('state.profile.age')==30 and page.evaluate('reference("iron")') is None
  assert page.evaluate('Object.keys(state.profile.body).length')==0
@@ -58,5 +59,5 @@ with sync_playwright() as p:
  # Migration keeps the prior known age for references, without fabricating a birthday.
  ctx=b.new_context();ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],profile:{name:'Прежний профиль',age:7,ageUnit:'months',weight:7.5,sex:'female',status:'none'}}))")
  page=ctx.new_page();page.goto(URL);assert page.locator('#profile-birthDate').input_value()=='' and page.locator('#profile-weight').input_value()=='7.5' and page.evaluate('reference("iron")') is None
- page.locator('#profile-birthDate').fill(page.evaluate('localDate()'));page.locator('#profile-form>button').click();assert page.evaluate('state.profile.legacyAge.age')==7 and page.evaluate('profileAge()')==0
+ fill_birth_date(page,page.evaluate('localDate()'));page.locator('#profile-form>button').click();assert page.evaluate('state.profile.legacyAge.age')==7 and page.evaluate('profileAge()')==0
  b.close();print('PASS: mobile About me/date/sections, DOB age and nutrition, optional body metrics/BMI, health states and cycle suppression, pregnancy/lactation, no inferred fertility, legacy preservation, validation/quota rollback, responsive inputs, offline/export')

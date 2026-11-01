@@ -5,7 +5,6 @@
  const Recognition=window.SpeechRecognition||window.webkitSpeechRecognition;
  const contexts=[
   {id:'capture',name:'Голосовая запись',mode:'capture',anchor:'#capture-form'},
-  {id:'profile-fill',name:'Мой профиль',mode:'profile',anchor:'#profile-form',before:true},
   {id:'cycle',name:'Цикл',anchor:'#cycle-form',before:true},
   {id:'sleep',name:'Сон',anchor:'#sleep-form',before:true},
   {id:'food',name:'Питание',anchor:'#food-form',before:true,master:true,fields:[['local-product-search','Название для поиска в моих продуктах']]},
