@@ -8,6 +8,7 @@ with sync_playwright() as p:
  ctx=browser.new_context(viewport={'width':1440,'height':1050},timezone_id='Europe/Podgorica')
  page=ctx.new_page(); errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(os.environ.get('LUNA_TEST_URL', 'http://127.0.0.1:8001/Test/'));page.wait_for_function('navigator.serviceWorker.controller !== null')
+ page.evaluate("state.profile={name:'Тест',sex:'female',age:35,ageUnit:'years',weight:60,status:'none',month:null};save()")
  assert page.locator('#cycle-summary').inner_text()=='Познакомимся?'
  today=datetime.strptime(page.evaluate('today'),'%Y-%m-%d')
  day=lambda n:(today+timedelta(days=n)).strftime('%Y-%m-%d')

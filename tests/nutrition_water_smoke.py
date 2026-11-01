@@ -8,7 +8,7 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox'])
  ctx=browser.new_context(viewport={'width':1280,'height':950},timezone_id='Europe/Podgorica')
  # Existing v1 user records must survive the additive migration.
- ctx.add_init_script("""if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:['2026-10-10'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'legacy',date:new Date().toLocaleDateString('en-CA'),product:'oats',grams:100}]}));""")
+ ctx.add_init_script("""if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({profile:{name:'Тест',sex:'female',age:35,ageUnit:'years',weight:60,status:'none',month:null},periods:['2026-10-10'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'legacy',date:new Date().toLocaleDateString('en-CA'),product:'oats',grams:100}]}));""")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  assert page.locator('#food-calories').inner_text()=='379 ккал'
