@@ -1,7 +1,9 @@
 /* Woman · botanical editorial. Existing forms and data remain in place. */
 :root {
-  --forest:#24382d; --olive:#576045; --paper:#f3eee5; --sand:#e9d9ca;
-  --clay:#9d592e; --earth:#6b4c3b; --ink:#29382e; --muted:#5c6657;
+  --forest:#354329; --olive:#59643d; --paper:#f1e9db; --sand:#e9d9ca;
+  --clay:#805035; --earth:#6b4c3b; --ink:#303b27; --muted:#60624c;
+  --blend:clamp(220px,28vw,320px);
+  --blend-mask:linear-gradient(to bottom,transparent 0%,#00000005 12%,#0000001f 28%,#00000080 50%,#000000e0 72%,#000000fa 88%,#000 100%);
   --border:#d3cbbd; --accent:var(--forest);
   --sans:Manrope,Arial,sans-serif;
   --display:'Cormorant Garamond',Georgia,serif;
@@ -11,7 +13,7 @@ html { scroll-padding-top:24px; }
 body { color:var(--ink); font:400 15px/1.75 var(--sans); }
 body::before,body::after { display:none; }
 body .app-backdrop { background:var(--forest); }
-body .app-backdrop img { filter:brightness(.42) saturate(.65); opacity:1; }
+body .app-backdrop img { filter:brightness(.46) saturate(.78) sepia(.12); opacity:1; }
 body .layout { width:calc(100% - 48px); max-width:880px; margin:28px auto 0; }
 html body .layout main,html body[data-view=diary][data-section=cycle] .layout main {
   padding:0; background:transparent; border:0; border-radius:36px 36px 0 0;
@@ -37,9 +39,13 @@ body input,body select,body textarea,body .profile-group textarea {
 body input::placeholder,body textarea::placeholder { color:#6b705f; opacity:1; }
 body :is(button,a,input,select,textarea,summary):focus-visible { outline:2px solid #9d592e; outline-offset:4px; }
 body button,body .cycle-mark-start { background:var(--forest); border-color:var(--forest); color:var(--paper); }
-body button:not(.day):not(:disabled):hover { background:#344a37; color:var(--paper); }
+body button:not(.day):not(:disabled):hover { background:#465336; color:var(--paper); }
 body .secondary,body .water-presets button,body .voice-note-actions button,body .icon-button {
   background:var(--forest)!important; border-color:var(--forest)!important; color:var(--paper)!important;
+}
+body .secondary:not(:disabled):hover,body .water-presets button:not(:disabled):hover,
+body .voice-note-actions button:not(:disabled):hover,body .icon-button:not(:disabled):hover {
+  background:#465336!important; border-color:#465336!important; color:var(--paper)!important;
 }
 body .text-link { color:#704325; text-underline-offset:5px; }
 /* The shared date and diary opening form one quiet, dark chapter. */
@@ -54,23 +60,41 @@ body .section-navigation { margin:0; padding:12px 24px 20px; background:var(--fo
 body .section-navigation nav a { color:var(--paper); font-size:12px; }
 body .section-navigation nav a.active,body .section-navigation nav a.active:hover { background:var(--sand); color:var(--forest); border-color:var(--sand); }
 body .section-navigation nav a:hover { background:#ffffff12; color:var(--paper); }
-/* Large chapter surfaces blend for 112px before their readable content begins. */
+/* Long eased blends: both pigment and texture settle before the text begins. */
 body .nature-panel { --surface:var(--paper); --previous:var(--surface); position:relative; isolation:isolate; }
 body .nature-dark { --surface:var(--forest); color:var(--paper); --muted:#d7dccc; }
 body .nature-light { --surface:var(--paper); color:var(--ink); }
+body .nature-clay { --surface:var(--clay); }
 body .nature-from-dark { --previous:var(--forest); }
 body .nature-from-light { --previous:var(--paper); }
+body .nature-from-olive { --previous:var(--olive); }
+body #cycle .period-editor { --previous:var(--clay); }
 body .nature-panel::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background:var(--surface); }
+body .nature-panel.nature-light::before {
+  background:linear-gradient(to bottom,var(--paper),#f1e9dbba 22%,#f1e9dbc9 78%,var(--paper)),url('./assets/sand-waterfall.webp') center/cover;
+}
+body #profile.nature-light::before {
+  background:linear-gradient(to bottom,var(--paper),#f1e9dbd9 22%,#f1e9dbeb 78%,var(--paper)),url('./assets/linen-olive.webp') center top/cover;
+}
 body .nature-panel.nature-leaf::before {
-  background:linear-gradient(100deg,#24382df0,#24382dbf),url('./assets/olive-leaves.webp') center 48%/cover;
+  background:linear-gradient(to bottom,var(--forest),#354329c9 18%,#354329db 76%,var(--forest)),url('./assets/dew-monstera.webp') center 48%/cover;
 }
 body .nature-panel.nature-water::before {
-  background:linear-gradient(90deg,#24382df5,#24382dd4),url('./assets/garden-spa.webp') center 80%/cover;
+  background:linear-gradient(to bottom,var(--forest),#354329e3 18%,#354329e8 76%,var(--forest)),url('./assets/garden-spa.webp') center 80%/cover;
 }
-body .nature-panel.nature-from-dark::before,body .nature-panel.nature-from-light::before {
-  mask-image:linear-gradient(transparent,#000 112px); -webkit-mask-image:linear-gradient(transparent,#000 112px);
+body .nature-panel.nature-clay::before {
+  background:linear-gradient(to bottom,var(--clay),#805035b3 24%,#805035b3 75%,var(--clay)),url('./assets/clay-grain.svg') center/cover;
 }
-body .nature-panel.nature-from-dark,body .nature-panel.nature-from-light { background:var(--previous); }
+body .nature-panel.nature-from-dark::before,body .nature-panel.nature-from-light::before,
+body .nature-panel.nature-from-olive::before,body :is(.food-grid,.sleep-grid)>.card+article::before {
+  mask-image:var(--blend-mask),linear-gradient(#000,#000);
+  mask-size:100% var(--blend),100% calc(100% - var(--blend) + 1px);
+  mask-position:top,bottom; mask-repeat:no-repeat;
+  -webkit-mask-image:var(--blend-mask),linear-gradient(#000,#000);
+  -webkit-mask-size:100% var(--blend),100% calc(100% - var(--blend) + 1px);
+  -webkit-mask-position:top,bottom; -webkit-mask-repeat:no-repeat;
+}
+body .nature-panel.nature-from-dark,body .nature-panel.nature-from-light,body .nature-panel.nature-from-olive { background:var(--previous); }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:12px 32px 42px; margin:0; border-radius:0; border:0;
   background:var(--forest); overflow:hidden;
@@ -83,14 +107,14 @@ body .diary-shell .day-widget .mini .topic-label,body .diary-shell .add-widget .
   color:var(--paper); font:500 12px/1.7 var(--sans); letter-spacing:0; overflow-wrap:normal;
 }
 body .diary-shell .topic-orb { width:82px; height:82px; border:1px solid #d9dfc75e; }
-body .diary-shell .mini.active .nature-topic-image { border-color:#f3eee5; box-shadow:0 0 0 5px #24382d,0 0 0 6px #b3bf94; }
-body .diary-shell .add-widget .topic-orb { border:1px solid #b9c4a77a; background:#f3eee509; color:var(--paper); }
-body .diary-shell .add-widget:hover .topic-orb { background:#f3eee514; border-color:var(--paper); }
+body .diary-shell .mini.active .nature-topic-image { border-color:#f1e9db; box-shadow:0 0 0 5px #354329,0 0 0 6px #b3bf94; }
+body .diary-shell .add-widget .topic-orb { border:1px solid #b9c4a77a; background:#f1e9db09; color:var(--paper); }
+body .diary-shell .add-widget:hover .topic-orb { background:#f1e9db14; border-color:var(--paper); }
 /* Cycle: ivory dial, deep water for care, ivory for dates. No nested frames. */
 html body[data-view=diary][data-section=cycle] #cycle { gap:0; margin:0; padding:0; background:transparent; border:0; }
 html body #cycle .cycle-dial-card,html body #cycle .cycle-recommendations,html body #cycle .period-editor {
   max-width:none; width:100%; border:0; border-radius:0; margin:0;
-  padding:136px 40px 48px; box-shadow:none; background:var(--previous);
+  padding:calc(var(--blend) + 24px) 40px 48px; box-shadow:none; background:var(--previous);
 }
 body .cycle-date-row { margin-bottom:26px; }
 body .cycle-date-row h2 { font:500 37px/1.15 var(--display); }
@@ -108,6 +132,7 @@ body .cycle-mark-start { min-height:50px; padding:14px 24px; font-size:13px; }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
 html body .nature-dark #phase-title,html body .nature-dark #phase-description { color:var(--paper); }
 html body .nature-dark :is(.fine,.muted,.tip p,.callout) { color:#d7dccc; }
+html body .nature-clay :is(.fine,.muted,.tip p,.callout) { color:#f8eddf; }
 body .cycle-recommendation-heading { align-items:flex-start; flex-wrap:wrap; }
 body .cycle-recommendation-heading h2 { font-size:40px; }
 body .cycle-recommendations #phase-title { font:500 28px/1.25 var(--display); margin:26px 0 16px; }
@@ -115,22 +140,26 @@ body .cycle-recommendations .tip { border-color:#d7dccc30; padding:22px 0; }
 body .cycle-recommendations .tip b { font:600 15px/1.5 var(--sans); }
 body .cycle-recommendations .tip p { font-size:14px; line-height:1.85; }
 body .pill,body .badge { border-color:#b4bca8; background:#e9d9ca; color:var(--forest); font:500 11px/1.5 var(--sans); }
-body .nature-dark .pill { border:1px solid #d7dccc50; background:#f3eee50c; color:var(--paper); }
+body .nature-dark .pill { border:1px solid #d7dccc50; background:#f1e9db0c; color:var(--paper); }
 body .nature-dark .callout { background:transparent; border:0; border-top:1px solid #d7dccc30; padding:20px 0 0; font-size:12px; }
 body .period-editor>h2 { font:500 38px/1.15 var(--display); margin-bottom:28px; }
 body #cycle-form { gap:17px; }
 body .period-record { background:#e9d9ca55; border-color:#d3cbbd; border-radius:20px; }
 /* Other topics enter on ivory; their large secondary blocks alternate textures. */
 html body main>section:not(#cycle):not(#profile),html body #profile {
-  background:linear-gradient(var(--forest),var(--paper) 112px); border:0;
-  margin:0; padding:136px 40px 48px; border-radius:0; box-shadow:none;
+  background:var(--previous); border:0;
+  margin:0; padding:calc(var(--blend) + 24px) 40px 48px; border-radius:0; box-shadow:none;
 }
 body .section>.section-title { padding:0; margin:0 0 28px; }
 body :is(.food-grid,.sleep-grid) { display:grid; grid-template-columns:minmax(0,1fr); gap:0; }
 body :is(.food-grid,.sleep-grid)>.card { padding:28px 0 36px; background:transparent; border:0; border-radius:0; }
 body :is(.food-grid,.sleep-grid)>.card+article {
-  padding:112px 32px 40px; margin:0 -40px; color:var(--paper);
-  background:linear-gradient(var(--paper),#576045ed 112px),url('./assets/olive-leaves.webp') center/cover;
+  padding:calc(var(--blend) + 24px) 32px 40px; margin:0 -40px; color:var(--paper);
+  background:var(--paper); position:relative; isolation:isolate;
+}
+body :is(.food-grid,.sleep-grid)>.card+article::before {
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:linear-gradient(to bottom,var(--olive),#59643ded 24%,#59643ded 76%,var(--olive)),url('./assets/dew-monstera.webp') center/cover;
 }
 body :is(.food-grid,.sleep-grid)>.card+article :is(h3,h4,.fine,.muted,.nutrient-label,.nutrient-note,.nutrient-label small,.nutrient-source,.nutrient-subtype,.nutrient-group>summary,.nutrient-fieldset legend,.bar-wrap small,.big-number) { color:var(--paper); }
 body :is(.food-grid,.sleep-grid)>.card+article :is(label,.reference-details>summary) { color:var(--paper); }
@@ -139,14 +168,14 @@ body :is(.food-grid,.sleep-grid)>.card+article .voice-card { background:var(--pa
 body :is(.food-grid,.sleep-grid)>.card+article .voice-card :is(label,p,.fine,.voice-status,.voice-interim) { color:var(--ink); }
 body .food-grid .nutrient-heading h3 { font:500 32px/1.15 var(--display); }
 body .history .empty { color:var(--muted); }
-body #food-history { margin:0 -40px; padding:128px 40px 28px; border:0; border-radius:0; background:linear-gradient(#576045,var(--paper) 112px); }
-body #sleep-events { margin:0 -40px; padding:128px 40px 28px; border:0; border-radius:0; background:linear-gradient(#576045,var(--paper) 112px); }
+body #food-history { margin:0 -40px; padding:calc(var(--blend) + 24px) 40px 28px; border:0; border-radius:0; background:var(--olive); }
+body #sleep-events { margin:0 -40px; padding:calc(var(--blend) + 24px) 40px 28px; border:0; border-radius:0; background:var(--olive); }
 body #sleep-history { padding:20px 0; background:transparent; border:0; }
-body .food-grid .macro { background:#f3eee5; border-color:#f3eee5; }
+body .food-grid .macro { background:#f1e9db; border-color:#f1e9db; }
 body .food-grid .macro strong,body .food-grid .macro span { color:var(--forest); }
-body #supplements { padding:128px 40px 24px; background:linear-gradient(#576045,var(--paper) 112px); border:0; border-radius:0; margin:0 -40px; }
+body #supplements { padding:calc(var(--blend) + 24px) 40px 24px; background:var(--olive); border:0; border-radius:0; margin:0 -40px; }
 body #food>.product-tools { margin-top:0; }
-body .water-card::after { content:''; display:block; height:240px; margin:36px -40px -48px; background:linear-gradient(var(--paper),#f3eee500 85px,#f3eee500 65%,var(--paper)),url('./assets/linen-olive.webp') center 92%/cover; pointer-events:none; }
+body .water-card::after { content:''; display:block; height:240px; margin:36px -40px -48px; background:linear-gradient(var(--paper),#f1e9db00 85px,#f1e9db00 65%,var(--paper)),url('./assets/linen-olive.webp') center 92%/cover; pointer-events:none; }
 body .water-card #water-total,body .big-number { font:500 58px/1.2 var(--display); color:var(--forest); }
 body #water .section-title { flex-wrap:wrap; gap:16px; }
 body #water .section-title h3 { font-size:36px; }
@@ -156,16 +185,16 @@ body .voice-card>summary { padding:18px; }
 body .profile-bmi,body .salt-summary,body .salt-block,body .ai-note { background:#e9d9ca; color:var(--ink); border-color:#d3cbbd; }
 body .catalog-item,body .widget-note { background:#e9d9ca70; border-color:#d3cbbd; }
 /* About me: open space for identity, foliage for health, then pale stone. */
-html body #profile { padding:136px 0 40px; }
+html body #profile { padding:calc(var(--blend) + 24px) 0 40px; }
 body .profile-card>h1 { margin:0 40px 30px; }
 body #profile-form { gap:0; }
 body .profile-basics { background:transparent; border:0; padding:0 40px 40px; border-radius:0; }
 body .profile-basic-fields { gap:22px; }
 body .profile-card .about-label { font:500 14px/1.6 var(--sans); }
-html body .profile-card .profile-group { border:0; padding:136px 40px 44px; margin:0; border-radius:0; min-width:0; background:var(--previous); }
+html body .profile-card .profile-group { border:0; padding:calc(var(--blend) + 24px) 40px 44px; margin:0; border-radius:0; min-width:0; background:var(--previous); }
 body .profile-card .profile-group>legend { float:left; width:100%; padding:0; margin:0 0 28px; font:500 38px/1.15 var(--display); }
 body #women-health-fields { clear:both; margin:0; }
-body .nature-dark input,body .nature-dark select,body .nature-dark textarea { color:var(--ink); background:#f3eee5; border-color:#c7c8b7; }
+body .nature-dark input,body .nature-dark select,body .nature-dark textarea { color:var(--ink); background:#f1e9db; border-color:#c7c8b7; }
 body .profile-card .nature-dark .fine { color:#d7dccc; }
 body #profile-body-fields { clear:both; }
 body #profile-form>button { width:calc(100% - 80px); margin:0 40px 24px; }
@@ -186,10 +215,12 @@ body .topic-editor-info .topic-toggle[aria-checked] { background:transparent; bo
 body .topic-drag-handle { background:transparent; color:var(--olive); }
 body .topic-drag-ghost { background:var(--paper); }
 html body main>footer,html body[data-view=diary][data-section=cycle] main>footer {
-  margin:0; padding:32px 32px 120px; background:var(--paper); border-radius:0 0 30px 30px;
+  margin:0; padding:32px 32px 120px; border-radius:0 0 30px 30px;
+  background:linear-gradient(var(--paper),#f1e9dbd9 55%,var(--paper)),url('./assets/sand-waterfall.webp') center/cover;
 }
-body .bottom-nav { background:#f3eee5; border:1px solid #cec7b7; box-shadow:0 8px 36px #101d1b30; border-radius:999px; }
+body .bottom-nav { background:#f1e9db; border:1px solid #cec7b7; box-shadow:0 8px 36px #101d1b30; border-radius:999px; }
 body .bottom-nav a { color:var(--olive); border-radius:999px; }
+body .bottom-nav .capture-tab { color:var(--forest); }
 body .bottom-nav a.active,body .bottom-nav a.active:hover { background:var(--forest); color:var(--paper); }
 body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
 @media(min-width:900px) {
@@ -205,7 +236,7 @@ body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
   body .diary-shell .topic-orb { width:76px; height:76px; }
   body .diary-shell .day-widget .mini,body .diary-shell .add-widget { min-height:112px; }
   html body #cycle .cycle-dial-card,html body #cycle .cycle-recommendations,html body #cycle .period-editor,
-  html body main>section:not(#cycle):not(#profile) { padding:128px 24px 36px; }
+  html body main>section:not(#cycle):not(#profile) { padding:calc(var(--blend) + 24px) 24px 36px; }
   body .cycle-date-row h2 { font-size:34px; }
   body .cycle-date-row { align-items:baseline; }
   body .cycle-recommendation-heading h2 { font-size:36px; }
@@ -218,10 +249,10 @@ body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
   body :is(.food-grid,.sleep-grid)>.card+article { margin:0 -24px; padding-left:24px; padding-right:24px; }
   body #food-history,body #sleep-events,body #supplements { margin-left:-24px; margin-right:-24px; padding-left:24px; padding-right:24px; }
   body .water-card::after { margin:32px -24px -36px; height:180px; }
-  html body #profile { padding:128px 0 36px; }
+  html body #profile { padding:calc(var(--blend) + 24px) 0 36px; }
   body .profile-card>h1 { margin-left:24px; margin-right:24px; }
   body .profile-basics { padding:0 24px 32px; }
-  html body .profile-card .profile-group { padding:128px 24px 36px; }
+  html body .profile-card .profile-group { padding:calc(var(--blend) + 24px) 24px 36px; }
   body .profile-card .profile-group>legend { font-size:34px; }
   body #profile-form>button { width:calc(100% - 48px); margin-left:24px; margin-right:24px; }
   body #profile>:is(p,details) { margin-left:24px; margin-right:24px; }

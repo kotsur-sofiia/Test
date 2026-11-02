@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="960" viewBox="0 0 640 960">
+  <defs>
+    <filter id="soft"><feGaussianBlur stdDeviation="32"/></filter>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency=".32" numOctaves="3" seed="17" stitchTiles="stitch"/>
+      <feColorMatrix type="saturate" values="0"/>
+      <feComponentTransfer>
+        <feFuncR type="linear" slope=".28" intercept=".38"/>
+        <feFuncG type="linear" slope=".21" intercept=".22"/>
+        <feFuncB type="linear" slope=".15" intercept=".14"/>
+      </feComponentTransfer>
+    </filter>
+  </defs>
+  <path fill="#945c40" d="M0 0h640v960H0z"/>
+  <g filter="url(#soft)" fill="none" stroke-linecap="round">
+    <path d="M-80 180C120 0 240 360 710 130M-70 690C170 430 430 890 720 570" stroke="#c48b65" stroke-width="100" opacity=".24"/>
+    <path d="M-90 290C150 140 270 500 730 270M-80 850C240 640 450 1000 740 740" stroke="#613d29" stroke-width="80" opacity=".18"/>
+  </g>
+  <path fill="#945c40" filter="url(#grain)" opacity=".38" d="M0 0h640v960H0z"/>
+</svg>
