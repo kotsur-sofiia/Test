@@ -13,7 +13,7 @@ with sync_playwright() as p:
  page.goto(URL.split('#')[0]+'#food');page.wait_for_function('navigator.serviceWorker.controller !== null')
  assert page.locator('#food-calories').inner_text()=='379 ккал'
  assert '13,2' in page.locator('#macros').inner_text()
- assert page.locator('#period-history .record').count()==1
+ assert page.locator('#period-history .period-record').count()==1
  for key,val in [('name','Мой творог'),('kcal','120'),('protein','10'),('fat','4'),('carbs','10')]:page.locator('#product-'+key).fill(val)
  page.locator('#product-save').click();page.locator('#food-grams').fill('200');page.locator('#food-form button').click()
  assert page.locator('#food-calories').inner_text()=='619 ккал'

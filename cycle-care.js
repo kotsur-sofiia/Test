@@ -31,8 +31,13 @@
     $('#cycle-start-action').hidden=!['empty','awaiting'].includes(s.status);
     $('#cycle-dial-date').textContent=fmtDay(selected);
     $('#cycle-dial-day').textContent=s.day??'—';$('#cycle-dial-day').style.fontSize=s.day>9999?'36px':s.day>999?'44px':'';
-    $('#cycle-dial-phase').textContent=s.phaseName || (s.status==='empty'?'Добавь начало цикла':s.status==='awaiting'?'Фаза не определена':'Расчёт фазы недоступен');
-    $('#cycle-dial-countdown').textContent=s.remaining>0?'До менструации ≈ '+days(s.remaining):s.status==='awaiting'?(s.overdue?'Ожидаемая дата прошла '+days(s.overdue)+' назад':'Ожидаемая дата сегодня'):s.status==='empty'?'Пока нет отметки':'Без календарного прогноза';
+    const names={menstrual:'МЕНСТРУАЛЬНАЯ',follicular:'ФОЛЛИКУЛЯРНАЯ',ovulation:'ОВУЛЯТОРНАЯ',luteal:'ЛЮТЕИНОВАЯ'};
+    $('#cycle-phase-name').textContent=names[s.phase]||(s.status==='empty'?'ОТМЕТЬ НАЧАЛО':s.status==='awaiting'?'НЕИЗВЕСТНАЯ':'БЕЗ ПРОГНОЗА');
+    $('#cycle-phase-word').textContent=s.phase||s.status==='awaiting'?'фаза':s.status==='empty'?'цикла':'фазы';
+    const delayed=s.status==='awaiting'&&s.overdue>0;
+    $('#cycle-dial-countdown').classList.toggle('is-delayed',delayed);
+    $('#cycle-countdown-label').textContent=delayed?'ЗАДЕРЖКА':'до менструации';
+    $('#cycle-countdown-value').textContent=delayed?days(s.overdue):s.remaining>0?'≈ '+days(s.remaining):s.status==='awaiting'?'ожидается сегодня':s.status==='empty'?'нет данных':'без прогноза';
     $('#cycle-dial-note').textContent=s.status==='awaiting'?'Новый цикл начнётся с твоей следующей отметки. Ожидаемая дата — не подтверждение менструации.':'Фаза и дата следующей менструации — ориентировочная оценка, а не подтверждение овуляции.';
     $('#cycle-dial').setAttribute('aria-label',[s.phaseName||'Фаза не определена',s.day?'День цикла '+s.day:'Нет отметки начала',$('#cycle-dial-countdown').textContent].join('. '));
     $('#cycle-dial').dataset.status=s.status;
@@ -76,7 +81,7 @@
   }
   function refreshDay() {
     const now=localDate();
-    if(now!==lastDay){if(selected===lastDay)selected=now;lastDay=now;$('#period-start').max=now;renderCycle();}
+    if(now!==lastDay){if(selected===lastDay)selected=now;lastDay=now;window.WomanPeriodEditor?.render();renderCycle();}
     else refresh();
   }
   $('#cycle-ai-request').onclick=request;

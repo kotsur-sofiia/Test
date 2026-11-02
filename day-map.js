@@ -103,6 +103,8 @@
     books:'<path d="M3 4h5c2 0 4 1 4 2 0-1 2-2 4-2h5v15h-5c-2 0-4 1-4 2 0-1-2-2-4-2H3ZM12 6v15"/>',
     affirmation:'<path d="M12 20 4 12C-2 5 7 0 12 7c5-7 14-2 8 5Z"/>'
   };
+  const natureTiles={cycle:0,food:1,water:2,skin:3,affirmation:4,meditation:5,books:6,activity:7,drawing:8,sleep:9,membership:10};
+  function natureIcon(element,id){const tile=natureTiles[id]??11;element.replaceChildren();element.classList.add('nature-topic-image');element.style.setProperty('--nature-x',(tile%4)*100/3+'%');element.style.setProperty('--nature-y',Math.floor(tile/4)*50+'%');}
   function decorate(card, topic) {
     const link = card.querySelector('.mini');
     if (!link.querySelector('.topic-orb')) {
@@ -111,7 +113,7 @@
       if (iconPaths[topic.id]) orb.innerHTML = '<svg viewBox="0 0 24 24">'+iconPaths[topic.id]+'</svg>';
       else orb.textContent = '✧';
       const label = link.querySelector('span'); label.className = 'topic-label'; label.textContent = topic.title;
-      link.prepend(orb);
+      natureIcon(orb,topic.id);link.prepend(orb);
     }
     link.setAttribute('aria-label',topic.title);
   }
@@ -210,7 +212,7 @@
       const row=document.createElement('div');row.className='topic-editor-row'+(enabled?' is-enabled':'');row.dataset.topic=id;
       const info=document.createElement('div');info.className='topic-editor-info';
       const icon=textEl('span',topic.icon,'widget-choice-icon');icon.setAttribute('aria-hidden','true');
-      if(iconPaths[id])icon.innerHTML='<svg viewBox="0 0 24 24">'+iconPaths[id]+'</svg>';
+      natureIcon(icon,id);
       const description=document.createElement('div');description.className='topic-editor-description';
       description.append(textEl('strong',topic.title),textEl('small',!available(id)?'Недоступен по сведениям анкеты':topic.hint));
       info.append(icon,description);

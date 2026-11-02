@@ -25,7 +25,7 @@ with sync_playwright() as p:
  def end():page.evaluate('window.__speech.at(-1).end()')
  def phrase(root,text):
   root.locator('.voice-start').click();emit([{'text':text,'final':True}]);end()
- assert page.locator('.voice-card').count()==8
+ assert page.locator('.voice-card').count()==7
  assert page.evaluate('__speech.length')==0,'Microphone must never start automatically'
  sleep=widget('sleep');sleep.locator('.voice-editor').fill('Сегодня')
  sleep.locator('.voice-start').click()
@@ -59,7 +59,7 @@ with sync_playwright() as p:
  profile=widget('products');profile.locator('.voice-target').select_option('note');phrase(profile,'<img src=x onerror="window.__unsafe=true">');profile.locator('.voice-save').click()
  assert profile.locator('.voice-note img').count()==0
  assert '<img' in profile.locator('.voice-history').inner_text() and page.evaluate('window.__unsafe===undefined')
- cycle=widget('cycle');phrase(cycle,'Запись о самочувствии');cycle.locator('.voice-save').click();assert page.evaluate('state.periods.length')==0
+ assert page.locator('[data-voice-section=cycle]').count()==0
  water=widget('water');phrase(water,'Выпила стакан воды');water.locator('.voice-save').click();assert page.evaluate('state.water.length')==0
  print('PASS: dictation to text fields in every form, no automatic catalog request or health calculation, plain-text rendering, separate section notes')
  # Errors recover without losing draft text. Late events from a failed recognizer are ignored.
@@ -100,16 +100,16 @@ with sync_playwright() as p:
  assert page.evaluate('__speech.at(-1).aborted') is True
  emit([{'text':'этот поздний результат не нужен','final':True}]);assert food.locator('.voice-editor').input_value()==''
  assert food.locator('.voice-date').input_value()==yesterday
- # Changing profile to hide the cycle also stops its microphone.
- cycle=widget('cycle');cycle.locator('.voice-start').click();page.evaluate("state.profile={name:'Тест',sex:'male',age:35,ageUnit:'years',weight:70,status:'none'};save()")
+ # Leaving the water diary for Profile stops its microphone; cycle has no voice input.
+ water=widget('water');water.locator('.voice-start').click();page.locator('.bottom-nav [data-view=profile]').click();page.evaluate("state.profile={name:'Тест',sex:'male',age:35,ageUnit:'years',weight:70,status:'none'};save()")
  assert page.evaluate('__speech.at(-1).aborted') is True
  assert not page.locator('#cycle').is_visible()
- print('PASS: explicit note dates, draft date retained across diary navigation, stale date results ignored, microphone stopped when a section is hidden')
+ print('PASS: explicit note dates, draft date retained across diary navigation, stale date results ignored, microphone stopped when leaving a section')
  with page.expect_download() as download:page.locator('#export-data').click()
  data=json.loads(Path(download.value.path()).read_text());assert len(data['voiceNotes'])==before+2
  assert all(isinstance(n['text'],str) and 'audio' not in n for n in data['voiceNotes'])
  ctx.set_offline(True);page.reload()
- assert page.locator('.voice-card').count()==8 and page.evaluate('navigator.onLine') is False
+ assert page.locator('.voice-card').count()==7 and page.evaluate('navigator.onLine') is False
  sleep=widget('sleep');assert 'Дополнение' in sleep.locator('.voice-history').inner_text()
  note_id=page.evaluate("state.voiceNotes.find(n=>n.section==='sleep').id")
  sleep.get_by_role('button',name=f'Удалить заметку {note_id}',exact=True).click();page.reload();sleep=widget('sleep');assert sleep.locator('.voice-note').count()==0

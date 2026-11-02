@@ -47,7 +47,7 @@ with sync_playwright() as p:
  for width in [320,375,390,430]:
   page.set_viewport_size({'width':width,'height':844});layout()
   page.screenshot(path=f'/tmp/luna-check/mobile-food-{width}.png')
- diary('cycle');layout();assert page.locator('.day').first.bounding_box()['height']>=44
+ diary('cycle');layout();assert page.locator('#calendar').count()==0 and page.locator('#cycle input[type=date]').count()==2
  diary('sleep');assert voice.locator('.voice-editor').input_value()=='Телефонный черновик'
  diary('food');assert page.locator('#food-grams').input_value()=='175'
  # Every screen size keeps a single diary topic without losing inputs.
@@ -56,7 +56,7 @@ with sync_playwright() as p:
  assert page.locator('#food-grams').input_value()=='175'
  page.set_viewport_size({'width':390,'height':844});expect(page.locator('#sleep')).not_to_be_visible()
  page.evaluate('scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')
- privacy=page.locator('.privacy-details>summary').bounding_box();assert privacy['y']+privacy['height']<=nav.bounding_box()['y']
+ privacy=page.locator('footer button:not([hidden])').last.bounding_box();assert privacy['y']+privacy['height']<=nav.bounding_box()['y']
  ctx.set_offline(True);page.reload();expect(page.locator('#food')).to_be_visible();layout()
  assert page.locator('#food-calories').inner_text()=='379 ккал' and page.locator('#water-total').inner_text()=='300 мл'
  open_about(page);assert page.locator('#profile-name').input_value()=='София'

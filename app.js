@@ -8,6 +8,7 @@ try { const s=JSON.parse(localStorage.getItem(KEY)); state=s && Array.isArray(s.
 if(!Array.isArray(state.products))state.products=[];
 if(!Array.isArray(state.water))state.water=[];
 if(!Array.isArray(state.supplements))state.supplements=[];
+if(!state.periodEnds||typeof state.periodEnds!=='object'||Array.isArray(state.periodEnds))state.periodEnds={};
 state.waterSettings={glass:250,bottle:500,container:'glass',...(state.waterSettings||{})};
 function save(){let persisted=true;try{localStorage.setItem(KEY,JSON.stringify(state));if($('#notice').textContent==='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.')$('#notice').textContent='';}catch{persisted=false;$('#notice').textContent='Не удалось сохранить данные. Проверь свободное место или скачай резервную копию.';}render();return persisted;}
 function localDate(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}
@@ -21,37 +22,18 @@ const fmtTime=s=>new Date(s).toLocaleString('ru',{day:'numeric',month:'short',ho
 const duration=m=>`${Math.floor(m/60)} ч ${Math.round(m%60)} мин`;
 function renderCurrentDate(now=new Date()){const dateHeading=now.toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'});$('#today').textContent=dateHeading.charAt(0).toLocaleUpperCase('ru')+dateHeading.slice(1)+' '+now.getFullYear()+' год';$('#today').dateTime=localDate(now);}
 renderCurrentDate();
-$('#period-start').max=today;$('#period-start').value=today;$('#food-date').value=today;
+$('#food-date').value=today;
 $('#cycle-length').value=state.cycleLength;$('#period-length').value=state.periodLength;
 const phases={menstrual:{name:'Менструация',food:'Включай источники железа: бобовые, мясо, зелень. Витамин C помогает усвоению растительного железа.',move:'Прогулка, мягкая растяжка или привычная тренировка по самочувствию. Отдых тоже подходит.',care:'Замечай боль, интенсивность кровотечения и усталость. Сильная боль не должна становиться привычной.'},follicular:{name:'Фолликулярная фаза',food:'Разнообразный рацион: овощи, цельные злаки, белок и полезные жиры. Специальная диета по фазе не обязательна.',move:'Если энергии достаточно, постепенно увеличивай нагрузку. Выбирай то, что нравится.',care:'Отмечай изменения энергии и настроения — твой личный опыт полезнее универсального расписания.'},ovulation:{name:'Овуляция · ориентировочно',food:'Продолжай привычное сбалансированное питание и пей по жажде. Особые продукты для овуляции не нужны.',move:'Ориентируйся на восстановление и привычный уровень нагрузки. Фаза сама по себе не требует рекордов.',care:'Это только оценка по длине цикла, а не подтверждённая овуляция или надёжное «фертильное окно».'},luteal:{name:'Лютеиновая фаза',food:'Регулярные приёмы пищи, клетчатка и белок помогают насыщению. Допустимо учитывать изменения аппетита.',move:'При усталости снизь интенсивность, выбери ходьбу, йогу или отдых. Если чувствуешь себя хорошо, сохраняй обычную активность.',care:'Отмечай сон, настроение и симптомы ПМС. Если они мешают обычной жизни, обсуди это с врачом.'}};
 function phaseAt(date){if(!canPredictCycle(state.profile))return null;const starts=state.periods.filter(s=>s<=date).sort();if(!starts.length)return null;const base=starts.at(-1);const elapsed=dayDiff(date,base);const day=elapsed%state.cycleLength+1;const ov=Math.max(state.periodLength+2,state.cycleLength-14);const key=day<=state.periodLength?'menstrual':day<ov-1?'follicular':day<=ov+1?'ovulation':'luteal';return {key,day,projected:elapsed>=state.cycleLength};}
 function textEl(tag,text,cls){const el=document.createElement(tag);el.textContent=text;if(cls)el.className=cls;return el;}
 function removeButton(label,fn){const b=textEl('button','×');b.type='button';b.setAttribute('aria-label',label);b.onclick=fn;return b;}
 function renderCycle(){
- $('#month-title').textContent=month.toLocaleDateString('ru',{month:'long',year:'numeric'});const calendar=$('#calendar');calendar.replaceChildren();
- const offset=(month.getDay()+6)%7;for(let i=0;i<offset;i++)calendar.append(document.createElement('span'));
- const count=new Date(month.getFullYear(),month.getMonth()+1,0).getDate();
- for(let d=1;d<=count;d++){const date=localDate(new Date(month.getFullYear(),month.getMonth(),d));const phase=phaseAt(date);const button=textEl('button',String(d),'day'+(phase?' '+phase.key:'')+(date===localDate()?' today':'')+(date===selected?' selected':''));button.setAttribute('aria-label',fmtDay(date)+(phase?`, ${phases[phase.key].name}, день ${phase.day}`:''));button.setAttribute('aria-pressed',String(date===selected));button.onclick=()=>{selected=date;renderCycle();};calendar.append(button);}
- const phase=phaseAt(selected);$('#selected-date').textContent=fmtDay(selected).toUpperCase();$('#phase-tips').replaceChildren();
- $('#phase-title').textContent=phase?phases[phase.key].name:'У каждого тела свой ритм';
- $('#phase-description').textContent=phase?`День ${phase.day} цикла · ${phase.projected?'прогноз нового цикла, начало не отмечено':'оценка по последней отметке'}. Самочувствие важнее расчёта.`:'Добавь дату начала менструации. Затем выбери день в календаре, чтобы посмотреть ориентировочные подсказки.';
- if(phase){for(const [icon,title,key]of[['♧','Питание','food'],['→','Движение','move'],['♡','На что обратить внимание','care']]){const tip=document.createElement('div');tip.className='tip';tip.append(textEl('span',icon));const body=document.createElement('div');body.append(textEl('b',title),textEl('p',phases[phase.key][key]));tip.append(body);$('#phase-tips').append(tip);}}
  window.WomanCycleCare?.render();
- const current=phaseAt(today);$('#cycle-summary').textContent=current?`День ${current.day} цикла`:'Познакомимся?';$('#cycle-sub').textContent=current?phases[current.key].name:'Отметь начало последней менструации';
- const history=$('#period-history');history.replaceChildren();for(const date of [...state.periods].sort().reverse()){const r=textEl('div',`Начало: ${fmtDay(date)} ${parseDay(date).getFullYear()}`,'record');r.append(removeButton(`Удалить отметку ${date}`,()=>{state.periods=state.periods.filter(d=>d!==date);save();}));history.append(r);}
+ const current=phaseAt(localDate());$('#cycle-summary').textContent=current?`День ${current.day} цикла`:'Познакомимся?';$('#cycle-sub').textContent=current?phases[current.key].name:'Отметь начало последней менструации';
+ window.WomanPeriodEditor?.render();
 }
-$('#prev-month').onclick=()=>{month.setMonth(month.getMonth()-1);renderCycle();};$('#next-month').onclick=()=>{month.setMonth(month.getMonth()+1);renderCycle();};
-$('#cycle-form').onsubmit=e=>{
- e.preventDefault();const date=$('#period-start').value,length=Number($('#cycle-length').value),bleeding=Number($('#period-length').value);
- if(!date||date>localDate()||!Number.isInteger(length)||length<21||length>45||!Number.isInteger(bleeding)||bleeding<1||bleeding>10)return;
- const old={cycleLength:state.cycleLength,periodLength:state.periodLength,periods:state.periods,profile:state.profile,selected,month};
- state.cycleLength=length;state.periodLength=bleeding;
- if(state.profile?.health)state.profile={...state.profile,health:{...state.profile.health,cycleLength:length,periodLength:bleeding}};
- if(!state.periods.includes(date))state.periods=[...state.periods,date];
- selected=localDate();month=new Date(parseDay(selected).getFullYear(),parseDay(selected).getMonth(),1);
- if(!save()){state.cycleLength=old.cycleLength;state.periodLength=old.periodLength;state.periods=old.periods;state.profile=old.profile;selected=old.selected;month=old.month;render();return;}
- if(old.profile?.health)for(const [key,value]of [['cycleLength',length],['periodLength',bleeding]]){const input=$('#profile-'+key);if(input.value===String(old.profile.health[key]??''))input.value=value;}
-};
+
 const minutes=s=>(new Date(s.end)-new Date(s.start))/60000;
 function sleepTotals(range){const start=addDays(today,-range+1);const totals={};for(const s of state.sleep){const date=localDate(new Date(s.end));if(date>=start&&date<=today)totals[date]=(totals[date]||0)+minutes(s);}return totals;}
 function renderSleep(){const range=Number($('#sleep-range').value);const totals=sleepTotals(range);const values=Object.values(totals);const sum=values.reduce((a,b)=>a+b,0);$('#sleep-average').textContent=values.length?duration(Math.round(sum/values.length)):'Нет записей';$('#sleep-average-note').textContent=`За ${range} дней · дней с записями: ${values.length} · всего: ${duration(Math.round(sum))}`;
