@@ -8,7 +8,7 @@ URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8035/Test/').split('#')[0]
 Path('/tmp/luna-check').mkdir(exist_ok=True)
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,locale='ru-RU',timezone_id='Europe/Podgorica')
- ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:['2026-10-20'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'legacy-meal',date:'2026-11-02',product:'oats',grams:100}],water:[{id:'legacy-water',date:'2026-11-02',ml:200,container:'glass'}]}))")
+ ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({dayMap:{version:2,topicRailVersion:1,order:['cycle','food','water','skin','activity']},periods:['2026-10-20'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'legacy-meal',date:'2026-11-02',product:'oats',grams:100}],water:[{id:'legacy-water',date:'2026-11-02',ml:200,container:'glass'}]}))")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  expect(page.locator('#cycle')).to_be_visible();assert page.locator('#page-title').text_content()=='Дневник'
  assert page.locator('#edit-day,#connection').count()==0
@@ -37,7 +37,7 @@ with sync_playwright() as p:
  page.locator('#widget-options [data-topic=skin] [data-action=toggle]').click();assert 'skin' not in order();assert page.evaluate('state.dayMap.notes.filter(n=>n.topic==="skin").length')==2
  page.locator('#widget-picker [data-close-dialog]').click();choose('skin');topic('skin');assert 'Мягкий уход' in page.locator('#widget-note-history').inner_text()
  expected=order();page.reload();assert order()==expected
- page.evaluate('''async()=>{const c=await caches.open('luna-diary-v41');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
+ page.evaluate('''async()=>{const c=await caches.open('luna-diary-v42');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
  old=page.evaluate('JSON.stringify(state.dayMap)');page.evaluate('()=>{window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException("full","QuotaExceededError")}}')
  page.locator('#add-widget').click();page.locator('#show-custom-widget').click();page.locator('#custom-widget-title').fill('Не сохранённая тема');page.locator('#custom-widget-form button[type=submit]').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;assert len(order())==len(expected);expect(page.locator('#custom-widget-title')).to_have_value('Не сохранённая тема');page.locator('#widget-picker [data-close-dialog]').click()
  topic('books');page.locator('#widget-note-text').fill('Текст при переполнении');page.locator('#widget-note-form button').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;expect(page.locator('#widget-note-text')).to_have_value('Текст при переполнении')

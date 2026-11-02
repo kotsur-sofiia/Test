@@ -10,11 +10,12 @@
     {id:'affirmation', title:'Аффирмации', hint:'Добрые слова для себя', icon:'♡', href:'#affirmation'},
     {id:'meditation', title:'Медитация', hint:'Практика и ощущения', icon:'☾', prompt:'Как прошла практика?', placeholder:'Практика, её длительность и ощущения после…'},
     {id:'books', title:'Книги', hint:'Страницы, мысли и открытия', icon:'▤', prompt:'Что ты читаешь?', placeholder:'Название книги, прочитанные страницы, мысль на память…'},
-    {id:'activity', title:'Физическая активность', hint:'Тренировки и движение', icon:'↗', href:'#activity'},
+    {id:'activity', title:'Активность', hint:'Тренировки и движение', icon:'↗', href:'#activity'},
     {id:'drawing', title:'Рисование', hint:'Идеи и творческие заметки', icon:'✎', prompt:'Что хочется нарисовать или запомнить?', placeholder:'Идея, материалы, впечатления от рисования…'},
     {id:'sleep', title:'Отдых', hint:'Сон и восстановление', icon:'☾', href:'#sleep'}
   ];
-  const initialOrder = ['cycle','food','water','skin','activity'];
+  const initialOrder = ['cycle','food','skin','books'];
+  const previousInitialOrder = ['cycle','food','water','skin','activity'];
   const grid = $('#day-widgets');
   const picker = $('#widget-picker');
   const nodes = new Map([...grid.children].map(node => [node.dataset.widgetId, node]));
@@ -30,12 +31,14 @@
       custom.push({id:topic.id, title:topic.title.trim().slice(0,40)});
     }
     const known = new Set([...topics,...custom].map(t => t.id));
-    const order = Array.isArray(saved.order) ? [...new Set(saved.order.filter(id => known.has(id)))] : [...initialOrder];
+    let order = Array.isArray(saved.order) ? [...new Set(saved.order.filter(id => known.has(id)))] : [...initialOrder];
+    // Refresh the old default once; preserve deliberately customised maps and all notes.
+    if(saved.topicRailVersion!==1&&order.length===previousInitialOrder.length&&order.every((id,index)=>id===previousInitialOrder[index]))order=[...initialOrder];
     // Put cycle first on upgrade; later explicit ordering in this editor is retained.
     if (saved.version !== 2 && order.includes('cycle')) { order.splice(order.indexOf('cycle'),1); order.unshift('cycle'); }
     // Keep notes for removed cards, including any unknown future topics.
     const notes = Array.isArray(saved.notes) ? saved.notes.filter(n => typeof n?.id === 'string' && typeof n.topic === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(n.date) && typeof n.text === 'string') : [];
-    return {...saved, version:2, order, custom, notes};
+    return {...saved, version:2, topicRailVersion:1, order, custom, notes};
   }
 
   function catalog(map = readMap()) {
@@ -112,7 +115,7 @@
       orb.className = 'topic-orb'; orb.setAttribute('aria-hidden','true');
       if (iconPaths[topic.id]) orb.innerHTML = '<svg viewBox="0 0 24 24">'+iconPaths[topic.id]+'</svg>';
       else orb.textContent = '✧';
-      const label = link.querySelector('span'); label.className = 'topic-label'; label.textContent = topic.title;
+      const label = link.querySelector('span'); label.className = 'topic-label'; label.textContent = topic.title.toLocaleUpperCase('ru');
       natureIcon(orb,topic.id);link.prepend(orb);
     }
     link.setAttribute('aria-label',topic.title);
@@ -176,7 +179,6 @@
     }
     $('#day-empty').hidden = visibleCount > 0;
     if (picker.open) renderPicker();
-    grid.append($('#add-widget'));
     routeChanged(document.body.dataset.topic);
     if (noteTopic && !$('#topic-notes').hidden) renderNotes();
   }
@@ -212,16 +214,15 @@
       const topic=all.find(t=>t.id===id),index=map.order.indexOf(id),enabled=index>=0;
       const row=document.createElement('div');row.className='topic-editor-row'+(enabled?' is-enabled':'');row.dataset.topic=id;
       const info=document.createElement('div');info.className='topic-editor-info';
-      const icon=textEl('span',topic.icon,'widget-choice-icon');icon.setAttribute('aria-hidden','true');
-      natureIcon(icon,id);
       const description=document.createElement('div');description.className='topic-editor-description';
-      description.append(textEl('strong',topic.title),textEl('small',!available(id)?'Недоступен по сведениям анкеты':topic.hint));
-      info.append(icon,description);
+      description.append(textEl('strong',topic.title.toLocaleUpperCase('ru')));description.title=topic.title;
+      info.append(description);
       const toggle=button((enabled?'Выключить: ':'Включить: ')+topic.title,'',()=>toggleTopic(id));
       toggle.className='topic-toggle';toggle.dataset.action='toggle';toggle.setAttribute('role','switch');toggle.setAttribute('aria-checked',String(enabled));
       toggle.disabled=!enabled&&!available(id);const track=document.createElement('span');track.className='switch-track';track.setAttribute('aria-hidden','true');track.append(textEl('span','','switch-knob'));toggle.append(track);info.append(toggle);row.append(info);
+      if(toggle.disabled)toggle.setAttribute('aria-label',topic.title+' — недоступен по сведениям анкеты');
       if(enabled){
-        const grip=button('Переместить: '+topic.title,'⠿',()=>{});grip.className='topic-drag-handle';grip.dataset.action='reorder';grip.setAttribute('aria-pressed','false');grip.setAttribute('aria-describedby','topic-reorder-help');info.append(grip);
+        const grip=button('Переместить: '+topic.title,'⠿',()=>{});grip.className='topic-drag-handle';grip.dataset.action='reorder';grip.setAttribute('aria-pressed','false');grip.setAttribute('aria-describedby','topic-reorder-help');info.prepend(grip);
       }
       list.append(row);
     }

@@ -43,8 +43,9 @@ with sync_playwright() as p:
  assert 'sand-waterfall.webp' in dial.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  care=page.locator('.cycle-recommendations');care_shot=Image.open(BytesIO(care.screenshot()))
  assert 'clay-grain.svg' in care.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
- clay=care_shot.getpixel((4,blend+40))[:3]
- assert clay[0]>clay[1]>clay[2] and contrast(rgb(page.locator('.cycle-recommendations h2').evaluate('(e)=>getComputedStyle(e).color')),clay)>4.5,clay
+ glass=page.locator('.glass-recommendation-body');glass_shot=Image.open(BytesIO(glass.screenshot()))
+ glass_background=glass_shot.getpixel((5,80))[:3]
+ assert contrast(rgb(page.locator('.cycle-recommendations h2').evaluate('(e)=>getComputedStyle(e).color')),glass_background)>4.5,glass_background
  # Each major route must remain navigable at narrow, tablet, desktop and landscape sizes.
  for width,height in [(320,844),(390,844),(768,1024),(1280,900),(844,390)]:
   page.set_viewport_size({'width':width,'height':height})
@@ -56,7 +57,7 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=41','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
+ for path in ['./nature-editorial.css?v=42','./liquid-glass.css?v=42','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
  assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'

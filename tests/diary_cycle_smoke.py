@@ -6,7 +6,7 @@ import os,json
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8035/Test/').split('#')[0]
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);c=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,locale='ru-RU',timezone_id='Europe/Podgorica')
- c.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:['2026-10-13'],cycleLength:28,periodLength:5,sleep:[],meals:[],profile:{name:'Private name',age:35,ageUnit:'years',sex:'female',status:'none',health:{healthNotes:'Private notes'}}}))")
+ c.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({dayMap:{version:2,topicRailVersion:1,order:['cycle','food','water','skin','activity']},periods:['2026-10-13'],cycleLength:28,periodLength:5,sleep:[],meals:[],profile:{name:'Private name',age:35,ageUnit:'years',sex:'female',status:'none',health:{healthNotes:'Private notes'}}}))")
  page=c.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  expect(page.locator('#cycle')).to_be_visible();assert page.locator('#page-title').text_content()=='Дневник'
  assert page.locator('#cycle-dial-day').inner_text()=='21' and page.locator('#cycle-phase-name').inner_text()=='ЛЮТЕИНОВАЯ' and page.locator('#cycle-phase-word').inner_text()=='фаза'

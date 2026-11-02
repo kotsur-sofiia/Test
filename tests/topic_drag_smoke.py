@@ -4,14 +4,15 @@ import os
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8038/Test/').split('#')[0]
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,locale='ru-RU')
+ ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],dayMap:{version:2,topicRailVersion:1,order:['cycle','food','water','skin','activity']}}))")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready');page.locator('#add-widget').click()
- assert page.locator('#add-widget .topic-label').text_content()=='Редактировать'
+ assert page.locator('#add-widget .topic-label').text_content()=='РЕДАКТИРОВАТЬ'
  assert page.locator('#widget-options [data-action=up],#widget-options [data-action=down]').count()==0
  def row(id):return page.locator('#widget-options [data-topic="'+id+'"]')
  toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='true'
- assert toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(48, 209, 88)'
+ assert toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(109, 134, 83)'
  assert '24' in toggle.locator('.switch-knob').evaluate('(e)=>getComputedStyle(e).transform')
- toggle.click();toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='false' and toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(182, 187, 182)';toggle.click()
+ toggle.click();toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='false' and toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(213, 214, 201)';toggle.click()
  page.evaluate('()=>{window.writes=0;window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(...args){if(args[0]==="luna-diary-v1")writes++;return realSet.apply(this,args)}}')
  page.locator('#widget-picker').evaluate('(e)=>e.scrollTop=0')
  cdp=ctx.new_cdp_session(page)

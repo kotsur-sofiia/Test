@@ -18,7 +18,7 @@ with sync_playwright() as p:
  open_editor();assert page.locator('#widget-picker-title').inner_text()=='Редактирование'
  assert 'Выбери то, что актуально именно тебе.' in page.locator('#widget-picker').inner_text()
  titles=page.locator('.topic-editor-description strong').all_text_contents()
- for title in ['Подписка','Цикл','Питание','Гидратация','Кожа','Аффирмации','Медитация','Книги','Физическая активность','Рисование']:assert title in titles,title
+ for title in ['Подписка','Цикл','Питание','Гидратация','Кожа','Аффирмации','Медитация','Книги','Активность','Рисование']:assert title.upper() in titles,title
  assert page.locator('#custom-widget-form').is_hidden() and page.locator('#show-custom-widget').inner_text()=='＋ Добавить свою'
  before=order();page.evaluate('()=>{window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw Error("full")}}');row('cycle').locator('[data-action=toggle]').click();assert order()==before;assert page.locator('#cycle').is_visible();page.evaluate('()=>{Storage.prototype.setItem=originalSet}')
  row('books').locator('[data-action=toggle]').click();assert row('books').locator('[data-action=toggle]').get_attribute('aria-checked')=='false'
