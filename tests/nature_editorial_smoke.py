@@ -1,0 +1,55 @@
+"""Readable botanical chapters, continuous gradients, responsive and offline."""
+from datetime import datetime, timezone
+from io import BytesIO
+from PIL import Image
+from playwright.sync_api import sync_playwright, expect
+import os, re
+
+URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8040/Test/').split('#')[0]
+
+def contrast(a,b):
+ def luminance(rgb):
+  values=[v/255 for v in rgb]
+  linear=[v/12.92 if v<=.04045 else ((v+.055)/1.055)**2.4 for v in values]
+  return sum(v*w for v,w in zip(linear,[.2126,.7152,.0722]))
+ x,y=sorted([luminance(a),luminance(b)])
+ return (y+.05)/(x+.05)
+
+with sync_playwright() as p:
+ b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
+ ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,locale='ru-RU',timezone_id='Europe/Podgorica')
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
+ page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc))
+ ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({sleep:[],meals:[],periods:['2026-10-13'],periodEnds:{'2026-10-13':'2026-10-17'},cycleLength:28,periodLength:5,water:[{id:'kept',date:'2026-11-02',ml:200,container:'glass'}]}))")
+ page.goto(URL+'#cycle');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
+ assert page.locator('#cycle-dial-day').inner_text()=='21'
+ assert 'Cormorant' in page.locator('.day-heading h1').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert 'Manrope' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
+ # The first 112px of a chapter must contain a gradual transition, not a hard seam.
+ dial=page.locator('.cycle-dial-card');dial.scroll_into_view_if_needed()
+ shot=Image.open(BytesIO(dial.screenshot()))
+ shades=[shot.getpixel((4,y))[:3] for y in [1,28,56,84,111]]
+ assert len(set(shades))==5 and all(sum(a)<sum(b) for a,b in zip(shades,shades[1:])),shades
+ def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
+ light_text=rgb(page.locator('.cycle-date-row h2').evaluate('(e)=>getComputedStyle(e).color'))
+ assert contrast(light_text,shot.getpixel((4,150))[:3])>7
+ date_text=rgb(page.locator('#today').evaluate('(e)=>getComputedStyle(e).color'))
+ header_background=rgb(page.locator('main>header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
+ assert contrast(date_text,header_background)>7
+ # Each major route must remain navigable at narrow, tablet, desktop and landscape sizes.
+ for width,height in [(320,844),(390,844),(768,1024),(1280,900),(844,390)]:
+  page.set_viewport_size({'width':width,'height':height})
+  for route in ['cycle','profile','food','water','sleep','skin','account','capture','library','friends']:
+   page.goto(URL+'#'+route);page.evaluate('document.fonts.ready')
+   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(width,route)
+  page.goto(URL+'#cycle')
+  for selector in ['#cycle-phase-name','#cycle-dial-day','#cycle-countdown-value']:
+   assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
+ assert page.evaluate('state.water.some(e=>e.id==="kept")')
+ page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
+ for path in ['./nature-editorial.css?v=39','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp']:
+  assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
+ assert 'Cormorant' in page.locator('.day-heading h1').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
+ assert not errors,errors
+ b.close();print('PASS: continuous light/dark gradients, Cyrillic editorial fonts, readable palette, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
