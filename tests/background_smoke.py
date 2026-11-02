@@ -11,10 +11,10 @@ with sync_playwright() as p:
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
  page.evaluate("state.water.push({id:'background-test',date:localDate(),ml:200,container:'glass'});save()")
  # Simulate a stale cached HTML shell. Online navigation must still load the actual app.
- page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v34');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
- page.reload();expect(page.locator('.app-backdrop img')).to_be_visible();expect(page.locator('#home')).to_be_visible()
+ page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v35');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
+ page.reload();expect(page.locator('.app-backdrop img')).to_be_visible();expect(page.locator('#diary-shell')).to_be_visible()
  page.wait_for_function('''async()=>{const r=await caches.match(new URL('./index.html',location.href));return r&&(await r.text()).includes('app-backdrop')}''')
- ctx.set_offline(True);page.reload();expect(page.locator('#home')).to_be_visible();page.wait_for_function('document.querySelector(".app-backdrop img").naturalWidth>0');assert page.evaluate('state.water.some(r=>r.id==="background-test")')
+ ctx.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();page.wait_for_function('document.querySelector(".app-backdrop img").naturalWidth>0');assert page.evaluate('state.water.some(r=>r.id==="background-test")')
  for width,height in [(320,844),(390,844),(844,390),(1280,1000)]:
   page.set_viewport_size({'width':width,'height':height});box=page.locator('.app-backdrop').bounding_box();assert box['x']==0 and box['y']==0 and box['width']==width and box['height']==height
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')

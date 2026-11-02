@@ -20,7 +20,7 @@ with sync_playwright() as p:
  assert page.evaluate(f'phaseAt("{day(-21)}")') is None
  page.reload();assert page.locator('#cycle-summary').inner_text()=='День 21 цикла'
  print('PASS: period history, four estimated phases, repeated-cycle prediction, no pre-history prediction, persistence')
- page.locator('[data-menu=diary] [href="#sleep"]').click()
+ page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false')
  def sleep(start,end,kind='night'):
   page.locator('#sleep-start').fill(start);page.locator('#sleep-end').fill(end);page.locator('#sleep-type').select_option(kind);page.locator('#sleep-form button').click()
  sleep(day(-2)+'T22:00',day(-1)+'T06:00')
@@ -34,7 +34,7 @@ with sync_playwright() as p:
  assert 'позже' in page.locator('#sleep-error').inner_text()
  for period in ['30','365']:
   page.locator('#sleep-range').select_option(period);assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин'
- page.locator('[data-menu=diary] [href="#food"]').click();page.locator('#food-product').select_option('oats');page.locator('#food-grams').fill('200');page.locator('#food-form button').click()
+ page.evaluate('location.hash="food"');page.wait_for_function('document.querySelector("#food").hidden===false');page.locator('#food-product').select_option('oats');page.locator('#food-grams').fill('200');page.locator('#food-form button').click()
  assert page.locator('#food-calories').inner_text()=='758 ккал'
  assert '8,5 / 18 мг · 47%' in page.locator('#nutrients').inner_text()
  page.locator('#food-date').fill(day(-1));page.locator('#food-date').dispatch_event('change');assert page.locator('#food-calories').inner_text()=='0 ккал'

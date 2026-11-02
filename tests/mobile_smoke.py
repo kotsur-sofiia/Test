@@ -13,7 +13,7 @@ with sync_playwright() as p:
  page.wait_for_function('navigator.serviceWorker.controller!==null')
  nav=page.locator('.bottom-nav')
  def diary(section):
-  page.locator(f'[data-menu="diary"] a[href="#{section}"]').click()
+  page.evaluate('(id)=>location.hash=id',section)
   expect(page.locator('#'+section)).to_be_visible()
   for other in ['home','cycle','sleep','food']:
    if other!=section:assert not page.locator('#'+other).is_visible(),other
@@ -30,7 +30,7 @@ with sync_playwright() as p:
  page.set_viewport_size({'width':390,'height':844})
  page.locator('#profile-name').fill('София');page.locator('#profile-sex').select_option('female')
  fill_birth_date(page,'1996-01-01');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
- nav.locator('[href="#home"]').click();expect(page.locator('#home')).to_be_visible();assert not page.locator('#food').is_visible()
+ nav.locator('[href="#home"]').click();expect(page.locator('#cycle')).to_be_visible();assert not page.locator('#food').is_visible()
  diary('sleep');page.locator('#sleep-start').fill((datetime.now()-timedelta(hours=8)).strftime('%Y-%m-%dT%H:%M'))
  page.locator('#sleep-end').fill(datetime.now().strftime('%Y-%m-%dT%H:%M'));page.locator('#sleep-form button').click()
  assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин'
@@ -42,8 +42,8 @@ with sync_playwright() as p:
  assert not groups.evaluate_all('(els)=>els.some(e=>e.open)')
  groups.first.locator('summary').click();assert groups.first.evaluate('(e)=>e.open')
  assert page.locator('#nutrients').evaluate('(e)=>getComputedStyle(e).maxHeight')=='none'
- page.locator('#water-volume').fill('300');page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='300 мл'
- page.locator('#food-grams').fill('175')
+ diary('water');page.locator('#water-volume').fill('300');page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='300 мл'
+ diary('food');page.locator('#food-grams').fill('175')
  for width in [320,375,390,430]:
   page.set_viewport_size({'width':width,'height':844});layout()
   page.screenshot(path=f'/tmp/luna-check/mobile-food-{width}.png')

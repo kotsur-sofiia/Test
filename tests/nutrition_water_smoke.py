@@ -26,16 +26,17 @@ with sync_playwright() as p:
  assert page.locator('#food-calories').inner_text()=='619 ккал'
  page.reload();assert page.locator('#food-calories').inner_text()=='619 ккал'
  print('PASS: v1 migration, gram-scaled KBJU, custom create/edit/delete, historical snapshot preservation, unknown micronutrients')
- page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='250 мл'
+ page.evaluate('location.hash="water"');page.wait_for_function('!document.querySelector("#water").hidden');page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='250 мл'
  page.locator('#water-container').select_option('bottle');assert page.locator('#water-volume').input_value()=='500'
  page.locator('#water-presets').get_by_role('button',name='300 мл',exact=True).click();page.locator('#water-form button').click()
  page.locator('#water-container').select_option('glass');assert page.locator('#water-volume').input_value()=='250'
  page.locator('#water-volume').fill('330');page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='880 мл'
  page.reload();assert page.locator('#water-volume').input_value()=='330';assert page.locator('#water-total').inner_text()=='880 мл'
- page.locator('#food-date').fill('2026-09-01');page.locator('#food-date').dispatch_event('change');assert page.locator('#water-total').inner_text()=='0 мл'
+ page.locator('#water-date').fill('2026-09-01');page.locator('#water-date').dispatch_event('change');assert page.locator('#water-total').inner_text()=='0 мл'
  page.locator('#water-form button').click();assert page.locator('#water-total').inner_text()=='330 мл'
  page.locator('#water-history button').click();assert page.locator('#water-total').inner_text()=='0 мл'
  print('PASS: water presets, arbitrary amount, independent glass/bottle settings, daily totals, deletion, persistence')
+ page.evaluate('location.hash="food"');page.wait_for_function('!document.querySelector("#food").hidden')
  fixture={'status':1,'product':{'code':'1234567890123','product_name':'Тестовый йогурт','brands':'Fixture','nutriments':{'energy-kcal_100g':100,'proteins_100g':5,'fat_100g':4,'carbohydrates_100g':11,'iron_100g':.002,'vitamin-b12_100g':.000002}}}
  page.route('https://world.openfoodfacts.org/**',lambda route:route.fulfill(status=200,content_type='application/json',body=json.dumps(fixture)))
  page.locator('#catalog-query').fill('1234567890123');page.locator('#catalog-submit').click();page.get_by_role('button',name='Сохранить в мою базу',exact=True).wait_for();page.get_by_role('button',name='Сохранить в мою базу',exact=True).click()

@@ -25,7 +25,7 @@ with sync_playwright() as p:
  assert page.evaluate('''()=>{const dates=['2026-12-31','2027-01-01','2028-02-28','2028-02-29','2028-03-01','2026-03-28','2026-03-29','2026-03-30'];return dates.every((s,i)=>{const d=new Date(s+'T12:00:00');return LifeAffirmation.forDate(d)===LifeAffirmation.forDate(new Date(s+'T22:00:00'))&&(!i||LifeAffirmation.forDate(d)!==LifeAffirmation.forDate(new Date(dates[i-1]+'T12:00:00')))})}''')
  page.locator('.bottom-nav [data-view="profile"]').click();page.locator('[data-menu="profile"] [href="#devices"]').click();expect(page.locator('#devices')).to_be_visible()
  assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Профиль' and 'пока не доступно' in page.locator('#devices').inner_text()
- ctx.set_offline(True);page.reload();expect(page.locator('#devices')).to_be_visible();page.locator('.bottom-nav [data-view="diary"]').click();expect(page.locator('#home')).to_be_visible();assert page.locator('#daily-affirmation').inner_text()==second
+ ctx.set_offline(True);page.reload();expect(page.locator('#devices')).to_be_visible();page.locator('.bottom-nav [data-view="diary"]').click();expect(page.locator('#diary-shell')).to_be_visible();assert page.locator('#daily-affirmation').inner_text()==second
  assert page.evaluate('state.meals[0].id')=='old' and page.evaluate('state.profile.name')=='София'
  for width in [320,375,390,430,844,1280]:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width

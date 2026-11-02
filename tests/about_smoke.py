@@ -32,7 +32,7 @@ with sync_playwright() as p:
  assert page.evaluate('state.profile.body.muscleMass')==40 and page.evaluate('state.profile.health.fertility')=='trying'
  page.evaluate("state.periods=['2026-10-20'];save()")
  assert page.evaluate('phaseAt(today)') is not None
- page.locator('.bottom-nav [href="#home"]').click();page.locator('[data-menu="diary"] [href="#cycle"]').click()
+ page.locator('.bottom-nav [href="#home"]').click();page.locator('[data-widget-id=cycle] a').click()
  page.locator('#period-start').fill('2026-10-20');page.locator('#cycle-length').fill('30');page.locator('#cycle-form button').click()
  open_about(page);assert page.locator('#profile-cycleLength').input_value()=='30' and page.evaluate('state.profile.health.cycleLength')==30
  for key,value in [('cyclePattern','irregular'),('menstrualStage','menopause'),('hormones','combined')]:

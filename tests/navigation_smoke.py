@@ -24,21 +24,21 @@ with sync_playwright() as p:
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
  fill_birth_date(page,'1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
- bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and not page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
- assert page.locator('[data-menu="diary"]').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
- page.locator('[data-menu=diary] [href="#food"]').click();page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
- page.locator('[data-menu=diary] [href="#sleep"]').click();voice=page.locator('[data-voice-section="sleep"]');voice.evaluate('(e)=>e.open=true');voice.locator('.voice-editor').fill('Черновик дневника сна')
+ bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#diary-shell')).to_be_visible() and not page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
+ assert page.locator('#diary-shell').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
+ page.evaluate('location.hash="food"');page.wait_for_function('document.querySelector("#food").hidden===false');page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
+ page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false');voice=page.locator('[data-voice-section="sleep"]');voice.evaluate('(e)=>e.open=true');voice.locator('.voice-editor').fill('Черновик дневника сна')
  voice.locator('.voice-start').click();assert page.evaluate('__speech.at(-1).aborted') is None
  bottom.get_by_role('link',name='Библиотека',exact=True).click();expect(page.locator('#library')).to_be_visible() and not page.locator('#sleep').is_visible()
  assert page.evaluate('__speech.at(-1).aborted') is True
  bottom.get_by_role('link',name='Друзья',exact=True).click();expect(page.locator('#friends')).to_be_visible() and not page.locator('#library').is_visible()
- bottom.get_by_role('link',name='Дневник',exact=True).click();page.locator('[data-menu=diary] [href="#sleep"]').click();assert voice.locator('.voice-editor').input_value()=='Черновик дневника сна'
+ bottom.get_by_role('link',name='Дневник',exact=True).click();page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false');assert voice.locator('.voice-editor').input_value()=='Черновик дневника сна'
  assert page.locator('#food-calories').inner_text()=='379 ккал'
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Clinical visibility survives routing: a male or lactating profile must not reveal cycle predictions.
  page.locator('#profile-sex').select_option('male');page.locator('#profile-form button').click();bottom.get_by_role('link',name='Дневник',exact=True).click()
  assert not page.locator('#cycle').is_visible() and not page.locator('[data-menu="diary"] a[href="#cycle"]').is_visible()
- page.locator('[data-menu=diary] [href="#sleep"]').click();expect(page.locator('#sleep')).to_be_visible()
+ page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false');expect(page.locator('#sleep')).to_be_visible()
  page.evaluate('location.hash="cycle"');page.wait_for_function('location.hash==="#cycle"')
  assert not page.locator('#cycle').is_visible()
  # Browser history and direct routes select the appropriate main area and contextual menu.

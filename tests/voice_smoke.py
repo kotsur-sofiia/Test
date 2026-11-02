@@ -19,7 +19,7 @@ with sync_playwright() as p:
  requests=[];page.on('request',lambda r:requests.append(r.url))
  page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
  def widget(section):
-  page.evaluate('(hash)=>location.hash=hash', 'sleep' if section=='sleep' else 'cycle' if section=='cycle' else 'food');page.wait_for_function('document.body.dataset.view==="diary"')
+  page.evaluate('(hash)=>location.hash=hash', 'water' if section=='water' else 'sleep' if section=='sleep' else 'cycle' if section=='cycle' else 'food');page.wait_for_function('document.body.dataset.view==="diary"')
   root=page.locator(f'[data-voice-section="{section}"]');root.evaluate('(d)=>d.open=true');return root
  def emit(parts):page.evaluate('(parts)=>window.__speech.at(-1).result(parts)',parts)
  def end():page.evaluate('window.__speech.at(-1).end()')

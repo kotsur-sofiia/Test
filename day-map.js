@@ -2,22 +2,22 @@
 'use strict';
 (() => {
   const topics = [
-    {id:'affirmation', title:'Аффирмация', hint:'Добрые слова для себя', icon:'♡'},
+    {id:'affirmation', title:'Аффирмация', hint:'Добрые слова для себя', icon:'♡', href:'#affirmation'},
     {id:'cycle', title:'Цикл', hint:'Календарь и самочувствие', icon:'◌', href:'#cycle'},
     {id:'sleep', title:'Отдых', hint:'Сон и восстановление', icon:'☾', href:'#sleep'},
     {id:'food', title:'Питание', hint:'Продукты и баланс за день', icon:'♧', href:'#food'},
-    {id:'water', title:'Вода', hint:'Маленькие глотки заботы', icon:'♧', href:'#water-form'},
+    {id:'water', title:'Вода', hint:'Маленькие глотки заботы', icon:'♧', href:'#water'},
     {id:'skin', title:'Кожа', hint:'Уход и твои наблюдения', icon:'✧', prompt:'Как чувствует себя кожа?', placeholder:'Уход, ощущения, что подошло сегодня…'},
     {id:'books', title:'Книги', hint:'Страницы, мысли и открытия', icon:'▤', prompt:'Что ты читаешь?', placeholder:'Название книги, прочитанные страницы, мысль на память…'},
-    {id:'activity', title:'Движение', hint:'Тренировки и активность', icon:'↗', href:'#activity'}
+    {id:'activity', title:'Активность', hint:'Тренировки и активность', icon:'↗', href:'#activity'}
   ];
-  const initialOrder = ['affirmation','cycle','sleep','food','water'];
+  const initialOrder = ['cycle','food','water','skin','activity'];
   const grid = $('#day-widgets');
   const picker = $('#widget-picker');
-  const notesDialog = $('#widget-notes');
   const nodes = new Map([...grid.children].map(node => [node.dataset.widgetId, node]));
   let editing = false;
   let noteTopic = null;
+  let activeTopic = 'cycle';
   const drafts = new Map();
 
   function readMap() {
@@ -38,6 +38,10 @@
     return [...topics, ...map.custom.map(t => ({...t, hint:'Твоя личная тема', icon:'✧', prompt:'Что хочется запомнить?', placeholder:'Несколько слов о своём дне…'}))];
   }
   function available(id) { return id !== 'cycle' || $('#cycle').dataset.available !== 'false'; }
+  function homeTopic() {
+    const order = readMap().order.filter(available);
+    return order.includes(activeTopic) ? activeTopic : order.includes('cycle') ? 'cycle' : order[0] || 'empty';
+  }
   function announce(text, error = false) {
     for (const id of ['day-builder-status','widget-picker-status']) {
       const element = $('#'+id);
@@ -70,14 +74,47 @@
     const card = document.createElement('article');
     card.className = 'day-widget';
     card.dataset.widgetId = topic.id;
-    const link = document.createElement(topic.href ? 'a' : 'button');
+    const link = document.createElement('a');
     link.className = 'mini';
-    if (topic.href) link.href = topic.href;
-    else { link.type = 'button'; link.onclick = () => openNotes(topic.id); }
+    link.href = topic.href || '#'+topic.id;
     link.append(textEl('span',topic.title.toLocaleUpperCase('ru')), textEl('strong',topic.hint), textEl('p',topic.href ? 'Открыть дневник' : 'Добавить заметку'));
     card.append(link);
     nodes.set(topic.id, card);
     return card;
+  }
+
+  const iconPaths = {
+    cycle:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="4" r="2" fill="currentColor" stroke="none"/>',
+    food:'<path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18M19 21V3c-5 0-5 10 0 10"/>',
+    water:'<path d="M12 3C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-12ZM8 15a4 4 0 0 0 4 4"/>',
+    skin:'<path d="m12 3 2.5 6.5L21 12l-6.5 2.5L12 21l-2.5-6.5L3 12l6.5-2.5Z"/>',
+    activity:'<path d="M3 12h4l3-7 4 14 3-7h4"/>',
+    sleep:'<path d="M20 15A9 9 0 0 1 9 4a9 9 0 1 0 11 11Z"/>',
+    books:'<path d="M3 4h5c2 0 4 1 4 2 0-1 2-2 4-2h5v15h-5c-2 0-4 1-4 2 0-1-2-2-4-2H3ZM12 6v15"/>',
+    affirmation:'<path d="M12 20 4 12C-2 5 7 0 12 7c5-7 14-2 8 5Z"/>'
+  };
+  function decorate(card, topic) {
+    const link = card.querySelector('.mini');
+    if (!link.querySelector('.topic-orb')) {
+      const orb = document.createElement('span');
+      orb.className = 'topic-orb'; orb.setAttribute('aria-hidden','true');
+      if (iconPaths[topic.id]) orb.innerHTML = '<svg viewBox="0 0 24 24">'+iconPaths[topic.id]+'</svg>';
+      else orb.textContent = '✧';
+      const label = link.querySelector('span'); label.className = 'topic-label'; label.textContent = topic.title;
+      link.prepend(orb);
+    }
+    link.setAttribute('aria-label',topic.title);
+  }
+  function routeChanged(id) {
+    if (catalog().some(t => t.id === id)) activeTopic = id;
+    for (const [topic,node] of nodes) {
+      const link = node.querySelector('.mini');
+      link.classList.toggle('active',topic === id);
+      if (topic === id) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
+    }
+    const topic = catalog().find(t => t.id === id);
+    if (topic && !topic.href) openNotes(id);
+    else rememberDraft();
   }
 
   function addControls(card, topic) {
@@ -92,7 +129,10 @@
         if (index < 0) return;
         if (!delta) {
           map.order.splice(index,1);
-          if (commit(map,'Виджет убран. Записи сохранены; его можно вернуть через «Добавить».')) $('#edit-day').focus({preventScroll:true});
+          if (commit(map,'Виджет убран. Записи сохранены; его можно вернуть через «Добавить».')) {
+            if (activeTopic === topic.id) { history.replaceState(null,'','#home'); window.LunaNavigation.refresh(); }
+            $('#edit-day').focus({preventScroll:true});
+          }
         } else {
           const target = index + delta;
           if (target < 0 || target >= map.order.length) return;
@@ -140,6 +180,7 @@
     for (const id of ordered) {
       const topic = all.find(t => t.id === id);
       const card = nodes.get(id) || makeCard(topic);
+      decorate(card,topic);
       addControls(card, topic);
       const selected = map.order.includes(id);
       card.hidden = !selected || !editing && !available(id);
@@ -158,13 +199,15 @@
       grid.append(card);
     }
     $('#day-empty').hidden = visibleCount > 0;
-    $('#edit-day').hidden = map.order.length === 0;
-    $('#edit-day').textContent = editing ? 'Готово' : 'Изменить';
+    $('#edit-day').disabled = map.order.length === 0;
+    $('#edit-day').textContent = editing ? 'Готово' : 'Редактировать';
     $('#edit-day').setAttribute('aria-pressed',String(editing));
     grid.classList.toggle('is-editing',editing);
     $('#day-edit-help').hidden = !editing;
     if (picker.open) renderPicker();
-    if (notesDialog.open) renderNotes();
+    grid.append($('#add-widget'));
+    routeChanged(document.body.dataset.topic);
+    if (noteTopic && !$('#topic-notes').hidden) renderNotes();
   }
 
   function renderPicker() {
@@ -196,6 +239,8 @@
   function openNotes(id) {
     const topic = catalog().find(t => t.id === id);
     if (!topic) return;
+    if (noteTopic === id) return;
+    rememberDraft();
     noteTopic = id;
     const draft = drafts.get(id);
     $('#widget-notes-title').textContent = topic.title;
@@ -205,7 +250,10 @@
     $('#widget-note-text').value = draft?.text || '';
     $('#widget-note-status').textContent = '';
     renderNotes();
-    notesDialog.showModal();
+  }
+  function rememberDraft() {
+    if (noteTopic) drafts.set(noteTopic,{date:$('#widget-note-date').value,text:$('#widget-note-text').value});
+    noteTopic = null;
   }
   function renderNotes() {
     const list = $('#widget-note-history'), date = $('#widget-note-date').value;
@@ -230,7 +278,7 @@
   help.id = 'day-edit-help'; help.hidden = true;
   $('#day-widgets').before(help);
   $('#edit-day').onclick = () => { editing = !editing; render(); };
-  for (const id of ['add-widget','add-widget-top']) $('#'+id).onclick = () => { announce(''); renderPicker(); picker.showModal(); };
+  $('#add-widget').onclick = () => { announce(''); renderPicker(); picker.showModal(); };
   $('#custom-widget-form').onsubmit = event => {
     event.preventDefault();
     const title = $('#custom-widget-title').value.trim();
@@ -255,27 +303,24 @@
       $('#widget-note-status').textContent = 'Заметка сохранена.';
     } else $('#widget-note-status').textContent = 'Не удалось сохранить заметку. Текст остался в поле — попробуй ещё раз.';
   };
-  for (const dialog of [picker,notesDialog]) {
+  for (const dialog of [picker]) {
     dialog.querySelector('[data-close-dialog]').onclick = () => dialog.close();
     dialog.addEventListener('click', event => { if (event.target === dialog) { const b = dialog.getBoundingClientRect(); if (event.clientX < b.left || event.clientX > b.right || event.clientY < b.top || event.clientY > b.bottom) dialog.close(); } });
   }
-  notesDialog.addEventListener('close',() => {
-    if (noteTopic) drafts.set(noteTopic,{date:$('#widget-note-date').value,text:$('#widget-note-text').value});
-    noteTopic = null;
-  });
   grid.addEventListener('click',event => {
     const link = event.target.closest('a.mini');
     if (!link) return;
     if (link.getAttribute('aria-disabled') === 'true') { event.preventDefault(); return; }
-    if (['#food','#water-form'].includes(link.hash)) {
+    if (['#food','#water'].includes(link.hash)) {
       $('#food-date').value = localDate(); renderFood(); window.LunaVoice?.refresh();
     }
   });
   window.addEventListener('hashchange',() => {
-    for (const dialog of [picker,notesDialog]) if (dialog.open) dialog.close();
+    if (picker.open) picker.close();
     render();
   });
   document.addEventListener('visibilitychange',() => { if (!document.hidden) render(); });
-  window.WomanDayMap = Object.freeze({render, refreshDay:render});
+  window.WomanDayMap = Object.freeze({render, homeTopic, routeChanged, refreshDay:() => { render(); window.WomanCycleCare?.refreshDay(); }});
   render();
+  window.LunaNavigation.refresh();
 })();
