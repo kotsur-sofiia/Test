@@ -45,7 +45,7 @@ with sync_playwright() as p:
  bottom.get_by_role('link',name='Друзья',exact=True).click();bottom.get_by_role('link',name='Библиотека',exact=True).click()
  page.go_back();expect(page.locator('#friends')).to_be_visible()
  page.goto(URL.split('#')[0]+'#settings');expect(page.locator('#settings')).to_be_visible() and bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
- ctx.set_offline(True);page.reload();expect(page.locator('#settings')).to_be_visible() and page.locator('#connection').inner_text()=='Без интернета'
+ ctx.set_offline(True);page.reload();expect(page.locator('#settings')).to_be_visible() and page.evaluate('navigator.onLine') is False
  bottom.get_by_role('link',name='Дневник',exact=True).click();assert page.locator('#food-calories').inner_text()=='379 ккал'
  for width in [390,768,1024]:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width

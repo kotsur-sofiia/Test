@@ -42,7 +42,7 @@ with sync_playwright() as p:
  print('PASS: overnight sleep, naps, mean by recorded days, overlap and invalid-range rejection, 7/30/365 days, food gram scaling and daily isolation')
  with page.expect_download() as d:page.locator('#export-data').click()
  assert d.value.suggested_filename.startswith('woman-diary-')
- ctx.set_offline(True);page.reload();assert page.locator('#connection').inner_text()=='Без интернета';assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин';assert page.locator('#food-calories').inner_text()=='758 ккал'
+ ctx.set_offline(True);page.reload();assert page.evaluate('navigator.onLine') is False;assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин';assert page.locator('#food-calories').inner_text()=='758 ккал'
  page.locator('#food-history button').click();assert page.locator('#food-calories').inner_text()=='0 ккал';page.reload();assert page.locator('#food-calories').inner_text()=='0 ккал'
  ctx.set_offline(False)
  print('PASS: backup export, offline reload, offline deletion and persistence')

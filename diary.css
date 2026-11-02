@@ -91,3 +91,43 @@ body[data-view=diary]:not([data-section=profile]) .section-navigation { display:
 
 .cycle-recommendations p,.cycle-recommendations b { overflow-wrap:anywhere; }
 @media(max-width:767px),(max-width:1023px) and (pointer:coarse) { #home .welcome { padding:22px 14px; } }
+
+/* A single topic editor is opened by the Add circle. */
+.layout main>header { display:flex; justify-content:center; margin:0 0 24px; }
+.layout main>header #today {
+  display:block; width:100%; text-align:center; font:700 clamp(18px,2.5vw,21px)/1.5 var(--sans);
+  color:#29442a; letter-spacing:0; text-wrap:balance; text-shadow:none;
+}
+.diary-shell .day-heading { justify-content:center; margin:12px 0 28px; }
+.diary-shell .day-heading h1 { width:100%; text-align:center; text-transform:uppercase; font:600 clamp(34px,5vw,46px)/1.4 var(--display); letter-spacing:.035em; }
+.diary-shell .add-widget .topic-orb { flex-direction:column; gap:0; }
+.diary-shell .add-widget .topic-add-plus { font:400 28px/1.05 var(--sans); }
+.diary-shell .add-widget .topic-add-label { font:700 10px/1.5 var(--sans); }
+#widget-picker .sheet-heading { position:sticky; top:0; z-index:1; background:#f1e8d7; padding-bottom:16px; border-bottom:1px solid #d8ceb9; }
+#widget-picker .sheet-heading::before { content:''; position:absolute; inset:-28px -28px 0; z-index:-1; background:#f1e8d7; }
+#widget-picker-title { font-size:24px; }
+#widget-options { gap:12px; }
+.editor-help { margin:0 0 18px; }
+.topic-editor-row { border:1px solid #d8ceb9; border-radius:25px; padding:14px; background:#eee4d1; }
+.topic-editor-row.is-enabled { border-color:#9daa89; background:#f4ecdd; }
+.topic-editor-info { display:flex; align-items:center; gap:10px; }
+.topic-editor-info .widget-choice-icon { width:28px; flex-shrink:0; font-size:26px; color:#526244; }
+.topic-editor-info .widget-choice-icon svg { display:block; width:26px; height:26px; fill:none; stroke:currentColor; stroke-width:1.5; stroke-linecap:round; stroke-linejoin:round; }
+.topic-editor-description { flex:1; min-width:0; }
+.topic-editor-description strong { display:block; font:700 16px/1.5 var(--sans); color:#29442a; overflow-wrap:anywhere; }
+.topic-editor-description small { display:block; margin-top:3px; font:400 13px/1.5 var(--sans); color:#59634e; }
+.topic-toggle { flex-shrink:0; min-width:58px; min-height:44px; padding:8px 10px; border-radius:999px; font-size:13px; }
+.topic-toggle[aria-checked=false] { background:#e3d8bf; border-color:#b9c3a5; color:#29442a; }
+.topic-toggle[aria-checked=false]:not(:disabled):hover { background:#d8cbb0; color:#29442a; }
+.topic-order-controls { display:flex; align-items:center; justify-content:flex-end; gap:8px; margin-top:10px; }
+.topic-order-controls small { margin-right:auto; font:600 12px/1.5 var(--sans); color:#59634e; }
+.topic-order-controls button { width:44px; height:44px; min-height:44px; padding:0; font-size:22px; }
+.show-custom-widget { display:block; width:100%; margin-top:22px; min-height:50px; font-size:15px; }
+.custom-widget-form label { font-size:14px; }
+@media(max-width:360px) {
+  #widget-picker { padding-left:14px; padding-right:14px; }
+  #widget-picker-title { font-size:22px; }
+  .topic-editor-row { padding:12px; }
+  .topic-editor-info { gap:8px; }
+  .topic-editor-info .widget-choice-icon { width:22px; font-size:23px; }
+}

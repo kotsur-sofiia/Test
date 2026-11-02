@@ -7,7 +7,7 @@
     let raw;
     try { raw = decodeURIComponent(location.hash.slice(1) || 'home'); } catch { raw = 'home'; }
     const id = raw === 'home' ? (window.WomanDayMap?.homeTopic() ?? ($('#cycle').dataset.available === 'false' ? 'food' : 'cycle')) : raw;
-    const notes = ['skin','books'].includes(id) || id.startsWith('custom-');
+    const notes = ['skin','books','meditation','drawing'].includes(id) || id.startsWith('custom-');
     const target = id === 'affirmation' ? $('#home') : id === 'empty' ? $('#day-placeholder') : notes ? $('#topic-notes') : document.getElementById(id);
     const area = target?.closest('[data-main-view]')?.dataset.mainView || 'profile';
     const section = target?.closest('[data-main-view]')?.id;

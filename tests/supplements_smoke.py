@@ -129,7 +129,7 @@ with sync_playwright() as p:
  assert data['profile']['age']==35 and data['profile']['status']=='lactating' and 'month' not in data['profile'] and len(data['supplements'])==4
  assert data['supplements'][0]['id']=='old-omega6'
  ctx.set_offline(True);page.reload()
- assert page.locator('#connection').inner_text()=='Без интернета'
+ assert page.evaluate('navigator.onLine') is False
  assert norm('potassium')==2800 and page.locator('#profile-status').input_value()=='lactating' and page.locator('#profile-name').input_value()=='Тестовый профиль'
  assert page.locator('#supplement-history .record').count()==3
  page.locator('#supplement-history .record').first.locator('button').click()

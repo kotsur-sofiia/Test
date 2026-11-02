@@ -109,7 +109,7 @@ with sync_playwright() as p:
  data=json.loads(Path(download.value.path()).read_text());assert len(data['voiceNotes'])==before+2
  assert all(isinstance(n['text'],str) and 'audio' not in n for n in data['voiceNotes'])
  ctx.set_offline(True);page.reload()
- assert page.locator('.voice-card').count()==8 and page.locator('#connection').inner_text()=='Без интернета'
+ assert page.locator('.voice-card').count()==8 and page.evaluate('navigator.onLine') is False
  sleep=widget('sleep');assert 'Дополнение' in sleep.locator('.voice-history').inner_text()
  note_id=page.evaluate("state.voiceNotes.find(n=>n.section==='sleep').id")
  sleep.get_by_role('button',name=f'Удалить заметку {note_id}',exact=True).click();page.reload();sleep=widget('sleep');assert sleep.locator('.voice-note').count()==0

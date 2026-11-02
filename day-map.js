@@ -2,20 +2,22 @@
 'use strict';
 (() => {
   const topics = [
-    {id:'affirmation', title:'Аффирмация', hint:'Добрые слова для себя', icon:'♡', href:'#affirmation'},
+    {id:'membership', title:'Подписка', hint:'Возможности приложения', icon:'◇', href:'#membership'},
     {id:'cycle', title:'Цикл', hint:'Календарь и самочувствие', icon:'◌', href:'#cycle'},
-    {id:'sleep', title:'Отдых', hint:'Сон и восстановление', icon:'☾', href:'#sleep'},
     {id:'food', title:'Питание', hint:'Продукты и баланс за день', icon:'♧', href:'#food'},
-    {id:'water', title:'Вода', hint:'Маленькие глотки заботы', icon:'♧', href:'#water'},
+    {id:'water', title:'Гидратация', hint:'Вода и выпитый объём', icon:'♧', href:'#water'},
     {id:'skin', title:'Кожа', hint:'Уход и твои наблюдения', icon:'✧', prompt:'Как чувствует себя кожа?', placeholder:'Уход, ощущения, что подошло сегодня…'},
+    {id:'affirmation', title:'Аффирмации', hint:'Добрые слова для себя', icon:'♡', href:'#affirmation'},
+    {id:'meditation', title:'Медитация', hint:'Практика и ощущения', icon:'☾', prompt:'Как прошла практика?', placeholder:'Практика, её длительность и ощущения после…'},
     {id:'books', title:'Книги', hint:'Страницы, мысли и открытия', icon:'▤', prompt:'Что ты читаешь?', placeholder:'Название книги, прочитанные страницы, мысль на память…'},
-    {id:'activity', title:'Активность', hint:'Тренировки и активность', icon:'↗', href:'#activity'}
+    {id:'activity', title:'Физическая активность', hint:'Тренировки и движение', icon:'↗', href:'#activity'},
+    {id:'drawing', title:'Рисование', hint:'Идеи и творческие заметки', icon:'✎', prompt:'Что хочется нарисовать или запомнить?', placeholder:'Идея, материалы, впечатления от рисования…'},
+    {id:'sleep', title:'Отдых', hint:'Сон и восстановление', icon:'☾', href:'#sleep'}
   ];
   const initialOrder = ['cycle','food','water','skin','activity'];
   const grid = $('#day-widgets');
   const picker = $('#widget-picker');
   const nodes = new Map([...grid.children].map(node => [node.dataset.widgetId, node]));
-  let editing = false;
   let noteTopic = null;
   let activeTopic = 'cycle';
   const drafts = new Map();
@@ -29,9 +31,11 @@
     }
     const known = new Set([...topics,...custom].map(t => t.id));
     const order = Array.isArray(saved.order) ? [...new Set(saved.order.filter(id => known.has(id)))] : [...initialOrder];
+    // Put cycle first on upgrade; later explicit ordering in this editor is retained.
+    if (saved.version !== 2 && order.includes('cycle')) { order.splice(order.indexOf('cycle'),1); order.unshift('cycle'); }
     // Keep notes for removed cards, including any unknown future topics.
     const notes = Array.isArray(saved.notes) ? saved.notes.filter(n => typeof n?.id === 'string' && typeof n.topic === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(n.date) && typeof n.text === 'string') : [];
-    return {...saved, version:1, order, custom, notes};
+    return {...saved, version:2, order, custom, notes};
   }
 
   function catalog(map = readMap()) {
@@ -51,9 +55,12 @@
   }
   function commit(next, message) {
     const old = state.dayMap;
+    const previousTopic = activeTopic;
     state.dayMap = next;
     if (!save()) {
       if (old === undefined) delete state.dayMap; else state.dayMap = old;
+      activeTopic = previousTopic;
+      window.LunaNavigation.refresh();
       render();
       announce('Не удалось сохранить изменения. Проверь свободное место и попробуй ещё раз.', true);
       return false;
@@ -84,6 +91,9 @@
   }
 
   const iconPaths = {
+    membership:'<path d="m12 3 9 9-9 9-9-9Z"/>',
+    meditation:'<path d="M12 12c-5-8-9-6-9-2 0 6 6 9 9 9 3 0 9-3 9-9 0-4-4-6-9 2ZM12 12V4M9 5l3-2 3 2"/>',
+    drawing:'<path d="m5 15-2 6 6-2L21 7l-4-4ZM14 6l4 4M5 15l4 4"/>',
     cycle:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="4" r="2" fill="currentColor" stroke="none"/>',
     food:'<path d="M5 3v6a3 3 0 0 0 6 0V3M8 3v18M19 21V3c-5 0-5 10 0 10"/>',
     water:'<path d="M12 3C9 7 5 11 5 15a7 7 0 0 0 14 0c0-4-4-8-7-12ZM8 15a4 4 0 0 0 4 4"/>',
@@ -115,38 +125,6 @@
     const topic = catalog().find(t => t.id === id);
     if (topic && !topic.href) openNotes(id);
     else rememberDraft();
-  }
-
-  function addControls(card, topic) {
-    if (card.querySelector('.widget-controls')) return;
-    const controls = document.createElement('div');
-    controls.className = 'widget-controls';
-    controls.setAttribute('role','group');
-    controls.setAttribute('aria-label','Настроить: '+topic.title);
-    for (const [action, text, label, delta] of [['up','↑','Выше',-1],['down','↓','Ниже',1],['remove','×','Убрать',0]]) {
-      const control = button(label+': '+topic.title,text,() => {
-        const map = readMap(), index = map.order.indexOf(topic.id);
-        if (index < 0) return;
-        if (!delta) {
-          map.order.splice(index,1);
-          if (commit(map,'Виджет убран. Записи сохранены; его можно вернуть через «Добавить».')) {
-            if (activeTopic === topic.id) { history.replaceState(null,'','#home'); window.LunaNavigation.refresh(); }
-            $('#edit-day').focus({preventScroll:true});
-          }
-        } else {
-          const target = index + delta;
-          if (target < 0 || target >= map.order.length) return;
-          [map.order[index],map.order[target]] = [map.order[target],map.order[index]];
-          if (commit(map,'Порядок виджетов сохранён.')) {
-            const current = card.querySelector('[data-action="'+action+'"]');
-            (current.disabled ? card.querySelector('[data-action="remove"]') : current).focus({preventScroll:true});
-          }
-        }
-      });
-      control.dataset.action = action;
-      controls.append(control);
-    }
-    card.prepend(controls);
   }
 
   function summary(topic, map, date) {
@@ -181,14 +159,10 @@
       const topic = all.find(t => t.id === id);
       const card = nodes.get(id) || makeCard(topic);
       decorate(card,topic);
-      addControls(card, topic);
       const selected = map.order.includes(id);
-      card.hidden = !selected || !editing && !available(id);
+      card.hidden = !selected || !available(id);
       if (!card.hidden) visibleCount++;
       card.classList.toggle('widget-unavailable', !available(id));
-      card.querySelector('.widget-controls').hidden = !editing;
-      card.querySelector('[data-action="up"]').disabled = map.order.indexOf(id) === 0;
-      card.querySelector('[data-action="down"]').disabled = map.order.indexOf(id) === map.order.length-1;
       if (id !== 'affirmation') {
         const link = card.querySelector('.mini');
         const [title,description] = summary(topic,map,date);
@@ -199,41 +173,63 @@
       grid.append(card);
     }
     $('#day-empty').hidden = visibleCount > 0;
-    $('#edit-day').disabled = map.order.length === 0;
-    $('#edit-day').textContent = editing ? 'Готово' : 'Редактировать';
-    $('#edit-day').setAttribute('aria-pressed',String(editing));
-    grid.classList.toggle('is-editing',editing);
-    $('#day-edit-help').hidden = !editing;
     if (picker.open) renderPicker();
     grid.append($('#add-widget'));
     routeChanged(document.body.dataset.topic);
     if (noteTopic && !$('#topic-notes').hidden) renderNotes();
   }
 
-  function renderPicker() {
-    const map = readMap(), list = $('#widget-options');
-    list.replaceChildren();
-    for (const topic of catalog(map)) {
-      const added = map.order.includes(topic.id);
-      const choice = button((added ? 'Добавлен: ' : 'Добавить: ')+topic.title,'',() => {
-        const next = readMap();
-        if (next.order.includes(topic.id) || !available(topic.id)) return;
-        next.order.push(topic.id);
-        if (commit(next,'«'+topic.title+'» добавлен в карту дня.')) {
-          const focus = list.querySelector('button:not(:disabled)') || picker.querySelector('[data-close-dialog]');
-          focus.focus({preventScroll:true});
-        }
-      });
-      choice.className = 'widget-choice';
-      choice.dataset.topic = topic.id;
-      choice.disabled = added || !available(topic.id);
-      const icon = textEl('span',topic.icon,'widget-choice-icon');
-      icon.setAttribute('aria-hidden','true');
-      const body = document.createElement('span');
-      body.append(textEl('strong',topic.title),textEl('small',!available(topic.id) ? 'Недоступен по сведениям анкеты' : topic.hint));
-      choice.append(icon,body,textEl('span',added ? '✓' : '+','widget-choice-add'));
-      list.append(choice);
+  function focusEditorRow(id, action='toggle') {
+    const row = [...$('#widget-options').children].find(node => node.dataset.topic === id);
+    const target = row?.querySelector('[data-action="'+action+'"]');
+    (target && !target.disabled ? target : row?.querySelector('[data-action="toggle"]'))?.focus({preventScroll:true});
+  }
+  function toggleTopic(id) {
+    const map=readMap(),index=map.order.indexOf(id),enabled=index>=0;
+    if (!enabled && !available(id)) return;
+    if (enabled) map.order.splice(index,1);
+    else if (id==='cycle') map.order.unshift(id);
+    else map.order.push(id);
+    if (commit(map,enabled?'Тема выключена. Все записи сохранены.':'Тема включена.')) {
+      if (enabled && activeTopic===id) { history.replaceState(null,'','#home'); window.LunaNavigation.refresh(); }
+      focusEditorRow(id);
     }
+  }
+  function moveTopic(id, delta) {
+    const map=readMap(),index=map.order.indexOf(id),target=index+delta;
+    if(index<0||target<0||target>=map.order.length)return;
+    [map.order[index],map.order[target]]=[map.order[target],map.order[index]];
+    if(commit(map,'Порядок тем сохранён.'))focusEditorRow(id,delta<0?'up':'down');
+  }
+  function renderPicker() {
+    const map=readMap(),list=$('#widget-options'),all=catalog(map),scroll=picker.scrollTop;
+    list.replaceChildren();
+    const order=[...map.order,...all.map(t=>t.id).filter(id=>!map.order.includes(id))];
+    for(const id of order){
+      const topic=all.find(t=>t.id===id),index=map.order.indexOf(id),enabled=index>=0;
+      const row=document.createElement('div');row.className='topic-editor-row'+(enabled?' is-enabled':'');row.dataset.topic=id;
+      const info=document.createElement('div');info.className='topic-editor-info';
+      const icon=textEl('span',topic.icon,'widget-choice-icon');icon.setAttribute('aria-hidden','true');
+      if(iconPaths[id])icon.innerHTML='<svg viewBox="0 0 24 24">'+iconPaths[id]+'</svg>';
+      const description=document.createElement('div');description.className='topic-editor-description';
+      description.append(textEl('strong',topic.title),textEl('small',!available(id)?'Недоступен по сведениям анкеты':topic.hint));
+      info.append(icon,description);
+      const toggle=button((enabled?'Выключить: ':'Включить: ')+topic.title,enabled?'Вкл':'Выкл',()=>toggleTopic(id));
+      toggle.className='topic-toggle';toggle.dataset.action='toggle';toggle.setAttribute('role','switch');toggle.setAttribute('aria-checked',String(enabled));
+      toggle.disabled=!enabled&&!available(id);info.append(toggle);row.append(info);
+      if(enabled){
+        const controls=document.createElement('div');controls.className='topic-order-controls';
+        controls.setAttribute('role','group');controls.setAttribute('aria-label','Порядок: '+topic.title);
+        controls.append(textEl('small','Порядок '+(index+1)));
+        for(const [action,text,label,delta] of [['up','↑','Выше',-1],['down','↓','Ниже',1]]){
+          const control=button(label+': '+topic.title,text,()=>moveTopic(id,delta));
+          control.dataset.action=action;control.disabled=delta<0?index===0:index===map.order.length-1;controls.append(control);
+        }
+        row.append(controls);
+      }
+      list.append(row);
+    }
+    picker.scrollTop=scroll;
   }
 
   function openNotes(id) {
@@ -274,11 +270,10 @@
     }
   }
 
-  const help = textEl('p','Стрелками меняй порядок. Крестик убирает только виджет — записи остаются.','fine');
-  help.id = 'day-edit-help'; help.hidden = true;
-  $('#day-widgets').before(help);
-  $('#edit-day').onclick = () => { editing = !editing; render(); };
   $('#add-widget').onclick = () => { announce(''); renderPicker(); picker.showModal(); };
+  function showCustom(show) { $('#custom-widget-form').hidden=!show;$('#show-custom-widget').setAttribute('aria-expanded',String(show));if(show)$('#custom-widget-title').focus(); }
+  $('#show-custom-widget').onclick=()=>showCustom($('#custom-widget-form').hidden);
+  $('#cancel-custom-widget').onclick=()=>{showCustom(false);$('#show-custom-widget').focus();};
   $('#custom-widget-form').onsubmit = event => {
     event.preventDefault();
     const title = $('#custom-widget-title').value.trim();
@@ -287,7 +282,7 @@
     if (map.custom.length >= 30) { announce('Можно создать до 30 своих тем. Готовые темы доступны выше.',true); return; }
     const id = 'custom-'+crypto.randomUUID();
     map.custom.push({id,title}); map.order.push(id);
-    if (commit(map,'Тема «'+title+'» добавлена.')) $('#custom-widget-title').value = '';
+    if (commit(map,'Тема «'+title+'» добавлена.')) { $('#custom-widget-title').value='';showCustom(false);focusEditorRow(id); }
   };
   $('#custom-widget-title').oninput = event => event.target.setCustomValidity('');
   $('#widget-note-date').onchange = renderNotes;

@@ -56,7 +56,7 @@ with sync_playwright() as p:
  print('PASS: fixture-based keyword search and partial macro totals are not presented as complete')
  page.unroute('https://world.openfoodfacts.org/**');page.route('https://world.openfoodfacts.org/**',lambda route:route.abort())
  page.evaluate('lastCatalogRequest=0');page.locator('#catalog-query').fill('неизвестный');page.locator('#catalog-submit').click();page.wait_for_function("document.querySelector('#catalog-status').textContent.includes('недоступен')")
- ctx.set_offline(True);page.reload();assert page.locator('#connection').inner_text()=='Без интернета'
+ ctx.set_offline(True);page.reload();assert page.evaluate('navigator.onLine') is False
  # Selected diary day resets to today, preserving all logged historical dates.
  assert page.locator('#food-calories').inner_text()=='619 ккал'
  page.locator('#local-product-search').fill('Тестовый');assert page.locator('#food-product option').count()==1

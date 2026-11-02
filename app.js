@@ -19,7 +19,7 @@ const today=localDate();let selected=today;let month=new Date(new Date().getFull
 const fmtDay=s=>parseDay(s).toLocaleDateString('ru',{day:'numeric',month:'long'});
 const fmtTime=s=>new Date(s).toLocaleString('ru',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
 const duration=m=>`${Math.floor(m/60)} ч ${Math.round(m%60)} мин`;
-function renderCurrentDate(now=new Date()){const dateHeading=now.toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'});$('#today').textContent=dateHeading.charAt(0).toLocaleUpperCase('ru')+dateHeading.slice(1)+' '+now.getFullYear();$('#today').dateTime=localDate(now);}
+function renderCurrentDate(now=new Date()){const dateHeading=now.toLocaleDateString('ru',{weekday:'long',day:'numeric',month:'long'});$('#today').textContent=dateHeading.charAt(0).toLocaleUpperCase('ru')+dateHeading.slice(1)+' '+now.getFullYear()+' год';$('#today').dateTime=localDate(now);}
 renderCurrentDate();
 $('#period-start').max=today;$('#period-start').value=today;$('#food-date').value=today;
 $('#cycle-length').value=state.cycleLength;$('#period-length').value=state.periodLength;
@@ -197,7 +197,7 @@ $('#water-container').onchange=()=>{const type=$('#water-container').value;state
 $('#water-form').onsubmit=e=>{e.preventDefault();const ml=Number($('#water-volume').value),container=$('#water-container').value,date=$('#food-date').value;if(!date||!Number.isInteger(ml)||ml<1||ml>10000)return;state.waterSettings.container=container;state.waterSettings[container]=ml;state.water.push({id:crypto.randomUUID(),date,ml,container});save();};
 
 $('#export-data').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`woman-diary-${today}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
-function connection(){$('#connection').textContent=navigator.onLine?'На связи':'Без интернета';}window.addEventListener('online',connection);window.addEventListener('offline',connection);connection();
+
 let prompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;$('#install').hidden=false;});$('#install').onclick=async()=>{if(prompt){await prompt.prompt();prompt=null;$('#install').hidden=true;}};
 function updateNavigation(){window.LunaNavigation?.refresh();}window.addEventListener('hashchange',updateNavigation);
 if('serviceWorker'in navigator)navigator.serviceWorker.register('./sw.js').catch(()=>{$('#notice').textContent='Не удалось включить офлайн-режим. Попробуй обновить страницу с интернетом.';});

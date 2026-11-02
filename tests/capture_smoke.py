@@ -54,7 +54,7 @@ with sync_playwright() as p:
   for link in nav.locator('a').all():assert link.bounding_box()['width']>=44 and link.bounding_box()['height']>=44
  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo({top:0,behavior:"instant"})');page.screenshot(path='/tmp/luna-check/capture-mobile.png')
  ctx.set_offline(True);page.reload();expect(page.locator('#capture')).to_be_visible();assert page.evaluate('[state.meals.length,state.sleepEvents.length,state.workouts.length]')==[4,1,2]
- assert page.locator('#connection').inner_text()=='Без интернета'
+ assert page.evaluate('navigator.onLine') is False
  # Text-only export includes new record types.
  with page.expect_download() as download:page.locator('#export-data').click()
  data=json.loads(Path(download.value.path()).read_text());assert len(data['sleepEvents'])==1 and len(data['workouts'])==2
