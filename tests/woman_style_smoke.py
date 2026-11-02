@@ -13,8 +13,8 @@ with sync_playwright() as p:
  assert page.locator('[href*=wet-glass]').count()==0
  styles=page.evaluate('''()=>{const header=getComputedStyle(document.querySelector('main>header')),text=getComputedStyle(document.querySelector('#daily-affirmation')),date=getComputedStyle(document.querySelector('#today'));return {headerBg:header.backgroundColor,textShadow:text.textShadow,dateShadow:date.textShadow,color:text.color,dateColor:date.color,drop:getComputedStyle(document.body,'::after').content}}''')
  assert styles['headerBg']=='rgba(0, 0, 0, 0)',styles
- assert styles['textShadow']=='none' and styles['dateShadow']!='none'
- assert styles['color']==styles['dateColor'] and styles['drop'] in ['none','normal']
+ assert styles['textShadow']=='none' and styles['dateShadow']=='none'
+ assert styles['drop'] in ['none','normal']
  original=page.locator('#daily-affirmation').inner_text()
  for width in [320,375,390,430,768,1280]:
   page.set_viewport_size({'width':width,'height':900});page.evaluate('document.fonts.ready')
@@ -26,4 +26,4 @@ with sync_playwright() as p:
  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo({top:0,behavior:"instant"})');page.screenshot(path='/tmp/luna-check/woman-mobile.png')
  page.locator('.bottom-nav [data-view="profile"]').click();expect(page.locator('#account')).to_be_visible();assert page.locator('[data-menu="profile"] a span:not(.menu-icon)').all_text_contents()==['Аккаунт','Настройки','Подписка','Подключённые девайсы']
  ctx.set_offline(True);page.reload();assert page.evaluate('caches.match(new URL("./assets/dew-monstera.webp",location.href)).then(Boolean)');expect(page.locator('#account')).to_be_visible();page.locator('.bottom-nav [data-view="diary"]').click();expect(page.locator('#home')).to_be_visible();assert page.title().startswith('Woman')
- assert not errors,errors;b.close();print('PASS: Woman identity, original PWA id, no droplets, no sidebar, no date panel, matching orange colors, date-only glow, all 31 affirmations fit within two lines at 320–1280 px, offline/profile navigation')
+ assert not errors,errors;b.close();print('PASS: Woman identity, original PWA id, no droplets, no sidebar, no date panel, minimal green styling without glow, all 31 affirmations fit within two lines at 320–1280 px, offline/profile navigation')
