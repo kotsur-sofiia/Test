@@ -6,7 +6,7 @@ import os
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8016/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},has_touch=True,is_mobile=True,locale='ru-RU',timezone_id='Europe/Podgorica');ctx.add_init_script('window.micCalls=0;window.SpeechRecognition=class{constructor(){micCalls++}}')
- page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null')
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL.split('#')[0]+'#profile');page.wait_for_function('navigator.serviceWorker.controller!==null')
  assert page.locator('#profile [type=date]').count()==0 and page.locator('[data-voice-section="profile-fill"]').count()==0
  assert page.locator('#profile .voice-start').count()==0 and page.evaluate('micCalls')==0
  menu=page.locator('[data-menu="profile"]');assert menu.locator('a span:not(.menu-icon)').all_text_contents()==['Аккаунт','Настройки','Подписка','Подключённые девайсы']

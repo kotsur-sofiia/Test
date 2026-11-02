@@ -7,7 +7,7 @@ import os,json
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8015/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,timezone_id='Europe/Podgorica',locale='ru-RU');page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("italic 400 39px Cormorant Garamond","Обо мне"),document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("italic 400 39px Cormorant Garamond","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")')
+ page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL.split('#')[0]+'#profile');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("italic 400 39px Cormorant Garamond","Обо мне"),document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("italic 400 39px Cormorant Garamond","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")')
  assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='Понедельник, 2 ноября 2026'
  assert page.locator('#profile h1').inner_text()=='Обо мне'
  assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Дневник'
@@ -63,6 +63,6 @@ with sync_playwright() as p:
  assert not errors,errors;ctx.close()
  # Migration keeps the prior known age for references, without fabricating a birthday.
  ctx=b.new_context();ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],profile:{name:'Прежний профиль',age:7,ageUnit:'months',weight:7.5,sex:'female',status:'none'}}))")
- page=ctx.new_page();page.goto(URL);assert page.locator('#profile-birthDate').input_value()=='' and page.locator('#profile-weight').input_value()=='7.5' and page.evaluate('reference("iron")') is None
+ page=ctx.new_page();page.goto(URL.split('#')[0]+'#profile');assert page.locator('#profile-birthDate').input_value()=='' and page.locator('#profile-weight').input_value()=='7.5' and page.evaluate('reference("iron")') is None
  fill_birth_date(page,page.evaluate('localDate()'));page.locator('#profile-form>button').click();assert page.evaluate('state.profile.legacyAge.age')==7 and page.evaluate('profileAge()')==0
  b.close();print('PASS: mobile About me/date/sections, DOB age and nutrition, optional body metrics/BMI, health states and cycle suppression, pregnancy/lactation, no inferred fertility, legacy preservation, validation/quota rollback, responsive inputs, offline/export')

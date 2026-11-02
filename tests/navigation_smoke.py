@@ -8,7 +8,7 @@ URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8012/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox']);ctx=b.new_context(viewport={'width':1280,'height':1000})
  ctx.add_init_script("""window.__speech=[];window.SpeechRecognition=class{constructor(){__speech.push(this)}start(){queueMicrotask(()=>this.onstart?.())}stop(){}abort(){this.aborted=true}}""")
- page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null')
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL.split('#')[0]+'#profile');page.wait_for_function('navigator.serviceWorker.controller!==null')
  bottom=page.get_by_role('navigation',name='Основная навигация',exact=True)
  assert bottom.evaluate('(e)=>getComputedStyle(e).position')=='fixed'
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Nunito')
@@ -24,21 +24,21 @@ with sync_playwright() as p:
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
  fill_birth_date(page,'1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
- bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
+ bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#home')).to_be_visible() and not page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
  assert page.locator('[data-menu="diary"]').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
- page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
- voice=page.locator('[data-voice-section="sleep"]');voice.evaluate('(e)=>e.open=true');voice.locator('.voice-editor').fill('Черновик дневника сна')
+ page.locator('[data-menu=diary] [href="#food"]').click();page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
+ page.locator('[data-menu=diary] [href="#sleep"]').click();voice=page.locator('[data-voice-section="sleep"]');voice.evaluate('(e)=>e.open=true');voice.locator('.voice-editor').fill('Черновик дневника сна')
  voice.locator('.voice-start').click();assert page.evaluate('__speech.at(-1).aborted') is None
  bottom.get_by_role('link',name='Библиотека',exact=True).click();expect(page.locator('#library')).to_be_visible() and not page.locator('#sleep').is_visible()
  assert page.evaluate('__speech.at(-1).aborted') is True
  bottom.get_by_role('link',name='Друзья',exact=True).click();expect(page.locator('#friends')).to_be_visible() and not page.locator('#library').is_visible()
- bottom.get_by_role('link',name='Дневник',exact=True).click();assert voice.locator('.voice-editor').input_value()=='Черновик дневника сна'
+ bottom.get_by_role('link',name='Дневник',exact=True).click();page.locator('[data-menu=diary] [href="#sleep"]').click();assert voice.locator('.voice-editor').input_value()=='Черновик дневника сна'
  assert page.locator('#food-calories').inner_text()=='379 ккал'
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Clinical visibility survives routing: a male or lactating profile must not reveal cycle predictions.
  page.locator('#profile-sex').select_option('male');page.locator('#profile-form button').click();bottom.get_by_role('link',name='Дневник',exact=True).click()
  assert not page.locator('#cycle').is_visible() and not page.locator('[data-menu="diary"] a[href="#cycle"]').is_visible()
- expect(page.locator('#sleep')).to_be_visible()
+ page.locator('[data-menu=diary] [href="#sleep"]').click();expect(page.locator('#sleep')).to_be_visible()
  page.evaluate('location.hash="cycle"');page.wait_for_function('location.hash==="#cycle"')
  assert not page.locator('#cycle').is_visible()
  # Browser history and direct routes select the appropriate main area and contextual menu.

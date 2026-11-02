@@ -101,7 +101,7 @@ with sync_playwright() as p:
  emit([{'text':'этот поздний результат не нужен','final':True}]);assert food.locator('.voice-editor').input_value()==''
  assert food.locator('.voice-date').input_value()==yesterday
  # Changing profile to hide the cycle also stops its microphone.
- cycle.locator('.voice-start').click();page.evaluate("state.profile={name:'Тест',sex:'male',age:35,ageUnit:'years',weight:70,status:'none'};save()")
+ cycle=widget('cycle');cycle.locator('.voice-start').click();page.evaluate("state.profile={name:'Тест',sex:'male',age:35,ageUnit:'years',weight:70,status:'none'};save()")
  assert page.evaluate('__speech.at(-1).aborted') is True
  assert not page.locator('#cycle').is_visible()
  print('PASS: explicit note dates, draft date retained across diary navigation, stale date results ignored, microphone stopped when a section is hidden')

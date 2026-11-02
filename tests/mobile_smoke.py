@@ -9,7 +9,7 @@ with sync_playwright() as p:
  browser=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox'])
  ctx=browser.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True)
  ctx.add_init_script("window.SpeechRecognition=class{start(){this.onstart?.()}abort(){window.micAborted=true}stop(){}}")
- page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL)
+ page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL.split('#')[0]+'#profile')
  page.wait_for_function('navigator.serviceWorker.controller!==null')
  nav=page.locator('.bottom-nav')
  def diary(section):
@@ -50,9 +50,9 @@ with sync_playwright() as p:
  diary('cycle');layout();assert page.locator('.day').first.bounding_box()['height']>=44
  diary('sleep');assert voice.locator('.voice-editor').input_value()=='Телефонный черновик'
  diary('food');assert page.locator('#food-grams').input_value()=='175'
- # Touch landscape remains a single-screen diary; desktop expands without losing inputs.
+ # Every screen size keeps a single diary topic without losing inputs.
  page.set_viewport_size({'width':844,'height':390});layout();assert not page.locator('#sleep').is_visible()
- page.set_viewport_size({'width':1280,'height':1000});expect(page.locator('#sleep')).to_be_visible()
+ page.set_viewport_size({'width':1280,'height':1000});expect(page.locator('#sleep')).not_to_be_visible();expect(page.locator('#food')).to_be_visible()
  assert page.locator('#food-grams').input_value()=='175'
  page.set_viewport_size({'width':390,'height':844});expect(page.locator('#sleep')).not_to_be_visible()
  page.evaluate('scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')

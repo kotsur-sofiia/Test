@@ -1,0 +1,122 @@
+/* Softer outlines and rounded display type, with clear Nunito for long text. */
+:root { --display: Comfortaa, Nunito, Arial, sans-serif; }
+h1, h2, .profile-card>h1, .section-title h2, .phase-card h3,
+.empty-view h3, .mini strong, #home #daily-affirmation {
+  font-family: var(--display);
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: 1.4;
+}
+.layout main { border-radius: 88px 88px 38px 38px; }
+.card, .mini, .profile-basics, .profile-card .profile-group,
+.capture-item, .catalog-item { border-radius: 28px; }
+.card.profile-card { border-radius: 0; }
+.profile-card .profile-group>legend, .profile-card .about-label {
+  font-family: var(--sans);
+  font-weight: 700;
+}
+input, select, textarea, .profile-group textarea, .voice-editor,
+.capture-item textarea, .birth-control { border-radius: 20px; }
+.birth-control input, .birth-control select { border-radius: 0; }
+button, .section-navigation nav a, .badge, .pill { border-radius: 999px; }
+.voice-card, .voice-note, .record, .macro, .profile-bmi,
+.salt-summary, .salt-block, .ai-note { border-radius: 22px; }
+.bottom-nav { border-radius: 30px; }
+.bottom-nav a { border-radius: 23px; }
+.phase-card h3 { font-size: 25px; }
+
+.day-heading { flex-wrap: wrap; display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.day-heading h1 { font-size: 29px; margin: 6px 0; }
+.day-heading .day-edit { min-height: 44px; padding: 9px 18px; font-size: 14px; }
+.day-intro { font-size: 14px; color: #59634e; margin: 6px 0 24px; }
+.day-widgets { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px; }
+.day-widget { min-width: 0; display: flex; flex-direction: column; }
+.day-widget[hidden] { display: none; }
+.day-widget .mini {
+  display: flex; flex-direction: column; justify-content: center; width: 100%; flex: 1;
+  min-height: 148px; padding: 23px 38px 23px 23px; border-radius: 32px;
+  text-align: left; text-decoration: none; white-space: normal;
+  background: #29442a; border: 1px solid #29442a; cursor: pointer;
+}
+.day-widget .mini>span, .day-widget .mini strong, .day-widget .mini p, .day-widget .mini:after { color: #f1e8d7; }
+.day-widget .mini>span { font: 650 11px/1.5 var(--sans); letter-spacing: .06em; }
+.day-widget .mini strong {
+  font-family: var(--display); font-weight: 600; font-size: 19px; line-height: 1.45;
+  margin: 8px 0 0; overflow-wrap: anywhere;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+}
+.day-widget .mini p { font: 400 13px/1.6 var(--sans); margin: 8px 0 0; }
+.day-widget .mini:hover { background: #203922; border-color: #203922; }
+.affirmation-widget { grid-column: 1/-1; }
+.affirmation-widget .welcome {
+  border: 1px solid #d8ceb9; border-radius: 36px; padding: 25px; margin: 0;
+  height: 100%; background: #f4ecdd;
+}
+#home #daily-affirmation { font-size: clamp(24px,2.6vw,30px); margin: 12px 0 16px; max-width: none; }
+.day-empty { padding: 28px 10px; text-align: center; color: #59634e; font-size: 15px; line-height: 1.8; }
+.add-widget {
+  display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 58px;
+  margin-top: 18px; border: 1px dashed #8d9976; background: #e8ddc6; color: #29442a; font-size: 16px;
+}
+.add-widget span { font: 28px/1 var(--sans); }
+.add-widget:focus-visible { outline: 2px solid #29442a; outline-offset: 3px; }
+#day-builder-status:empty { display: none; }
+.widget-controls { display: flex; align-items: center; justify-content: flex-end; gap: 8px; padding: 0 4px 8px; }
+.widget-controls button { padding: 0; width: 44px; height: 44px; min-height: 44px; font-size: 23px; }
+.is-editing .day-widget { padding: 10px; border: 1px solid #cfc5af; border-radius: 38px; }
+.widget-unavailable .mini { background: #59634e; cursor: default; }
+
+.day-sheet {
+  position: fixed; inset: 0; width: min(560px,calc(100% - 32px)); max-width: none;
+  max-height: calc(100dvh - 48px); margin: auto; padding: 28px;
+  overflow-y: auto; overscroll-behavior: contain; background: #f1e8d7; color: #293d30;
+  border: 1px solid #d8ceb9; border-radius: 38px; box-shadow: 0 20px 80px #091b1955;
+}
+.day-sheet::backdrop { background: #0a211bd1; }
+body:has(.day-sheet[open]) { overflow: hidden; }
+.sheet-heading { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 20px; }
+.sheet-heading h2 { font-size: 25px; margin: 4px 0 0; }
+.sheet-heading p { margin: 8px 0 0; }
+.sheet-close { flex-shrink: 0; width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 26px; }
+.widget-options { display: grid; grid-template-columns: minmax(0,1fr); gap: 10px; }
+.widget-choice {
+  display: flex; align-items: center; gap: 14px; padding: 14px 16px; width: 100%; min-height: 76px;
+  border-radius: 26px; text-align: left; white-space: normal; color: #f1e8d7; background: #29442a;
+}
+.widget-choice-icon { font-size: 27px; width: 28px; text-align: center; flex-shrink: 0; }
+.widget-choice>span:nth-child(2) { flex: 1; min-width: 0; }
+.widget-choice strong { display: block; font-size: 16px; font-weight: 700; overflow-wrap: anywhere; }
+.widget-choice small { display: block; font: 400 13px/1.5 var(--sans); margin-top: 4px; }
+.widget-choice-add { font-size: 23px; }
+.widget-choice:disabled { opacity: 1; background: #e5dbc6; border-color: #d2c8b1; color: #59634e; }
+.custom-widget-form { margin-top: 24px; display: grid; gap: 14px; }
+.custom-widget-form input, #widget-note-form input, #widget-note-form textarea { font-size: 16px; min-height: 48px; }
+.day-sheet form button { min-height: 48px; font-size: 15px; }
+.day-sheet #widget-note-text { resize: vertical; padding: 16px; line-height: 1.6; width: 100%; }
+.widget-note { display: flex; align-items: flex-start; gap: 12px; background: #e8ddc6; border-radius: 24px; padding: 16px; }
+.widget-note p { flex: 1; min-width: 0; margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 15px; line-height: 1.7; }
+.widget-note button { width: 44px; height: 44px; min-height: 44px; padding: 0; flex-shrink: 0; font-size: 23px; }
+
+@media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
+  .layout main { border-radius: 54px 54px 30px 30px; }
+  .card, .profile-basics, .profile-card .profile-group { border-radius: 28px; }
+  .card.profile-card { border-radius: 0; }
+  h2, .section-title h2 { font-size: 22px; }
+  .profile-card>h1 { font-size: 27px; }
+  .day-heading h1 { font-size: 26px; }
+  .day-heading .day-edit { padding: 8px 14px; font-size: 13px; }
+  .day-widgets { grid-template-columns: minmax(0,1fr); gap: 14px; }
+  .day-widget .mini { min-height: 132px; padding: 20px 35px 20px 20px; }
+  .day-widget .mini strong { font-size: 18px; }
+  .affirmation-widget .welcome { padding: 22px 14px; border-radius: 30px; }
+  #home #daily-affirmation { font-size: 23px; line-height: 1.4; }
+  .day-sheet { width: calc(100% - 16px); max-height: calc(100dvh - 24px - env(safe-area-inset-top,0px)); inset: auto 0 0; margin: 0 auto; padding: 24px 18px calc(24px + env(safe-area-inset-bottom,0px)); border-radius: 34px 34px 0 0; }
+  .sheet-heading h2 { font-size: 23px; }
+  .bottom-nav { border-radius: 28px; }
+  .bottom-nav a { border-radius: 22px; }
+}
+@media(prefers-reduced-motion:reduce) { .day-widget .mini { transition: none; } }
+
+.day-heading-actions { display: flex; align-items: center; gap: 8px; }
+.day-add-top { width: 44px; height: 44px; min-height: 44px; padding: 0; font-size: 27px; }
+@media(max-width:360px) { .day-heading h1 { font-size: 23px; }.day-heading .day-edit { padding: 8px 11px; } }

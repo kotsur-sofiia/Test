@@ -10,7 +10,7 @@ with sync_playwright() as p:
  ctx=b.new_context(viewport={'width':1280,'height':1050},timezone_id='Europe/Podgorica')
  ctx.add_init_script("""if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:['2026-10-10'],cycleLength:28,periodLength:5,sleep:[],meals:[],products:[{id:'custom-archived',name:'Прежний продукт',kcal:100,protein:1,fat:2,carbs:3,sugars:2,inositol:20}],water:[{id:'old-water',date:'2026-10-01',ml:250,container:'glass'}],supplements:[{id:'old-omega6',name:'Прежняя запись',date:'2026-10-01',nutrient:'omega6',dose:100,unit:'mg'}]}));""")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller !== null')
+ page.goto(URL.split('#')[0]+'#profile');page.wait_for_function('navigator.serviceWorker.controller !== null')
  def row(key):return page.locator(f'#nutrients [data-nutrient="{key}"]')
  assert page.locator('#profile-form').is_visible()
  assert 'Без анкеты' in page.locator('#nutrition-profile-context').inner_text()
