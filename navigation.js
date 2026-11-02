@@ -14,5 +14,5 @@
  function navigate(){refresh();requestAnimationFrame(()=>{const route=current();if(route.id==='profile'){window.scrollTo({top:0,behavior:'instant'});return;}const target=route.target&&!route.target.closest('[hidden]')?route.target:document.querySelector('[data-main-view]:not([hidden])');target?.scrollIntoView({block:'start',behavior:'instant'});});}
  $('#settings-export').onclick=()=>$('#export-data').click();
  phone.addEventListener('change',refresh);
- window.addEventListener('hashchange',navigate);window.LunaNavigation=Object.freeze({refresh});refresh();
+ window.addEventListener('load',()=>{if(current().id==='profile')window.scrollTo({top:0,behavior:'instant'});});window.addEventListener('hashchange',navigate);window.LunaNavigation=Object.freeze({refresh});refresh();
 })();

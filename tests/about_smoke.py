@@ -7,7 +7,7 @@ import os,json
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8015/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,timezone_id='Europe/Podgorica',locale='ru-RU');page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
- page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready');assert page.evaluate('document.fonts.check("400 16px Manrope","Женское здоровье") && document.fonts.check("500 42px Cormorant Garamond","Обо мне")')
+ page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("500 35px Comfortaa","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")')
  assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='Понедельник, 2 ноября'
  assert page.locator('#profile h1').inner_text()=='Обо мне'
  assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Дневник'
@@ -56,7 +56,7 @@ with sync_playwright() as p:
    if field.is_visible() and field.get_attribute('type')!='checkbox':assert field.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=16
  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo({top:0,behavior:"instant"})');page.screenshot(path='/tmp/luna-check/about-me-mobile.png')
  page.locator('#profile-body-fields').scroll_into_view_if_needed();page.screenshot(path='/tmp/luna-check/body-mobile.png')
- ctx.set_offline(True);page.reload();page.evaluate('document.fonts.ready');assert page.evaluate('document.fonts.check("400 16px Manrope","Женское здоровье") && document.fonts.check("500 42px Cormorant Garamond","Обо мне")');assert page.locator('#profile-birthDate').input_value()=='1996-11-02' and page.locator('#profile-waterPercent').input_value()=='55'
+ ctx.set_offline(True);page.reload();page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("500 35px Comfortaa","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")');assert page.locator('#profile-birthDate').input_value()=='1996-11-02' and page.locator('#profile-waterPercent').input_value()=='55'
  assert page.locator('#profile-healthNotes').input_value()=='Личная заметка' and page.evaluate('state.periods.length')==1
  with page.expect_download() as d:page.locator('#export-data').click()
  data=json.loads(Path(d.value.path()).read_text());assert data['profile']['body']['basalMetabolism']==1450 and data['profile']['birthDate']=='1996-11-02'
