@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Life ID",
-  "short_name": "Life ID",
-  "description": "Life ID — дневник заботы о себе: цикл, сон, питание",
+  "name": "Woman",
+  "short_name": "Woman",
+  "description": "Woman — дневник заботы о себе: цикл, сон, питание",
   "lang": "ru",
   "start_url": "./",
   "scope": "./",

@@ -1,4 +1,4 @@
-"""Life ID identity, calendar rotation, legacy diary persistence and devices routing."""
+"""Woman identity, calendar rotation, legacy diary persistence and devices routing."""
 from playwright.sync_api import sync_playwright,expect
 from datetime import datetime,timezone
 from pathlib import Path
@@ -8,8 +8,8 @@ with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,timezone_id='Europe/Podgorica',locale='ru-RU')
  ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:['2026-10-20'],cycleLength:28,periodLength:5,sleep:[],meals:[{id:'old',date:'2026-11-02',product:'oats',grams:100}],profile:{name:'София',birthDate:'1996-11-02',age:30,ageUnit:'years',sex:'female',status:'none'}}))")
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,22,58,0,tzinfo=timezone.utc));page.goto(URL+'#home');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
- assert page.title()=='Life ID — подари внимание себе' and page.locator('.logo').text_content()=='Life ID'
- manifest=page.evaluate('fetch("./manifest.webmanifest").then(r=>r.json())');assert manifest['name']=='Life ID' and manifest['short_name']=='Life ID' and manifest['id']=='./'
+ assert page.title()=='Woman — подари внимание себе' and page.locator('.logo').text_content()=='Woman'
+ manifest=page.evaluate('fetch("./manifest.webmanifest").then(r=>r.json())');assert manifest['name']=='Woman' and manifest['short_name']=='Woman' and manifest['id']=='./'
  assert page.locator('#home .eyebrow').text_content()=='Подари внимание себе'
  assert page.locator('#affirmation-date').count()==0 and page.locator('#today').is_visible()
  assert page.locator('#today').inner_text()=='Понедельник, 2 ноября 2026'
@@ -31,4 +31,4 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo({top:0,behavior:"instant"})');page.screenshot(path='/tmp/luna-check/life-id-home.png')
  page.locator('.bottom-nav [data-view="profile"]').click();page.locator('[data-menu="profile"] [href="#devices"]').click();page.screenshot(path='/tmp/luna-check/life-id-devices.png')
- assert not errors,errors;b.close();print('PASS: Life ID branding/manifest, daily stable affirmation, live local midnight, month/year/leap/DST dates, devices navigation and offline route, unchanged legacy data, responsive typography')
+ assert not errors,errors;b.close();print('PASS: Woman branding/manifest, daily stable affirmation, live local midnight, month/year/leap/DST dates, devices navigation and offline route, unchanged legacy data, responsive typography')
