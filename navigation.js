@@ -2,7 +2,7 @@
 'use strict';
 (() => {
  const phone=matchMedia('(max-width:767px),(max-width:1023px) and (pointer:coarse)');
- const profileSections=new Set(['account','settings','subscription']);
+ const profileSections=new Set(['account','settings','subscription','devices']);
  function current(){if(location.hash==='#goals')history.replaceState(null,'','#profile');let id;try{id=decodeURIComponent(location.hash.slice(1)||'profile');}catch{id='profile';}const target=document.getElementById(id);const area=target?.closest('[data-main-view]')?.dataset.mainView||'profile';return {id,target,area,profileSection:profileSections.has(id)?id:'account'};}
  function refresh(){const route=current();let section=route.target?.closest('#profile,#food,#sleep,#cycle,#activity')?.id||'home';if(section==='cycle'&&$('#cycle').dataset.available==='false')section='home';document.body.dataset.view=route.area;document.body.dataset.section=route.area==='diary'?section:route.profileSection;for(const panel of document.querySelectorAll('[data-main-view]')){let visible=panel.dataset.mainView===route.area;if(route.area==='profile')visible=visible&&panel.id===route.profileSection;if(route.area==='diary'){if(section==='profile')visible=visible&&panel.id==='profile';else{visible=visible&&panel.id!=='profile';if(phone.matches)visible=visible&&(panel.id===section||!panel.id&&section==='home');}}if(panel.id==='cycle'&&panel.dataset.available==='false')visible=false;panel.hidden=!visible;}
   for(const menu of document.querySelectorAll('.sidebar nav[data-menu]'))menu.hidden=menu.dataset.menu!==route.area;

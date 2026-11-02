@@ -183,7 +183,7 @@ for(const ml of [100,200,250,300,500]){const button=textEl('button',ml+' мл');
 $('#water-container').onchange=()=>{const type=$('#water-container').value;state.waterSettings.container=type;$('#water-volume').value=state.waterSettings[type];save();};$('#water-volume').onchange=rememberWaterVolume;
 $('#water-form').onsubmit=e=>{e.preventDefault();const ml=Number($('#water-volume').value),container=$('#water-container').value,date=$('#food-date').value;if(!date||!Number.isInteger(ml)||ml<1||ml>10000)return;state.waterSettings.container=container;state.waterSettings[container]=ml;state.water.push({id:crypto.randomUUID(),date,ml,container});save();};
 
-$('#export-data').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`luna-diary-${today}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+$('#export-data').onclick=()=>{const url=URL.createObjectURL(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download=`life-id-diary-${today}.json`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
 function connection(){$('#connection').textContent=navigator.onLine?'На связи':'Без интернета';}window.addEventListener('online',connection);window.addEventListener('offline',connection);connection();
 let prompt;window.addEventListener('beforeinstallprompt',e=>{e.preventDefault();prompt=e;$('#install').hidden=false;});$('#install').onclick=async()=>{if(prompt){await prompt.prompt();prompt=null;$('#install').hidden=true;}};
 function updateNavigation(){window.LunaNavigation?.refresh();}window.addEventListener('hashchange',updateNavigation);

@@ -14,7 +14,7 @@ with sync_playwright() as p:
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Nunito')
  assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Голосовая запись','Библиотека','Друзья']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
- assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Аккаунт','⚙Настройки','◇Подписка']
+ assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Аккаунт','⚙Настройки','◇Подписка','⌁Подключённые девайсы']
  page.locator('#profile-name').fill('Несохранённое имя');assert bottom.locator('[aria-current="page"]').inner_text()=='Дневник';bottom.get_by_role('link',name='Профиль',exact=True).click();expect(page.locator('#account')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#settings"]').click();expect(page.locator('#settings')).to_be_visible() and not page.locator('#profile').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
@@ -38,7 +38,7 @@ with sync_playwright() as p:
  # Clinical visibility survives routing: a male or lactating profile must not reveal cycle predictions.
  page.locator('#profile-sex').select_option('male');page.locator('#profile-form button').click();bottom.get_by_role('link',name='Дневник',exact=True).click()
  assert not page.locator('#cycle').is_visible() and not page.locator('[data-menu="diary"] a[href="#cycle"]').is_visible()
- assert page.locator('#sleep').is_visible()
+ expect(page.locator('#sleep')).to_be_visible()
  page.evaluate('location.hash="cycle"');page.wait_for_function('location.hash==="#cycle"')
  assert not page.locator('#cycle').is_visible()
  # Browser history and direct routes select the appropriate main area and contextual menu.

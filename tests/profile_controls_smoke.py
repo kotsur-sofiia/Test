@@ -9,7 +9,7 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null')
  assert page.locator('#profile [type=date]').count()==0 and page.locator('[data-voice-section="profile-fill"]').count()==0
  assert page.locator('#profile .voice-start').count()==0 and page.evaluate('micCalls')==0
- menu=page.locator('[data-menu="profile"]');assert menu.locator('a span:not(.menu-icon)').all_text_contents()==['Аккаунт','Настройки','Подписка']
+ menu=page.locator('[data-menu="profile"]');assert menu.locator('a span:not(.menu-icon)').all_text_contents()==['Аккаунт','Настройки','Подписка','Подключённые девайсы']
  page.locator('#profile-name').fill('София');fill_birth_date(page,'2000-02-29');page.locator('#profile-form>button').click();assert page.evaluate('state.profile.birthDate')=='2000-02-29' and page.evaluate('profileAge()')==26
  # Lists adapt to leap years and month length; changing a year does not silently fix a typed day.
  page.locator('#profile-pickYear').select_option('2001');assert page.locator('#profile-pickDay option[value="29"]').count()==0
@@ -20,7 +20,7 @@ with sync_playwright() as p:
  fill_birth_date(page,'2026-11-03');page.locator('#profile-form>button').click();assert page.evaluate('state.profile.birthDate')=='1996-11-02'
  fill_birth_date(page,'1996-11-02');page.locator('#profile-name').fill('Черновик')
  page.locator('.bottom-nav [data-view="profile"]').click()
- for section in ['account','settings','subscription']:
+ for section in ['account','settings','subscription','devices']:
   menu.locator(f'[href="#{section}"]').click();expect(page.locator('#'+section)).to_be_visible();assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Профиль'
   assert menu.locator('[aria-current="page"]').get_attribute('href')=='#'+section
  open_about(page);assert page.locator('#profile-name').input_value()=='Черновик'
@@ -37,4 +37,4 @@ with sync_playwright() as p:
  ctx.set_offline(True);page.reload();assert page.locator('#profile-birthDay').input_value()=='02' and page.locator('#profile-birthMonth').input_value()=='11' and page.locator('#profile-birthYear').input_value()=='1996'
  page.locator('.bottom-nav [data-view="profile"]').click();expect(page.locator('#account')).to_be_visible();page.reload();expect(page.locator('#account')).to_be_visible()
  page.goto(URL+'#goals');expect(page.locator('#profile')).to_be_visible();assert page.evaluate('location.hash')=='#profile'
- assert not errors,errors;b.close();print('PASS: manual/dropdown date parts, leap-year/day lists, invalid/future dates, saved DOB hydration, three profile submenus and About me in Diary, drafts, phone controls, offline/direct/legacy routes, no profile microphone')
+ assert not errors,errors;b.close();print('PASS: manual/dropdown date parts, leap-year/day lists, invalid/future dates, saved DOB hydration, four profile submenus and About me in Diary, drafts, phone controls, offline/direct/legacy routes, no profile microphone')
