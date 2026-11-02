@@ -1,3 +1,4 @@
+from profile_form import move_topic
 """Editable circular diary topics, inline notes, preservation and offline state."""
 from playwright.sync_api import sync_playwright, expect
 from pathlib import Path
@@ -32,11 +33,11 @@ with sync_playwright() as p:
  page.locator('#add-widget').click();page.keyboard.press('Escape');expect(page.locator('#widget-picker')).not_to_be_visible()
  page.locator('#add-widget').click();page.locator('#show-custom-widget').click();title='<img src=x> Творчество';page.locator('#custom-widget-title').fill(title);page.locator('#custom-widget-form button[type=submit]').click();custom=page.evaluate('state.dayMap.custom[0].id');assert page.locator('#widget-picker img').count()==0;page.locator('#widget-picker [data-close-dialog]').click()
  note(custom,'Акварель, 20 минут')
- page.locator('#add-widget').click();previous=order();page.locator(f'#widget-options [data-topic="{custom}"] [data-action=up]').click();assert order()[-2:]==[custom,'affirmation']
+ page.locator('#add-widget').click();previous=order();move_topic(page,custom,-1);assert order()[-2:]==[custom,'affirmation']
  page.locator('#widget-options [data-topic=skin] [data-action=toggle]').click();assert 'skin' not in order();assert page.evaluate('state.dayMap.notes.filter(n=>n.topic==="skin").length')==2
  page.locator('#widget-picker [data-close-dialog]').click();choose('skin');topic('skin');assert 'Мягкий уход' in page.locator('#widget-note-history').inner_text()
  expected=order();page.reload();assert order()==expected
- page.evaluate('''async()=>{const c=await caches.open('luna-diary-v37');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
+ page.evaluate('''async()=>{const c=await caches.open('luna-diary-v38');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
  old=page.evaluate('JSON.stringify(state.dayMap)');page.evaluate('()=>{window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException("full","QuotaExceededError")}}')
  page.locator('#add-widget').click();page.locator('#show-custom-widget').click();page.locator('#custom-widget-title').fill('Не сохранённая тема');page.locator('#custom-widget-form button[type=submit]').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;assert len(order())==len(expected);expect(page.locator('#custom-widget-title')).to_have_value('Не сохранённая тема');page.locator('#widget-picker [data-close-dialog]').click()
  topic('books');page.locator('#widget-note-text').fill('Текст при переполнении');page.locator('#widget-note-form button').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;expect(page.locator('#widget-note-text')).to_have_value('Текст при переполнении')

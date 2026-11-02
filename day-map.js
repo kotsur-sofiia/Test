@@ -197,13 +197,14 @@
       focusEditorRow(id);
     }
   }
-  function moveTopic(id, delta) {
-    const map=readMap(),index=map.order.indexOf(id),target=index+delta;
-    if(index<0||target<0||target>=map.order.length)return;
-    [map.order[index],map.order[target]]=[map.order[target],map.order[index]];
-    if(commit(map,'Порядок тем сохранён.'))focusEditorRow(id,delta<0?'up':'down');
+  function saveTopicOrder(order,id){
+    const map=readMap();
+    if(order.length!==map.order.length||new Set(order).size!==order.length||order.some(topic=>!map.order.includes(topic))){renderPicker();return;}
+    if(order.every((topic,index)=>topic===map.order[index])){announce('Порядок тем не изменён.');return;}
+    map.order=order;if(commit(map,'Порядок тем сохранён.'))focusEditorRow(id,'reorder');
   }
   function renderPicker() {
+    reordering.cancel();
     const map=readMap(),list=$('#widget-options'),all=catalog(map),scroll=picker.scrollTop;
     list.replaceChildren();
     const order=[...map.order,...all.map(t=>t.id).filter(id=>!map.order.includes(id))];
@@ -216,18 +217,11 @@
       const description=document.createElement('div');description.className='topic-editor-description';
       description.append(textEl('strong',topic.title),textEl('small',!available(id)?'Недоступен по сведениям анкеты':topic.hint));
       info.append(icon,description);
-      const toggle=button((enabled?'Выключить: ':'Включить: ')+topic.title,enabled?'Вкл':'Выкл',()=>toggleTopic(id));
+      const toggle=button((enabled?'Выключить: ':'Включить: ')+topic.title,'',()=>toggleTopic(id));
       toggle.className='topic-toggle';toggle.dataset.action='toggle';toggle.setAttribute('role','switch');toggle.setAttribute('aria-checked',String(enabled));
-      toggle.disabled=!enabled&&!available(id);info.append(toggle);row.append(info);
+      toggle.disabled=!enabled&&!available(id);const track=document.createElement('span');track.className='switch-track';track.setAttribute('aria-hidden','true');track.append(textEl('span','','switch-knob'));toggle.append(track);info.append(toggle);row.append(info);
       if(enabled){
-        const controls=document.createElement('div');controls.className='topic-order-controls';
-        controls.setAttribute('role','group');controls.setAttribute('aria-label','Порядок: '+topic.title);
-        controls.append(textEl('small','Порядок '+(index+1)));
-        for(const [action,text,label,delta] of [['up','↑','Выше',-1],['down','↓','Ниже',1]]){
-          const control=button(label+': '+topic.title,text,()=>moveTopic(id,delta));
-          control.dataset.action=action;control.disabled=delta<0?index===0:index===map.order.length-1;controls.append(control);
-        }
-        row.append(controls);
+        const grip=button('Переместить: '+topic.title,'⠿',()=>{});grip.className='topic-drag-handle';grip.dataset.action='reorder';grip.setAttribute('aria-pressed','false');grip.setAttribute('aria-describedby','topic-reorder-help');info.append(grip);
       }
       list.append(row);
     }
@@ -317,6 +311,7 @@
     render();
   });
   document.addEventListener('visibilitychange',() => { if (!document.hidden) render(); });
+  const reordering=WomanTopicReorder.attach({list:$('#widget-options'),dialog:picker,onDrop:saveTopicOrder,announce});
   window.WomanDayMap = Object.freeze({render, homeTopic, routeChanged, refreshDay:() => { render(); window.WomanCycleCare?.refreshDay(); }});
   render();
   window.LunaNavigation.refresh();

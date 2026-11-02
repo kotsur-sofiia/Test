@@ -1,3 +1,4 @@
+from profile_form import move_topic
 """Single topic editor, centered header, larger date, upgrades and disabled data."""
 from playwright.sync_api import sync_playwright,expect
 from datetime import datetime,timezone
@@ -13,9 +14,9 @@ with sync_playwright() as p:
  def close_editor():page.locator('#widget-picker [data-close-dialog]').click()
  assert order()==['cycle','books','water']
  assert page.locator('#edit-day,#connection').count()==0
- expect(page.locator('#today')).to_have_text('Понедельник, 2 ноября 2026 год')
+ expect(page.locator('#today .date-weekday')).to_have_text('ПОНЕДЕЛЬНИК');expect(page.locator('#today .date-calendar')).to_have_text('2 ноября 2026')
  open_editor();assert page.locator('#widget-picker-title').inner_text()=='Редактирование'
- assert 'Выбери темы, актуальные именно тебе.' in page.locator('#widget-picker').inner_text()
+ assert 'Выбери то, что актуально именно тебе.' in page.locator('#widget-picker').inner_text()
  titles=page.locator('.topic-editor-description strong').all_text_contents()
  for title in ['Подписка','Цикл','Питание','Гидратация','Кожа','Аффирмации','Медитация','Книги','Физическая активность','Рисование']:assert title in titles,title
  assert page.locator('#custom-widget-form').is_hidden() and page.locator('#show-custom-widget').inner_text()=='＋ Добавить свою'
@@ -23,7 +24,7 @@ with sync_playwright() as p:
  row('books').locator('[data-action=toggle]').click();assert row('books').locator('[data-action=toggle]').get_attribute('aria-checked')=='false'
  assert page.evaluate('state.dayMap.notes[0].text')=='Прежняя запись о книге'
  row('meditation').locator('[data-action=toggle]').click();row('drawing').locator('[data-action=toggle]').click();row('membership').locator('[data-action=toggle]').click()
- row('membership').locator('[data-action=up]').click();expected=order();close_editor();page.reload();assert order()==expected
+ move_topic(page,'membership',-1);expected=order();close_editor();page.reload();assert order()==expected
  open_editor();row('books').locator('[data-action=toggle]').click();close_editor();page.locator('[data-widget-id=books] a').click();assert 'Прежняя запись' in page.locator('#widget-note-history').inner_text()
  for id,text in [('meditation','Десять минут спокойного дыхания'),('drawing','Идея акварели')]:
   page.locator('[data-widget-id='+id+'] a').click();expect(page.locator('#topic-notes')).to_be_visible();page.locator('#widget-note-text').fill(text);page.locator('#widget-note-form button').click();assert text in page.locator('#widget-note-history').inner_text()

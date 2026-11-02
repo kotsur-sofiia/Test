@@ -12,13 +12,13 @@ with sync_playwright() as p:
  manifest=page.evaluate('fetch("./manifest.webmanifest").then(r=>r.json())');assert manifest['name']=='Woman' and manifest['short_name']=='Woman' and manifest['id']=='./'
  assert page.locator('#home .eyebrow').text_content()=='Подари внимание себе'
  assert page.locator('#affirmation-date').count()==0 and page.locator('#today').is_visible()
- assert page.locator('#today').inner_text()=='Понедельник, 2 ноября 2026 год'
+ assert page.locator('#today').inner_text()=='ПОНЕДЕЛЬНИК\n2 ноября 2026'
  assert 'Твой ритм' not in page.locator('#home').inner_text() and 'Немного внимания' not in page.locator('#home').inner_text()
  first=page.locator('#daily-affirmation').inner_text();assert first and page.locator('#daily-affirmation').get_attribute('data-date')=='2026-11-02'
  # Midnight updates an already open app; no refresh, random reroll or storage writes.
  before=page.evaluate('localStorage.getItem("luna-diary-v1")');page.clock.pause_at(datetime(2026,11,2,22,59,59,tzinfo=timezone.utc));page.clock.run_for(2000)
  second=page.locator('#daily-affirmation').inner_text();assert first!=second and page.locator('#daily-affirmation').get_attribute('data-date')=='2026-11-03'
- assert page.locator('#today').inner_text()=='Вторник, 3 ноября 2026 год'
+ assert page.locator('#today').inner_text()=='ВТОРНИК\n3 ноября 2026'
  assert before==page.evaluate('localStorage.getItem("luna-diary-v1")')
  page.reload();assert page.locator('#daily-affirmation').inner_text()==second
  # Calendar mapping remains deterministic through DST changes, month/year boundaries and leap day.

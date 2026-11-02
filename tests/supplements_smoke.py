@@ -37,10 +37,11 @@ with sync_playwright() as p:
  assert page.locator('#profile-month').count()==0
  def profile(age,sex='female',status='none'):
   previous=page.evaluate('location.hash');page.evaluate('location.hash="profile"');page.wait_for_function('document.querySelector("#profile").hidden===false')
-  page.locator('#profile-name').fill('Тестовый профиль');fill_birth_date(page,page.evaluate('(age)=>{const d=new Date();return `${d.getFullYear()-age}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}',age));page.locator('#profile-birthDate').dispatch_event('change');page.locator('#profile-sex').select_option(sex);page.locator('#profile-weight').fill('60')
+  page.locator('#profile-name').fill('Тестовый профиль');fill_birth_date(page,page.evaluate('(age)=>{const d=new Date();return `${d.getFullYear()-age}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`}',age));page.locator('#profile-birthDate').dispatch_event('change');page.locator('#profile-weight').fill('60')
   if sex=='female' and age>=10:
    page.locator('#profile-status').select_option(status)
   page.locator('#profile-form button').click()
+  if sex=='male':page.evaluate("state.profile={...state.profile,sex:'male',status:'none',health:{...state.profile.health,breastfeeding:false}};save()")
   if previous and previous!='#profile':
    page.evaluate('(hash)=>location.hash=hash',previous);page.wait_for_function('document.body.dataset.view==="diary"')
  def norm(key):return page.evaluate('(key)=>reference(key)?.value??null',key)
@@ -71,7 +72,7 @@ with sync_playwright() as p:
  profile(13,status='lactating')
  assert norm('iron') is None and 'не назначаются' in page.locator('#profile-advice').inner_text()
  profile(35,'male')
- assert not page.locator('#profile-status-label').is_visible() and page.evaluate('state.profile.status')=='none'
+ assert page.evaluate('state.profile.sex')=='male' and page.evaluate('state.profile.status')=='none'
 
  profile(17,status='pregnant')
  assert norm('phosphorus')==1250 and norm('calcium')==1300 and norm('magnesium')==400

@@ -179,3 +179,32 @@ body[data-view=diary][data-section=cycle] #notice:not(:empty) { background:#f1e8
 .period-date-control:focus-within { outline:2px solid #7c8a5d; outline-offset:2px; border-radius:20px; }
 .period-native-date:focus-visible { opacity:0; outline:none; }
 #cycle-form input { font-size:16px; min-height:52px; }
+
+/* Date hierarchy and the matching Edit topic circle. */
+#today .date-weekday { display:block; font:800 16px/1.5 var(--sans); letter-spacing:.08em; text-transform:uppercase; }
+#today .date-calendar { display:block; font:700 19px/1.5 var(--sans); margin-top:3px; }
+.diary-shell .add-widget .topic-label { font:650 13px/1.5 var(--sans); color:#29442a; }
+#widget-picker .sheet-heading { display:block; }
+#widget-picker .sheet-heading>div { width:100%; min-width:0; }
+#widget-picker .sheet-heading .sheet-close { position:absolute; top:0; right:0; }
+#widget-picker-title { display:flex; align-items:center; justify-content:center; min-height:44px; padding:0 38px; margin:0; text-align:center; font-size:23px; }
+#widget-picker .sheet-heading p { font-size:13px; text-align:center; margin:8px 0 0; }
+.topic-editor-info { flex-wrap:wrap; gap:8px; }
+.topic-editor-info .topic-editor-description { flex:1 1 calc(100% - 62px); }
+.topic-editor-info .topic-toggle { margin-left:auto; }
+.topic-editor-info .topic-toggle[aria-checked] { display:flex; align-items:center; justify-content:center; width:60px; min-width:60px; height:44px; padding:0; background:transparent; border:0; box-shadow:none; }
+.topic-editor-info .topic-toggle[aria-checked]:not(:disabled):hover { background:transparent; filter:none; }
+.switch-track { display:block; position:relative; width:56px; height:32px; border-radius:999px; background:#b6bbb6; transition:background .18s ease; }
+.switch-knob { display:block; position:absolute; top:2px; left:2px; width:28px; height:28px; border-radius:50%; background:#fffdf6; box-shadow:0 1px 4px #1c30252e; transition:transform .18s ease; }
+.topic-toggle[aria-checked=true] .switch-track { background:#30d158; }
+.topic-toggle[aria-checked=true] .switch-knob { transform:translateX(24px); }
+.topic-drag-handle { width:44px; height:44px; min-height:44px; padding:0; border:0; background:transparent; color:#65745c; font:28px/1 var(--sans); cursor:grab; touch-action:pan-y; }
+button.topic-drag-handle:not(:disabled):hover { background:#e8ddc6; color:#29442a; }
+.topic-editor-row.is-enabled { user-select:none; -webkit-user-select:none; -webkit-touch-callout:none; touch-action:pan-y; cursor:grab; }
+.topic-editor-row.drag-placeholder { opacity:.25; border-style:dashed; }
+.topic-editor-row.keyboard-grabbed { border-color:#30b852; box-shadow:0 0 0 3px #30d15833; }
+.topic-drag-ghost { position:fixed; z-index:10; pointer-events:none; opacity:.97; border-color:#30b852; box-shadow:0 12px 32px #1428194d; transform:scale(1.015); }
+#widget-picker,#widget-options { overflow-anchor:none; }
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
+@media(max-width:360px) { #widget-picker-title { font-size:20px; }.topic-editor-info .topic-editor-description { flex-basis:calc(100% - 62px); } }
+@media(prefers-reduced-motion:reduce) { .switch-track,.switch-knob { transition:none; } }

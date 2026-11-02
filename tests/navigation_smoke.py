@@ -23,7 +23,7 @@ with sync_playwright() as p:
  page.locator('[data-menu="profile"] a[href="#account"]').click();expect(page.locator('#account')).to_be_visible();page.locator('[data-menu="profile"] a[href="#subscription"]').click();expect(page.locator('#subscription')).to_be_visible()
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
- fill_birth_date(page,'1991-01-01');page.locator('#profile-sex').select_option('female');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
+ fill_birth_date(page,'1991-01-01');page.locator('#profile-weight').fill('60');page.locator('#profile-form button').click()
  bottom.get_by_role('link',name='Дневник',exact=True).click();expect(page.locator('#diary-shell')).to_be_visible() and not page.locator('#sleep').is_visible() and not page.locator('#profile').is_visible()
  assert page.locator('#diary-shell').is_visible() and not page.locator('[data-menu="profile"]').is_visible()
  page.evaluate('location.hash="food"');page.wait_for_function('document.querySelector("#food").hidden===false');page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
@@ -36,7 +36,7 @@ with sync_playwright() as p:
  assert page.locator('#food-calories').inner_text()=='379 ккал'
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Clinical visibility survives routing: a male or lactating profile must not reveal cycle predictions.
- page.locator('#profile-sex').select_option('male');page.locator('#profile-form button').click();bottom.get_by_role('link',name='Дневник',exact=True).click()
+ page.evaluate("state.profile={...state.profile,sex:'male',status:'none'};save()");bottom.get_by_role('link',name='Дневник',exact=True).click()
  assert not page.locator('#cycle').is_visible() and not page.locator('[data-menu="diary"] a[href="#cycle"]').is_visible()
  page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false');expect(page.locator('#sleep')).to_be_visible()
  page.evaluate('location.hash="cycle"');page.wait_for_function('location.hash==="#cycle"')
