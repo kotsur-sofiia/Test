@@ -11,7 +11,7 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null')
  bottom=page.get_by_role('navigation',name='Основная навигация',exact=True)
  assert bottom.evaluate('(e)=>getComputedStyle(e).position')=='fixed'
- assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Arial')
+ assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('Manrope')
  assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Голосовая запись','Библиотека','Друзья']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
  assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Аккаунт','⚙Настройки','◇Подписка']

@@ -11,7 +11,7 @@
   for(const link of document.querySelectorAll('.sidebar nav a')){const selected=route.area==='profile'?link.hash==='#'+route.profileSection:route.area==='diary'?link.hash==='#'+diarySection:link.hash==='#'+route.area;link.classList.toggle('active',selected);if(selected)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}
   window.LunaVoice?.refresh();
  }
- function navigate(){refresh();requestAnimationFrame(()=>{const route=current();const target=route.target&&!route.target.closest('[hidden]')?route.target:document.querySelector('[data-main-view]:not([hidden])');target?.scrollIntoView({block:'start',behavior:'instant'});});}
+ function navigate(){refresh();requestAnimationFrame(()=>{const route=current();if(route.id==='profile'){window.scrollTo({top:0,behavior:'instant'});return;}const target=route.target&&!route.target.closest('[hidden]')?route.target:document.querySelector('[data-main-view]:not([hidden])');target?.scrollIntoView({block:'start',behavior:'instant'});});}
  $('#settings-export').onclick=()=>$('#export-data').click();
  phone.addEventListener('change',refresh);
  window.addEventListener('hashchange',navigate);window.LunaNavigation=Object.freeze({refresh});refresh();
