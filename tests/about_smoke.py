@@ -8,7 +8,7 @@ URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8015/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,timezone_id='Europe/Podgorica',locale='ru-RU');page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL);page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("italic 400 39px Cormorant Garamond","Обо мне"),document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("italic 400 39px Cormorant Garamond","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")')
- assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='Понедельник, 2 ноября'
+ assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='Понедельник, 2 ноября 2026'
  assert page.locator('#profile h1').inner_text()=='Обо мне'
  assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Дневник'
  assert not page.locator('#home').is_visible() and not page.locator('#sleep').is_visible()
