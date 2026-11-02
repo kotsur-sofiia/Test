@@ -6,7 +6,7 @@
     if (location.hash === '#goals') history.replaceState(null,'','#profile');
     let raw;
     try { raw = decodeURIComponent(location.hash.slice(1) || 'home'); } catch { raw = 'home'; }
-    const id = raw === 'home' ? (window.WomanDayMap?.homeTopic() ?? ($('#cycle').dataset.available === 'false' ? 'food' : 'cycle')) : raw;
+    const id = raw === 'cycle-form' ? 'cycle' : raw === 'home' ? (window.WomanDayMap?.homeTopic() ?? ($('#cycle').dataset.available === 'false' ? 'food' : 'cycle')) : raw;
     const notes = ['skin','books','meditation','drawing'].includes(id) || id.startsWith('custom-');
     const target = id === 'affirmation' ? $('#home') : id === 'empty' ? $('#day-placeholder') : notes ? $('#topic-notes') : document.getElementById(id);
     const area = target?.closest('[data-main-view]')?.dataset.mainView || 'profile';
@@ -21,6 +21,9 @@
     document.body.dataset.view = route.area;
     document.body.dataset.section = route.area === 'diary' ? section : route.profileSection;
     document.body.dataset.topic = route.topic;
+    const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Библиотека',friends:'Друзья'};
+    $('#page-title').textContent=route.area==='diary'?(section==='profile'?'Обо мне':'Дневник'):(titles[route.id]||titles[route.area]||'Профиль');
+    if(section!=='cycle')window.WomanPeriodEditor?.close();
     for (const panel of document.querySelectorAll('[data-main-view]')) {
       panel.hidden = panel.dataset.mainView !== route.area || panel.id !== (route.area === 'profile' ? route.profileSection : section);
     }
@@ -44,6 +47,7 @@
     refresh();
     requestAnimationFrame(() => {
       const route = current();
+      if(route.raw==='cycle-form'&&$('#cycle').dataset.available!=='false'){window.WomanPeriodEditor?.open();return;}
       if (route.target?.matches('[data-main-view]') || route.raw === 'home') window.scrollTo({top:0,behavior:'instant'});
       else (route.target && !route.target.closest('[hidden]') ? route.target : document.querySelector('[data-main-view]:not([hidden])'))?.scrollIntoView({block:'start',behavior:'instant'});
     });

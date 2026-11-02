@@ -1,3 +1,4 @@
+from profile_form import open_period_editor
 from playwright.sync_api import sync_playwright
 from datetime import datetime,timedelta
 import os
@@ -13,7 +14,7 @@ with sync_playwright() as p:
  today=datetime.strptime(page.evaluate('today'),'%Y-%m-%d')
  day=lambda n:(today+timedelta(days=n)).strftime('%Y-%m-%d')
  page.evaluate('location.hash="cycle"');page.wait_for_function('document.body.dataset.view==="diary"')
- page.locator('#period-start').fill(day(-20));page.get_by_role('button',name='Сохранить даты',exact=True).click()
+ open_period_editor(page);page.locator('#period-start').fill(day(-20));page.get_by_role('button',name='Сохранить даты',exact=True).click()
  assert page.locator('#cycle-summary').inner_text()=='День 21 цикла'
  for offset,key in [(0,'menstrual'),(5,'follicular'),(13,'ovulation'),(20,'luteal'),(28,'menstrual')]:
   assert page.evaluate(f'phaseAt("{day(-20+offset)}").key')==key

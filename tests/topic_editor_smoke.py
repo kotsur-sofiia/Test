@@ -14,7 +14,7 @@ with sync_playwright() as p:
  def close_editor():page.locator('#widget-picker [data-close-dialog]').click()
  assert order()==['cycle','books','water']
  assert page.locator('#edit-day,#connection').count()==0
- expect(page.locator('#today .date-weekday')).to_have_text('ПОНЕДЕЛЬНИК');expect(page.locator('#today .date-calendar')).to_have_text('2 ноября 2026')
+ assert page.locator('#today').count()==0;expect(page.locator('#page-title')).to_have_text('Дневник')
  open_editor();assert page.locator('#widget-picker-title').inner_text()=='Редактирование'
  assert 'Выбери то, что актуально именно тебе.' in page.locator('#widget-picker').inner_text()
  titles=page.locator('.topic-editor-description strong').all_text_contents()
@@ -31,9 +31,9 @@ with sync_playwright() as p:
  page.locator('[data-widget-id=membership] a').click();expect(page.locator('#membership')).to_be_visible();assert page.locator('.bottom-nav [aria-current=page]').inner_text()=='Дневник'
  for width,height in [(320,844),(375,844),(390,844),(430,844),(768,1000),(1280,1000),(844,390)]:
   page.set_viewport_size({'width':width,'height':height});page.evaluate('document.fonts.ready');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
-  h=page.locator('#diary-shell h1');parent=h.locator('..').bounding_box();box=h.bounding_box();assert abs(box['x']+box['width']/2-(parent['x']+parent['width']/2))<1
+  h=page.locator('#page-title');parent=h.locator('..').bounding_box();box=h.bounding_box();assert abs(box['x']+box['width']/2-(parent['x']+parent['width']/2))<1
   assert h.evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
-  assert page.locator('#today').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=18
+  assert h.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=40
   open_editor();box=page.locator('#widget-picker').bounding_box();assert box['x']>=0 and box['x']+box['width']<=width+1 and box['y']+box['height']<=height+1
   for control in row('cycle').locator('button').all():
    bounds=control.bounding_box();assert bounds['width']>=44 and bounds['height']>=44

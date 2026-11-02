@@ -27,7 +27,7 @@
    const sex='female',status=field('status').value;const profile={...(old||{}),name,birthDate,age,ageUnit:'years',sex,status,body,health,updated:localDate()};delete profile.month;if(old?.sex&&old.sex!=='female'&&!profile.legacySex)profile.legacySex=old.sex;if(body.weight!=null)profile.weight=body.weight;else delete profile.weight;
    if(old&&!old.birthDate&&!old.legacyAge)profile.legacyAge={age:old.age,ageUnit:old.ageUnit};
    const previousCycle={length:state.cycleLength,period:state.periodLength};if(sex==='female'&&health.cycleLength>=21&&health.cycleLength<=45)state.cycleLength=health.cycleLength;if(sex==='female'&&health.periodLength>=1&&health.periodLength<=10)state.periodLength=health.periodLength;
-   state.profile=profile;if(!save()){state.profile=old;state.cycleLength=previousCycle.length;state.periodLength=previousCycle.period;render();q('#profile-error').textContent='Не удалось сохранить профиль. Введённые поля оставлены: попробуй ещё раз или скопируй значения.';return;}q('#cycle-length').value=state.cycleLength;q('#period-length').value=state.periodLength;field('birthDate').value=WomanPeriodDates.format(birthDate);q('#profile-summary').textContent='Профиль сохранён. '+profileLabel();
+   state.profile=profile;if(!save()){state.profile=old;state.cycleLength=previousCycle.length;state.periodLength=previousCycle.period;render();q('#profile-error').textContent='Не удалось сохранить профиль. Введённые поля оставлены: попробуй ещё раз или скопируй значения.';return;}field('birthDate').value=WomanPeriodDates.format(birthDate);q('#profile-summary').textContent='Профиль сохранён. '+profileLabel();
   };
  }
  function render(){

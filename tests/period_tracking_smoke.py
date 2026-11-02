@@ -1,3 +1,4 @@
+from profile_form import open_period_editor
 """Start/end dates, continued delay, revised cycle presentation and natural image tiles."""
 from playwright.sync_api import sync_playwright,expect
 from datetime import datetime,timezone
@@ -14,8 +15,10 @@ with sync_playwright() as p:
  assert page.locator('.cycle-day-label').inner_text()=='день цикла'
  assert page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
  assert page.evaluate('state.periodEnds')=={}
+ open_period_editor(page)
  assert page.locator('#period-start').input_value()=='01.10.2026'
- def save():page.locator('#cycle-form button[type=submit]').click()
+ def save():
+  page.locator('#cycle-form button[type=submit]').click();open_period_editor(page)
  for value in ['31.04.2026','30.09.2026','05.11.2026']:
   page.locator('#period-end').fill(value);save();assert page.locator('#period-form-error').inner_text();assert page.evaluate('state.periodEnds')=={}
  page.locator('#period-end').fill('05102026');save();assert page.locator('#period-end').input_value()=='05.10.2026'
@@ -35,13 +38,14 @@ with sync_playwright() as p:
  page.locator('#period-end').fill('');page.locator('#period-start').fill('04.11.2026');save();assert page.locator('#cycle-dial-day').inner_text()=='1';assert page.locator('#cycle-countdown-label').inner_text()=='до менструации'
  assert page.locator('#cycle-phase-name').inner_text()=='МЕНСТРУАЛЬНАЯ' and page.locator('#cycle-phase-word').inner_text()=='фаза'
  assert page.evaluate('state.periodEnds["2026-11-04"]??null') is None
+ page.locator('#period-dialog-close').click()
  assert page.locator('.mini .nature-topic-image').count()>=11
  first=page.locator('[data-widget-id=cycle] .nature-topic-image');assert 'nature-topics.webp' in first.evaluate('(e)=>getComputedStyle(e).backgroundImage')
  for width in [320,375,390,430,768,1280]:
   page.set_viewport_size({'width':width,'height':1000});page.evaluate('document.fonts.ready');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
   assert page.locator('#cycle-phase-name').evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),width
   assert page.locator('.layout main').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgba(0, 0, 0, 0)'
-  cards=[page.locator('#diary-shell'),page.locator('.cycle-dial-card'),page.locator('.cycle-recommendations'),page.locator('.period-editor')]
+  cards=[page.locator('#diary-shell'),page.locator('.cycle-dial-card'),page.locator('.cycle-recommendations')]
   for previous,next_card in zip(cards,cards[1:]):assert abs(next_card.bounding_box()['y']-previous.bounding_box()['y']-previous.bounding_box()['height'])<2,width
   for field in page.locator('#cycle-form input').all():assert field.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=16
   assert float(page.locator('.bottom-nav').evaluate('(e)=>getComputedStyle(e).borderTopLeftRadius').replace('px',''))>=38

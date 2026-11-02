@@ -37,7 +37,7 @@
  function dayKey(date){return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;}
  function forDate(date){const n=Math.floor(Date.UTC(date.getFullYear(),date.getMonth(),date.getDate())/86400000);return phrases[((n%phrases.length)+phrases.length)%phrases.length];}
  let timer;
- function refresh(){const now=new Date(),text=document.getElementById('daily-affirmation');if(text){text.textContent=forDate(now);text.dataset.date=dayKey(now);}renderCurrentDate(now);window.WomanDayMap?.refreshDay();clearTimeout(timer);const next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);timer=setTimeout(refresh,Math.max(1000,next-now+50));}
+ function refresh(){const now=new Date(),text=document.getElementById('daily-affirmation');if(text){text.textContent=forDate(now);text.dataset.date=dayKey(now);}window.WomanDayMap?.refreshDay();clearTimeout(timer);const next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);timer=setTimeout(refresh,Math.max(1000,next-now+50));}
  window.LifeAffirmation=Object.freeze({forDate,dayKey});
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refresh();});window.addEventListener('pageshow',refresh);window.addEventListener('hashchange',refresh);refresh();
 })();

@@ -11,3 +11,8 @@ def open_about(page):
  page.locator('.bottom-nav [data-view="profile"]').click()
  page.locator('#account [href="#profile"]').click()
  page.locator('#profile').wait_for(state='visible')
+
+
+def open_period_editor(page):
+ if not page.locator("#period-dialog").evaluate("(e)=>e.open"):
+  page.locator("#cycle-start-action").click()

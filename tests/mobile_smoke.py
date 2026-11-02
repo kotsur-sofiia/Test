@@ -47,7 +47,7 @@ with sync_playwright() as p:
  for width in [320,375,390,430]:
   page.set_viewport_size({'width':width,'height':844});layout()
   page.screenshot(path=f'/tmp/luna-check/mobile-food-{width}.png')
- diary('cycle');layout();assert page.locator('#calendar').count()==0 and page.locator('#cycle input[type=date]').count()==2
+ diary('cycle');layout();assert page.locator('#calendar').count()==0 and page.locator('#period-dialog input[type=date]').count()==2 and page.locator('#cycle input[type=date]').count()==0
  diary('sleep');assert voice.locator('.voice-editor').input_value()=='Телефонный черновик'
  diary('food');assert page.locator('#food-grams').input_value()=='175'
  # Every screen size keeps a single diary topic without losing inputs.

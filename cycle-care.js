@@ -28,8 +28,7 @@
   function render() {
     const s=snapshot(), context=key(s), busy=pending?.key===context;
     if (pending && !busy) cancel();
-    $('#cycle-start-action').hidden=!['empty','awaiting'].includes(s.status);
-    $('#cycle-dial-date').textContent=fmtDay(selected);
+    $('#cycle-start-action').hidden=false;
     $('#cycle-dial-day').textContent=s.day??'—';$('#cycle-dial-day').style.fontSize=s.day>9999?'36px':s.day>999?'44px':'';
     const names={menstrual:'МЕНСТРУАЛЬНАЯ',follicular:'ФОЛЛИКУЛЯРНАЯ',ovulation:'ОВУЛЯТОРНАЯ',luteal:'ЛЮТЕИНОВАЯ'};
     $('#cycle-phase-name').textContent=names[s.phase]||(s.status==='empty'?'ОТМЕТЬ НАЧАЛО':s.status==='awaiting'?'НЕИЗВЕСТНАЯ':'БЕЗ ПРОГНОЗА');
@@ -50,7 +49,7 @@
       for (const [name,value] of Object.entries({x1:160+123*Math.cos(a),y1:160+123*Math.sin(a),x2:160+128*Math.cos(a),y2:160+128*Math.sin(a)})) line.setAttribute(name,value);
       ticks.append(line);
     }
-    $('#phase-title').textContent=s.phaseName||'Внимание к себе';
+    $('#phase-title').textContent=s.phaseName||'Забота о себе';
     const answer=answers.get(context);showTips(answer||model.advice(s));
     $('#cycle-care-source').textContent=answer?'ИИ':'Справочные';
     const configured=Boolean(endpoint());

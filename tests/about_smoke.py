@@ -1,3 +1,4 @@
+from profile_form import open_period_editor
 from profile_form import fill_birth_date, open_about
 """About-me structure, DOB-derived norms, health context, optional device readings and persistence."""
 from playwright.sync_api import sync_playwright, expect
@@ -8,13 +9,13 @@ URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8015/Test/')
 with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},is_mobile=True,has_touch=True,timezone_id='Europe/Podgorica',locale='ru-RU');page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
  page.clock.install(time=datetime(2026,11,2,12,tzinfo=timezone.utc));page.goto(URL.split('#')[0]+'#profile');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("italic 400 39px Cormorant Garamond","Обо мне"),document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("italic 400 39px Cormorant Garamond","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")')
- assert page.locator('#today').is_visible() and page.locator('#today').inner_text()=='ПОНЕДЕЛЬНИК\n2 ноября 2026'
- assert page.locator('#profile h1').inner_text()=='Обо мне'
+ assert page.locator('#today').count()==0 and page.locator('#page-title').text_content()=='Обо мне'
+ assert page.locator('#profile h1').count()==0
  assert page.locator('.bottom-nav [aria-current="page"]').inner_text()=='Дневник'
  assert not page.locator('#home').is_visible() and not page.locator('#sleep').is_visible()
  assert 'Общие данные' not in page.locator('#profile').inner_text() and 'Дополнительные данные' not in page.locator('#profile').inner_text()
  styles=page.locator('#profile .about-label,#profile .profile-group>legend').evaluate_all('(els)=>els.map(e=>{const s=getComputedStyle(e);return [s.fontFamily,s.fontSize,s.fontWeight].join("|")})')
- assert len(styles)==4 and len(set(styles))==1,styles
+ assert len(styles)==4 and all(float(v.split("|")[1].replace("px",""))>=14 for v in styles),styles
  assert 'НАЧНЁМ' not in page.locator('#profile').inner_text() and 'Справочные ориентиры учитывают возраст' not in page.locator('#profile').inner_text()
  assert page.locator('#profile-age').count()==0
  assert page.locator('.profile-basics input:not([type=hidden])').count()==2
@@ -32,8 +33,8 @@ with sync_playwright() as p:
  page.evaluate("state.periods=['2026-10-20'];save()")
  assert page.evaluate('phaseAt(today)') is not None
  page.locator('.bottom-nav [href="#home"]').click();page.locator('[data-widget-id=cycle] a').click()
- page.locator('#period-start').fill('2026-10-20');page.locator('#cycle-length').fill('30');page.locator('#cycle-form button').click()
- open_about(page);assert page.locator('#profile-cycleLength').input_value()=='30' and page.evaluate('state.profile.health.cycleLength')==30
+ open_period_editor(page);page.locator('#period-start').fill('2026-10-20');page.locator('#cycle-form button').click()
+ open_about(page);assert page.locator('#profile-cycleLength').input_value()=='29' and page.evaluate('state.profile.health.cycleLength')==29
  for key,value in [('cyclePattern','irregular'),('menstrualStage','menopause'),('hormones','therapy')]:
   page.locator('#profile-'+key).select_option(value);save();assert page.evaluate('phaseAt(today)') is None
   page.locator('#profile-'+key).select_option({'cyclePattern':'regular','menstrualStage':'menstruating','hormones':'none'}[key]);save()

@@ -23,19 +23,21 @@ with sync_playwright() as p:
  ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({sleep:[],meals:[],periods:['2026-10-13'],periodEnds:{'2026-10-13':'2026-10-17'},cycleLength:28,periodLength:5,water:[{id:'kept',date:'2026-11-02',ml:200,container:'glass'}]}))")
  page.goto(URL+'#cycle');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  assert page.locator('#cycle-dial-day').inner_text()=='21'
- assert 'Cormorant' in page.locator('.day-heading h1').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert page.locator('.app-backdrop,#today,#cycle-dial-date,#cycle-length,#period-length').count()==0
+ assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert 'Manrope' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
  # The extended transition must ease in and out, with visible texture after it settles.
  dial=page.locator('.cycle-dial-card');dial.scroll_into_view_if_needed()
  shot=Image.open(BytesIO(dial.screenshot()))
- blend=round(dial.evaluate('(e)=>parseFloat(getComputedStyle(e).paddingTop)')-24)
- assert blend>=220
+ blend=round(dial.evaluate('(e)=>parseFloat(getComputedStyle(e,"::before").maskSize.split(",")[0].split(" ")[1])'))
+ inset=dial.evaluate('(e)=>parseFloat(getComputedStyle(e).paddingTop)')
+ assert 120<=blend<=180 and inset<=88
  shades=[shot.getpixel((4,y))[:3] for y in [1,round(blend*.25),round(blend*.5),round(blend*.75),blend-1]]
  assert len(set(shades))==5 and all(sum(a)<sum(b) for a,b in zip(shades,shades[1:])),shades
  def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
  light_text=rgb(page.locator('.cycle-date-row h2').evaluate('(e)=>getComputedStyle(e).color'))
- assert contrast(light_text,shot.getpixel((4,blend+20))[:3])>7
- date_text=rgb(page.locator('#today').evaluate('(e)=>getComputedStyle(e).color'))
+ assert contrast(light_text,shot.getpixel((4,round(inset)+20))[:3])>7
+ date_text=rgb(page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).color'))
  header_background=rgb(page.locator('main>header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
  assert contrast(date_text,header_background)>7 and header_background[1]-header_background[2]>20
  assert 'sand-waterfall.webp' in dial.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
@@ -54,9 +56,9 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=40','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
+ for path in ['./nature-editorial.css?v=41','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
- assert 'Cormorant' in page.locator('.day-heading h1').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
  assert not errors,errors
- b.close();print('PASS: extended eased transitions, sand/clay textures, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
+ b.close();print('PASS: compact eased transitions, sand/clay textures, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
