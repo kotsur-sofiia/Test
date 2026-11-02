@@ -73,7 +73,7 @@ html body .switch-knob { width:28px; height:28px; left:1px; top:1px; background:
 html body .topic-toggle[aria-checked=true] .switch-knob { transform:translateX(24px); }
 html body .topic-toggle:disabled .switch-track { opacity:.5; }
 /* The terracotta underneath remains visible through the recommendations glass. */
-html body #cycle .cycle-recommendations { padding:var(--chapter-inset) 18px 30px; }
+html body #cycle .cycle-recommendations { padding:32px 18px calc(110px + env(safe-area-inset-bottom,0px)); }
 .glass-recommendation-body {
   padding:28px; border-radius:36px; border:1px solid #fff7e9d9;
   background:linear-gradient(145deg,#fff9eddb,#f5ebdbbf 55%,#fff8e6b8);

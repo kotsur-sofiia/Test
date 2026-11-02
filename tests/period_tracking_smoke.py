@@ -49,9 +49,8 @@ with sync_playwright() as p:
   for previous,next_card in zip(cards,cards[1:]):assert abs(next_card.bounding_box()['y']-previous.bounding_box()['y']-previous.bounding_box()['height'])<2,width
   for field in page.locator('#cycle-form input').all():assert field.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=16
   assert float(page.locator('.bottom-nav').evaluate('(e)=>getComputedStyle(e).borderTopLeftRadius').replace('px',''))>=38
- with page.expect_download() as download:page.locator('#export-data').click()
- data=json.loads(Path(download.value.path()).read_text());assert data['periodEnds']['2026-10-01']=='2026-10-08' and data['legacyExtra']=='keep' and data['voiceNotes'][0]['id']=='old-cycle-note'
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert data['periodEnds']['2026-10-01']=='2026-10-08' and data['legacyExtra']=='keep' and data['voiceNotes'][0]['id']=='old-cycle-note'
  ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible();assert page.evaluate('caches.match(new URL("./assets/nature-topics.webp",location.href)).then(Boolean)')
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-08'
  page.clock.fast_forward(17*24*60*60*1000);page.clock.fast_forward(17*24*60*60*1000);assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
- assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, continuous chapter transitions, responsive surfaces, export/offline/midnight')
+ assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, direct texture boundaries, responsive surfaces, stored records/offline/midnight')

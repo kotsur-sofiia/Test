@@ -2,21 +2,20 @@
 :root {
   --forest:#354329; --olive:#59643d; --paper:#f1e9db; --sand:#e9d9ca;
   --clay:#805035; --earth:#6b4c3b; --ink:#303b27; --muted:#60624c;
-  --blend:clamp(120px,16vw,180px);
-  --chapter-inset:clamp(64px,7vw,88px);
-  --blend-mask:linear-gradient(to bottom,transparent 0%,#00000012 10%,#00000059 23%,#000000bf 40%,#000000f0 55%,#000000fc 75%,#000 100%);
+  --chapter-inset:32px;
+  --content-gutter:max(24px,calc((100vw - 880px)/2));
   --border:#d3cbbd; --accent:var(--forest);
   --sans:Manrope,Arial,sans-serif;
   --display:'Cormorant Garamond',Georgia,serif;
-  color:var(--ink); background:var(--paper); font-family:var(--sans);
+  color:var(--ink); background:transparent; font-family:var(--sans);
 }
 html { scroll-padding-top:24px; }
-body { color:var(--ink); background:var(--paper); font:400 15px/1.75 var(--sans); }
+body { color:var(--ink); background:transparent; padding-bottom:0; font:400 15px/1.75 var(--sans); }
 body::before,body::after { display:none; }
-body .layout { width:calc(100% - 48px); max-width:880px; margin:28px auto 0; }
+body .layout { width:100%; max-width:none; margin:0; }
 html body .layout main,html body[data-view=diary][data-section=cycle] .layout main {
-  padding:0; background:transparent; border:0; border-radius:36px 36px 0 0;
-  box-shadow:0 24px 100px #101d1b30; min-height:calc(100svh - 28px);
+  display:flex; flex-direction:column; padding:0; background:transparent; border:0; border-radius:0;
+  box-shadow:none; min-height:100svh;
 }
 body h1,body h2,body h3,body h4,body .profile-card>h1,body .section-title h2,
 body .phase-card h3,body .empty-view h3 {
@@ -49,8 +48,8 @@ body .voice-note-actions button:not(:disabled):hover,body .icon-button:not(:disa
 body .text-link { color:#704325; text-underline-offset:5px; }
 /* The shared date and diary opening form one quiet, dark chapter. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
-  margin:0; padding:30px 24px 24px; background:linear-gradient(#354329c4,#354329),url('./assets/dew-monstera.webp') center 40%/cover; background-color:var(--forest);
-  border:0; border-radius:36px 36px 0 0; color:var(--paper); box-shadow:none;
+  margin:0; padding:20px 2vw; background:url('./assets/dew-monstera.webp') center 40%/cover; background-color:var(--forest);
+  border:0; border-radius:0; color:var(--paper); box-shadow:inset 0 0 0 100vmax #35432980;
 }
 html body #page-title { width:100%; margin:0; text-align:center; text-transform:uppercase; color:var(--paper); font:400 clamp(42px,7vw,66px)/1.12 var(--display); letter-spacing:.015em; }
 body .section-navigation { margin:0; padding:12px 24px 20px; background:var(--forest); }
@@ -58,7 +57,7 @@ body .section-navigation:has(nav:not([hidden])) { padding-top:0; }
 body .section-navigation nav a { color:var(--paper); font-size:12px; }
 body .section-navigation nav a.active,body .section-navigation nav a.active:hover { background:var(--sand); color:var(--forest); border-color:var(--sand); }
 body .section-navigation nav a:hover { background:#ffffff12; color:var(--paper); }
-/* Long eased blends: both pigment and texture settle before the text begins. */
+/* Three background images meet directly, without colour fades or masks. */
 body .nature-panel { --surface:var(--paper); --previous:var(--surface); position:relative; isolation:isolate; }
 body .nature-dark { --surface:var(--forest); color:var(--paper); --muted:#d7dccc; }
 body .nature-light { --surface:var(--paper); color:var(--ink); }
@@ -71,29 +70,21 @@ body[data-section=cycle] main>footer { --previous:var(--clay); }
 body #cycle .period-editor { --previous:var(--clay); }
 body .nature-panel::before { content:''; position:absolute; inset:0; z-index:-1; pointer-events:none; background:var(--surface); }
 body .nature-panel.nature-light::before {
-  background:linear-gradient(to bottom,var(--paper),#f1e9dbba 22%,#f1e9dbc9 78%,var(--paper)),url('./assets/sand-waterfall.webp') center/cover;
+  background:url('./assets/sand-waterfall.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499;
 }
 body #profile.nature-light::before {
-  background:linear-gradient(to bottom,var(--paper),#f1e9dbd9 22%,#f1e9dbeb 78%,var(--paper)),url('./assets/linen-olive.webp') center top/cover;
+  background:url('./assets/sand-waterfall.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499;
 }
 body .nature-panel.nature-leaf::before {
-  background:linear-gradient(to bottom,var(--forest),#354329b3 18%,#354329c9 76%,var(--forest)),url('./assets/dew-monstera.webp') center 48%/cover;
+  background:url('./assets/dew-monstera.webp') center 48%/cover; box-shadow:inset 0 0 0 100vmax #35432980;
 }
 body .nature-panel.nature-water::before {
-  background:linear-gradient(to bottom,var(--forest),#354329e3 18%,#354329e8 76%,var(--forest)),url('./assets/garden-spa.webp') center 80%/cover;
+  background:url('./assets/dew-monstera.webp') center/cover; box-shadow:inset 0 0 0 100vmax #35432980;
 }
 body .nature-panel.nature-clay::before {
-  background:linear-gradient(to bottom,var(--clay),#805035b3 24%,#805035b3 75%,var(--clay)),url('./assets/clay-grain.svg') center/cover;
+  background:url('./assets/clay-grain.svg') center/cover; box-shadow:inset 0 0 0 100vmax #80503580;
 }
-body .nature-panel.nature-from-dark::before,body .nature-panel.nature-from-light::before,
-body .nature-panel.nature-from-olive::before,body .nature-panel.nature-from-clay::before,body :is(.food-grid,.sleep-grid)>.card+article::before {
-  mask-image:var(--blend-mask),linear-gradient(#000,#000);
-  mask-size:100% var(--blend),100% calc(100% - var(--blend) + 1px);
-  mask-position:top,bottom; mask-repeat:no-repeat;
-  -webkit-mask-image:var(--blend-mask),linear-gradient(#000,#000);
-  -webkit-mask-size:100% var(--blend),100% calc(100% - var(--blend) + 1px);
-  -webkit-mask-position:top,bottom; -webkit-mask-repeat:no-repeat;
-}
+body .nature-panel::before,body :is(.food-grid,.sleep-grid)>.card+article::before { mask:none; -webkit-mask:none; }
 body .nature-panel.nature-from-dark,body .nature-panel.nature-from-light,body .nature-panel.nature-from-olive { background:var(--previous); }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:12px 32px 42px; margin:0; border-radius:0; border:0;
@@ -159,7 +150,7 @@ body :is(.food-grid,.sleep-grid)>.card+article {
 }
 body :is(.food-grid,.sleep-grid)>.card+article::before {
   content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:linear-gradient(to bottom,var(--olive),#59643ddb 24%,#59643ddb 76%,var(--olive)),url('./assets/dew-monstera.webp') center/cover;
+  background:url('./assets/clay-grain.svg') center/cover; box-shadow:inset 0 0 0 100vmax #80503580;
 }
 body :is(.food-grid,.sleep-grid)>.card+article :is(h3,h4,.fine,.muted,.nutrient-label,.nutrient-note,.nutrient-label small,.nutrient-source,.nutrient-subtype,.nutrient-group>summary,.nutrient-fieldset legend,.bar-wrap small,.big-number) { color:var(--paper); }
 body :is(.food-grid,.sleep-grid)>.card+article :is(label,.reference-details>summary) { color:var(--paper); }
@@ -175,7 +166,7 @@ body .food-grid .macro { background:#f1e9db; border-color:#f1e9db; }
 body .food-grid .macro strong,body .food-grid .macro span { color:var(--forest); }
 body #supplements { padding:var(--chapter-inset) 40px 24px; background:var(--olive); border:0; border-radius:0; margin:0 -40px; }
 body #food>.product-tools { margin-top:0; }
-body .water-card::after { content:''; display:block; height:240px; margin:36px -40px -48px; background:linear-gradient(var(--paper),#f1e9db00 85px,#f1e9db00 65%,var(--paper)),url('./assets/linen-olive.webp') center 92%/cover; pointer-events:none; }
+body .water-card::after { display:none; }
 body .water-card #water-total,body .big-number { font:500 58px/1.2 var(--display); color:var(--forest); }
 body #water .section-title { flex-wrap:wrap; gap:16px; }
 body #water .section-title h3 { font-size:36px; }
@@ -235,8 +226,8 @@ body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
   html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell { padding-bottom:54px; }
 }
 @media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
-  body .layout { width:calc(100% - 16px); margin:calc(8px + env(safe-area-inset-top,0px)) auto 0; }
-  html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header { padding:26px 20px 22px; border-radius:32px 32px 0 0; }
+  body .layout { width:100%; margin:0; }
+  html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header { padding:calc(16px + env(safe-area-inset-top,0px)) 2vw 16px; border-radius:0; }
   html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell { padding:12px 20px 32px; }
   body .diary-shell .day-heading { margin-bottom:30px; }
   body .diary-shell .day-widgets { gap:22px 8px; }
@@ -255,7 +246,7 @@ body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
   body .fine,body .muted { font-size:13px; }
   body :is(.food-grid,.sleep-grid)>.card+article { margin:0 -24px; padding-left:24px; padding-right:24px; }
   body #food-history,body #sleep-events,body #supplements { margin-left:-24px; margin-right:-24px; padding-left:24px; padding-right:24px; }
-  body .water-card::after { margin:32px -24px -36px; height:180px; }
+  body .water-card::after { display:none; }
   html body #profile { padding:var(--chapter-inset) 0 36px; }
   body .profile-card>h1 { margin-left:24px; margin-right:24px; }
   body .profile-basics { padding:0 24px 32px; }
@@ -278,3 +269,25 @@ body .bottom-nav a span { font-family:var(--sans); font-weight:600; }
   body #widget-picker-title { font-size:27px; }
 }
 @media(prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+
+/* Edge-to-edge imagery, readable content width and an oversized diary title. */
+html body main>[data-main-view]:not([hidden]) { flex:1; }
+html body main>section:not(#cycle):not(#profile) { padding:32px var(--content-gutter) calc(110px + env(safe-area-inset-bottom,0px)); }
+html body #cycle .cycle-dial-card { padding:32px var(--content-gutter) 32px; }
+html body #cycle .cycle-recommendations { padding-bottom:calc(110px + env(safe-area-inset-bottom,0px)); }
+html body #profile { padding:32px 0 calc(110px + env(safe-area-inset-bottom,0px)); }
+html body .profile-basics { padding-inline:var(--content-gutter); }
+html body .profile-card .profile-group { padding:32px var(--content-gutter); }
+html body #profile>:is(p,details) { margin-inline:var(--content-gutter); }
+html body #profile-form>button { width:calc(100% - var(--content-gutter)*2); margin-inline:var(--content-gutter); }
+html body :is(.food-grid,.sleep-grid)>.card+article,
+html body #food-history,html body #sleep-events,html body #supplements { margin-inline:calc(var(--content-gutter)*-1); padding-inline:var(--content-gutter); }
+body .cycle-date-row { max-width:880px; margin-inline:auto; }
+body .glass-recommendation-body { max-width:880px; margin-inline:auto; }
+body .topic-strip { max-width:1080px; margin-inline:auto; }
+body .section-navigation { background:url('./assets/dew-monstera.webp') center/cover; box-shadow:inset 0 0 0 100vmax #35432980; }
+body .section-navigation:has(nav:not([hidden])) { padding-inline:var(--content-gutter); }
+body[data-view=diary]:not([data-section=profile]) #page-title {
+  font-size:19.5vw; font-weight:700; line-height:1; letter-spacing:-.015em; white-space:nowrap;
+}
+body #notice:empty { display:none; }

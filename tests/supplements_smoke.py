@@ -125,8 +125,7 @@ with sync_playwright() as p:
  assert '15 / 15 мкг · 100%' in row('d').inner_text()
  assert page.locator('#supplement-history .record').count()==3
  profile(35,status='lactating')
- with page.expect_download() as download:page.locator('#export-data').click()
- data=json.loads(Path(download.value.path()).read_text())
+ data=page.evaluate('JSON.parse(JSON.stringify(state))')
  assert data['profile']['age']==35 and data['profile']['status']=='lactating' and 'month' not in data['profile'] and len(data['supplements'])==4
  assert data['supplements'][0]['id']=='old-omega6'
  ctx.set_offline(True);page.reload()
@@ -142,5 +141,5 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),width
  page.locator('#supplements').screenshot(path='/tmp/luna-check/supplements.png')
  assert not errors,errors
- print('PASS: single omega-3 record, optional/validated components, no double counting, no omega-6 options, old logs preserved, vitamin D IU, export, offline profile/norms, deletion, responsive UI')
+ print('PASS: single omega-3 record, optional/validated components, no double counting, no omega-6 options, old logs preserved, vitamin D IU, stored records, offline profile/norms, deletion, responsive UI')
  b.close()

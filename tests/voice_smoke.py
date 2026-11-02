@@ -105,8 +105,7 @@ with sync_playwright() as p:
  assert page.evaluate('__speech.at(-1).aborted') is True
  assert not page.locator('#cycle').is_visible()
  print('PASS: explicit note dates, draft date retained across diary navigation, stale date results ignored, microphone stopped when leaving a section')
- with page.expect_download() as download:page.locator('#export-data').click()
- data=json.loads(Path(download.value.path()).read_text());assert len(data['voiceNotes'])==before+2
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert len(data['voiceNotes'])==before+2
  assert all(isinstance(n['text'],str) and 'audio' not in n for n in data['voiceNotes'])
  ctx.set_offline(True);page.reload()
  assert page.locator('.voice-card').count()==7 and page.evaluate('navigator.onLine') is False
@@ -116,7 +115,7 @@ with sync_playwright() as p:
  for width in [390,768,1024]:
   page.set_viewport_size({'width':width,'height':844});assert page.evaluate('document.documentElement.scrollWidth <= innerWidth'),width
  assert not errors,errors
- print('PASS: JSON text-only export, offline voice module, saved notes, deletion persistence, responsive layouts, no browser errors')
+ print('PASS: text-only stored records, offline voice module, saved notes, deletion persistence, responsive layouts, no browser errors')
  ctx.close()
  # Unsupported browser: readable fallback, no microphone request, keyboard text still saved.
  unsupported=browser.new_context();unsupported.add_init_script('window.SpeechRecognition=undefined;window.webkitSpeechRecognition=undefined;')

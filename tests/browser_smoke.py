@@ -41,12 +41,11 @@ with sync_playwright() as p:
  page.locator('#food-date').fill(day(-1));page.locator('#food-date').dispatch_event('change');assert page.locator('#food-calories').inner_text()=='0 ккал'
  page.locator('#food-date').fill(day(0));page.locator('#food-date').dispatch_event('change');assert page.locator('#food-calories').inner_text()=='758 ккал'
  print('PASS: overnight sleep, naps, mean by recorded days, overlap and invalid-range rejection, 7/30/365 days, food gram scaling and daily isolation')
- with page.expect_download() as d:page.locator('#export-data').click()
- assert d.value.suggested_filename.startswith('woman-diary-')
+ assert page.locator('#export-data,#settings-export').count()==0
  ctx.set_offline(True);page.reload();assert page.evaluate('navigator.onLine') is False;assert page.locator('#sleep-average').inner_text()=='8 ч 0 мин';assert page.locator('#food-calories').inner_text()=='758 ккал'
  page.locator('#food-history button').click();assert page.locator('#food-calories').inner_text()=='0 ккал';page.reload();assert page.locator('#food-calories').inner_text()=='0 ккал'
  ctx.set_offline(False)
- print('PASS: backup export, offline reload, offline deletion and persistence')
+ print('PASS: removed export controls, offline reload, offline deletion and persistence')
  page.evaluate('scrollTo(0,0)');page.screenshot(path='/tmp/luna-check/desktop.png',full_page=True)
  page.set_viewport_size({'width':390,'height':844});page.reload();assert page.evaluate('document.documentElement.scrollWidth <= innerWidth')
  page.screenshot(path='/tmp/luna-check/mobile.png',full_page=True)

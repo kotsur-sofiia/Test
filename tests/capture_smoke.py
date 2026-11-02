@@ -56,8 +56,7 @@ with sync_playwright() as p:
  ctx.set_offline(True);page.reload();expect(page.locator('#capture')).to_be_visible();assert page.evaluate('[state.meals.length,state.sleepEvents.length,state.workouts.length]')==[4,1,2]
  assert page.evaluate('navigator.onLine') is False
  # Text-only export includes new record types.
- with page.expect_download() as download:page.locator('#export-data').click()
- data=json.loads(Path(download.value.path()).read_text());assert len(data['sleepEvents'])==1 and len(data['workouts'])==2
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert len(data['sleepEvents'])==1 and len(data['workouts'])==2
  assert not errors,errors
  b.close()
- print('PASS: five tabs, mixed interim speech, explicit review, meals/KBJU, standalone wake-up, sleep interval/overlap, workout minutes, water, unknown food notes, quota rollback, stale review, navigation cancellation, permission fallback, phone targets, offline persistence/export. Real speech not verified.')
+ print('PASS: five tabs, mixed interim speech, explicit review, meals/KBJU, standalone wake-up, sleep interval/overlap, workout minutes, water, unknown food notes, quota rollback, stale review, navigation cancellation, permission fallback, phone targets, offline persistence. Real speech not verified.')

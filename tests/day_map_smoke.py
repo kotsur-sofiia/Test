@@ -37,7 +37,7 @@ with sync_playwright() as p:
  page.locator('#widget-options [data-topic=skin] [data-action=toggle]').click();assert 'skin' not in order();assert page.evaluate('state.dayMap.notes.filter(n=>n.topic==="skin").length')==2
  page.locator('#widget-picker [data-close-dialog]').click();choose('skin');topic('skin');assert 'Мягкий уход' in page.locator('#widget-note-history').inner_text()
  expected=order();page.reload();assert order()==expected
- page.evaluate('''async()=>{const c=await caches.open('luna-diary-v42');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
+ page.evaluate('''async()=>{const c=await caches.open('luna-diary-v43');await c.put(new URL('./app.js',location.href),new Response('throw Error("Old script loaded")',{headers:{'Content-Type':'text/javascript'}}))}''');page.reload();expect(page.locator('#diary-shell')).to_be_visible()
  old=page.evaluate('JSON.stringify(state.dayMap)');page.evaluate('()=>{window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw new DOMException("full","QuotaExceededError")}}')
  page.locator('#add-widget').click();page.locator('#show-custom-widget').click();page.locator('#custom-widget-title').fill('Не сохранённая тема');page.locator('#custom-widget-form button[type=submit]').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;assert len(order())==len(expected);expect(page.locator('#custom-widget-title')).to_have_value('Не сохранённая тема');page.locator('#widget-picker [data-close-dialog]').click()
  topic('books');page.locator('#widget-note-text').fill('Текст при переполнении');page.locator('#widget-note-form button').click();assert page.evaluate('JSON.stringify(state.dayMap)')==old;expect(page.locator('#widget-note-text')).to_have_value('Текст при переполнении')
@@ -53,12 +53,11 @@ with sync_playwright() as p:
   page.locator('#add-widget').click();box=page.locator('#widget-picker').bounding_box();assert box['x']>=0 and box['x']+box['width']<=width+1 and box['y']>=0 and box['y']+box['height']<=height+1,(width,height,box)
   page.locator('#widget-picker [data-close-dialog]').click()
  page.evaluate('state.profile={name:"Тест",age:35,ageUnit:"years",sex:"male",status:"none"};save()');page.locator('#add-widget').click();assert page.locator('#widget-options [data-topic=cycle] [data-action=toggle]').is_disabled();page.locator('#widget-picker [data-close-dialog]').click()
- with page.expect_download() as d:page.locator('#export-data').click()
- data=json.loads(Path(d.value.path()).read_text());assert len(data['dayMap']['notes'])==5 and data['meals'][0]['id']=='legacy-meal'
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert len(data['dayMap']['notes'])==5 and data['meals'][0]['id']=='legacy-meal'
  ctx.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();topic('water');assert page.locator('#water-total').inner_text()=='500 мл';choose('skin');topic('skin');assert 'Мягкий уход' in page.locator('#widget-note-history').inner_text()
  page.clock.fast_forward(13*60*60*1000);assert page.locator('#today').count()==0;assert page.locator('[data-widget-id=water] strong').text_content()=='0 мл'
  assert not errors,errors
  # Existing selections keep their order; unknown/duplicate ids are ignored without losing metadata.
  clean=b.new_context();clean.add_init_script("localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],dayMap:{version:1,order:['water','water','unknown'],custom:[],notes:[],futureField:'keep'}}))");other=clean.new_page();other.goto(URL+'#home');assert other.locator('#day-widgets>.day-widget:not([hidden])').count()==1
  other.locator('#add-widget').click();other.locator('#widget-options [data-topic=books] [data-action=toggle]').click();assert other.evaluate('state.dayMap.futureField')=='keep';clean.close();b.close()
- print('PASS: circular topics, inline notes, editable order and empty diary, old data, quotas/drafts, independent water, responsive picker, export, offline and midnight')
+ print('PASS: circular topics, inline notes, editable order and empty diary, old data, quotas/drafts, independent water, responsive picker, stored records, offline and midnight')

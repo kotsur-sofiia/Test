@@ -52,7 +52,6 @@
       else (route.target && !route.target.closest('[hidden]') ? route.target : document.querySelector('[data-main-view]:not([hidden])'))?.scrollIntoView({block:'start',behavior:'instant'});
     });
   }
-  $('#settings-export').onclick = () => $('#export-data').click();
   window.addEventListener('load',navigate);
   window.addEventListener('hashchange',navigate);
   window.LunaNavigation = Object.freeze({refresh});

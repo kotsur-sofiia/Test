@@ -18,8 +18,7 @@ with sync_playwright() as p:
  page.locator('#profile-name').fill('Несохранённое имя');assert bottom.locator('[aria-current="page"]').inner_text()=='Дневник';bottom.get_by_role('link',name='Профиль',exact=True).click();expect(page.locator('#account')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#settings"]').click();expect(page.locator('#settings')).to_be_visible() and not page.locator('#profile').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
- with page.expect_download() as d:page.locator('#settings-export').click()
- data=json.loads(Path(d.value.path()).read_text());assert 'meals' in data and 'sleep' in data
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert 'meals' in data and 'sleep' in data
  page.locator('[data-menu="profile"] a[href="#account"]').click();expect(page.locator('#account')).to_be_visible();page.locator('[data-menu="profile"] a[href="#subscription"]').click();expect(page.locator('#subscription')).to_be_visible()
  open_about(page);assert page.locator('#profile-name').input_value()=='Несохранённое имя'
  # Save a profile and use a diary, then verify tab transitions retain both data and drafts.
@@ -53,6 +52,6 @@ with sync_playwright() as p:
   for link in bottom.locator('a').all():assert link.is_visible()
   # Scroll to the end: fixed navigation must leave the last text above it.
   page.evaluate('window.scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')
-  nav_top=bottom.bounding_box()['y'];notice=page.locator('footer button:not([hidden])').last.bounding_box();assert notice['y']+notice['height']<=nav_top+1,(width,notice,nav_top)
+  nav_top=bottom.bounding_box()['y'];notice=page.locator('[data-main-view]:visible').locator('p:visible').last.bounding_box();assert notice['y']+notice['height']<=nav_top+1,(width,notice,nav_top)
  assert not errors,errors
- b.close();print('PASS: five main tabs, profile submenu, export settings, unsaved drafts and diary persistence, microphone cancellation, cycle restrictions, history/direct/offline routes, responsive safe bottom area')
+ b.close();print('PASS: five main tabs, profile submenu, local settings, unsaved drafts and diary persistence, microphone cancellation, cycle restrictions, history/direct/offline routes, responsive safe bottom area')

@@ -58,11 +58,10 @@ with sync_playwright() as p:
  page.locator('#profile-body-fields').scroll_into_view_if_needed();page.screenshot(path='/tmp/luna-check/body-mobile.png')
  ctx.set_offline(True);page.reload();page.evaluate('Promise.all([document.fonts.ready,document.fonts.load("italic 400 39px Cormorant Garamond","Обо мне"),document.fonts.load("500 26px Caveat","Немного внимания к себе")])');assert page.evaluate('document.fonts.check("400 16px Nunito","Женское здоровье") && document.fonts.check("italic 400 39px Cormorant Garamond","Обо мне") && document.fonts.check("500 26px Caveat","Немного внимания к себе")');assert page.locator('#profile-birthDate').input_value()=='02.11.1996' and page.locator('#profile-waterPercent').input_value()=='55'
  assert page.locator('#profile-healthNotes').input_value()=='Личная заметка' and page.evaluate('state.periods.length')==1
- with page.expect_download() as d:page.locator('#export-data').click()
- data=json.loads(Path(d.value.path()).read_text());assert data['profile']['body']['basalMetabolism']==1450 and data['profile']['birthDate']=='1996-11-02'
+ data=page.evaluate('JSON.parse(JSON.stringify(state))');assert data['profile']['body']['basalMetabolism']==1450 and data['profile']['birthDate']=='1996-11-02'
  assert not errors,errors;ctx.close()
  # Migration keeps the prior known age for references, without fabricating a birthday.
  ctx=b.new_context();ctx.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],profile:{name:'Прежний профиль',age:7,ageUnit:'months',weight:7.5,sex:'female',status:'none'}}))")
  page=ctx.new_page();page.goto(URL.split('#')[0]+'#profile');assert page.locator('#profile-birthDate').input_value()=='' and page.locator('#profile-weight').input_value()=='7.5' and page.evaluate('reference("iron")') is None
  fill_birth_date(page,page.evaluate('localDate()'));page.locator('#profile-form>button').click();assert page.evaluate('state.profile.legacyAge.age')==7 and page.evaluate('profileAge()')==0
- b.close();print('PASS: mobile About me/date/sections, DOB age and nutrition, optional body metrics/BMI, health states and cycle suppression, pregnancy/lactation, no inferred fertility, legacy preservation, validation/quota rollback, responsive inputs, offline/export')
+ b.close();print('PASS: mobile About me/date/sections, DOB age and nutrition, optional body metrics/BMI, health states and cycle suppression, pregnancy/lactation, no inferred fertility, legacy preservation, validation/quota rollback, responsive inputs, offline persistence')

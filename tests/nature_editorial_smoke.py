@@ -26,14 +26,13 @@ with sync_playwright() as p:
  assert page.locator('.app-backdrop,#today,#cycle-dial-date,#cycle-length,#period-length').count()==0
  assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert 'Manrope' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
- # The extended transition must ease in and out, with visible texture after it settles.
+ # Natural scenes now meet directly; there is no fade mask or colour gradient.
  dial=page.locator('.cycle-dial-card');dial.scroll_into_view_if_needed()
  shot=Image.open(BytesIO(dial.screenshot()))
- blend=round(dial.evaluate('(e)=>parseFloat(getComputedStyle(e,"::before").maskSize.split(",")[0].split(" ")[1])'))
  inset=dial.evaluate('(e)=>parseFloat(getComputedStyle(e).paddingTop)')
- assert 120<=blend<=180 and inset<=88
- shades=[shot.getpixel((4,y))[:3] for y in [1,round(blend*.25),round(blend*.5),round(blend*.75),blend-1]]
- assert len(set(shades))==5 and all(sum(a)<sum(b) for a,b in zip(shades,shades[1:])),shades
+ assert inset<=32
+ assert dial.evaluate('(e)=>getComputedStyle(e,"::before").maskImage')=='none'
+ assert 'gradient' not in dial.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
  light_text=rgb(page.locator('.cycle-date-row h2').evaluate('(e)=>getComputedStyle(e).color'))
  assert contrast(light_text,shot.getpixel((4,round(inset)+20))[:3])>7
@@ -57,9 +56,9 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=42','./liquid-glass.css?v=42','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
+ for path in ['./nature-editorial.css?v=43','./liquid-glass.css?v=43','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
  assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
  assert not errors,errors
- b.close();print('PASS: compact eased transitions, sand/clay textures, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
+ b.close();print('PASS: direct texture boundaries, sand/clay textures, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')

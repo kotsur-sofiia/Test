@@ -56,7 +56,7 @@ with sync_playwright() as p:
  assert page.locator('#food-grams').input_value()=='175'
  page.set_viewport_size({'width':390,'height':844});expect(page.locator('#sleep')).not_to_be_visible()
  page.evaluate('scrollTo({top:document.documentElement.scrollHeight,behavior:"instant"})')
- privacy=page.locator('footer button:not([hidden])').last.bounding_box();assert privacy['y']+privacy['height']<=nav.bounding_box()['y']
+ privacy=page.locator('[data-main-view]:visible').locator('p:visible').last.bounding_box();assert privacy['y']+privacy['height']<=nav.bounding_box()['y']
  ctx.set_offline(True);page.reload();expect(page.locator('#food')).to_be_visible();layout()
  assert page.locator('#food-calories').inner_text()=='379 ккал' and page.locator('#water-total').inner_text()=='300 мл'
  open_about(page);assert page.locator('#profile-name').input_value()=='София'
