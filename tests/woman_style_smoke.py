@@ -1,4 +1,4 @@
-"""Woman brand, no droplets, transparent navigation and compact daily phrases."""
+"""Woman identity, compact daily phrases and responsive navigation."""
 from playwright.sync_api import sync_playwright,expect
 import os,json
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8024/Test/')
@@ -26,4 +26,4 @@ with sync_playwright() as p:
  page.set_viewport_size({'width':390,'height':844});page.evaluate('scrollTo({top:0,behavior:"instant"})');page.screenshot(path='/tmp/luna-check/woman-mobile.png')
  page.locator('.bottom-nav [data-view="profile"]').click();expect(page.locator('#account')).to_be_visible();assert page.locator('[data-menu="profile"] a span:not(.menu-icon)').all_text_contents()==['Аккаунт','Настройки','Подписка','Подключённые девайсы']
  ctx.set_offline(True);page.reload();assert page.evaluate('caches.match(new URL("./assets/dew-monstera.webp",location.href)).then(Boolean)');expect(page.locator('#account')).to_be_visible();page.locator('.bottom-nav [data-view="diary"]').click();expect(page.locator('#home')).to_be_visible();assert page.title().startswith('Woman')
- assert not errors,errors;b.close();print('PASS: Woman identity, original PWA id, no droplets, no sidebar, no date panel, minimal green styling without glow, all 31 affirmations fit within two lines at 320–1280 px, offline/profile navigation')
+ assert not errors,errors;b.close();print('PASS: Woman identity, original PWA id, no droplets, no sidebar, no date panel, beige reading surface and leaf-green controls without glow, all 31 affirmations fit within two lines at 320–1280 px, offline/profile navigation')
