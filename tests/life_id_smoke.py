@@ -10,7 +10,7 @@ with sync_playwright() as p:
  page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.clock.install(time=datetime(2026,11,2,22,59,59,tzinfo=timezone.utc));page.goto(URL+'#home');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  assert page.title()=='Life ID — удели внимание себе' and page.locator('.logo').text_content()=='Life ID'
  manifest=page.evaluate('fetch("./manifest.webmanifest").then(r=>r.json())');assert manifest['name']=='Life ID' and manifest['short_name']=='Life ID' and manifest['id']=='./'
- assert page.locator('#home .eyebrow').inner_text()=='Удели внимание себе'
+ assert page.locator('#home .eyebrow').text_content()=='Удели внимание себе'
  assert 'Твой ритм' not in page.locator('#home').inner_text() and 'Немного внимания' not in page.locator('#home').inner_text()
  first=page.locator('#daily-affirmation').inner_text();assert first and page.locator('#daily-affirmation').get_attribute('data-date')=='2026-11-02'
  # Midnight updates an already open app; no refresh, random reroll or storage writes.
