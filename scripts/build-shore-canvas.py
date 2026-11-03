@@ -15,6 +15,8 @@ def image(name):
 phone = image('shore-phone.webp')
 desktop = image('shore-desktop.webp')
 sand = image('shore-sand-continuation.webp')
+incoming_phone = image('shore-incoming-phone.webp')
+incoming_desktop = image('shore-incoming-desktop.webp')
 
 # No viewBox: the photo scale depends on width, never on document length. The
 # capped photo heights keep the water above the dial even on wide screens.
@@ -22,9 +24,18 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
 <style>
 .coast {{ width:100%; height:min(300vw,1000px); }}
 .coast-wide,.sand-wide {{ display:none; }}
+.incoming-phone {{ width:100%; height:min(300vw,1000px); }}
+.incoming-wide {{ display:none; }}
+@media(min-width:768px) {{ .incoming-phone {{ display:none; }} .incoming-wide {{ display:block; width:100%; height:min(80vw,880px); }} }}
 @media(min-width:768px) {{ .coast-phone,.sand-phone {{ display:none; }} .sand-wide {{ display:block; }} .coast-wide {{ display:block; height:min(100vw,1100px); }} }}
 </style>
 <defs>
+<linearGradient id="incoming-join" x1="0" y1="0" x2="0" y2="1">
+<stop offset="0" stop-color="white"/><stop offset=".23" stop-color="white"/><stop offset=".36" stop-color="black"/>
+</linearGradient>
+<mask id="incoming-mask" maskUnits="objectBoundingBox" maskContentUnits="objectBoundingBox">
+<rect width="1" height="1" fill="url(#incoming-join)"/>
+</mask>
 <image id="sand-photo" href="{sand}" width="1000" height="1000"/>
 <pattern id="natural-sand-phone" patternUnits="userSpaceOnUse" width="100%" height="100vw">
 <svg width="100%" height="100vw" viewBox="0 0 1000 1000"><use href="#sand-photo"/></svg>
@@ -44,6 +55,8 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
 <rect class="sand-continuation sand-wide" y="680" width="100%" height="100%" fill="url(#natural-sand-wide)"/>
 <image class="coast coast-phone" href="{phone}" width="100%" height="1000" preserveAspectRatio="none" mask="url(#join)"/>
 <image class="coast coast-wide" href="{desktop}" width="100%" height="1100" preserveAspectRatio="none" mask="url(#join)"/>
+<image class="incoming-phone" href="{incoming_phone}" width="100%" height="1000" preserveAspectRatio="none" mask="url(#incoming-mask)"/>
+<image class="incoming-wide" href="{incoming_desktop}" width="100%" height="880" preserveAspectRatio="none" mask="url(#incoming-mask)"/>
 </svg>'''
 (ASSETS / 'shore-canvas.svg').write_text(svg)
 print('Built assets/shore-canvas.svg')
