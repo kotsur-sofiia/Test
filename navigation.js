@@ -18,6 +18,10 @@
       }
     }
     document.documentElement.style.setProperty('--top-panel-height',Math.max(header.getBoundingClientRect().bottom,bottom+12)+'px');
+    // Stretch the actual document photo so even the highest part of the foam
+    // passes below the last caption, including the second profile menu.
+    const foamEdgeRatio=matchMedia('(min-width:768px)').matches ? .13 : .165;
+    document.documentElement.style.setProperty('--shore-photo-height',((Math.max(header.getBoundingClientRect().bottom,bottom)+18)/foamEdgeRatio)+'px');
   }
   function current() {
     if (location.hash === '#goals') history.replaceState(null,'','#profile');

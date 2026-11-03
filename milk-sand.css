@@ -3,16 +3,20 @@
 body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
   display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:#f3eee5 url('./assets/shore-canvas.svg?v=88') center top/100% 100% no-repeat;
+  background-image:url('./assets/shore-canvas.svg?v=95'),url('./assets/shore-sand-continuation.webp');
+  background-position:center top;
+  background-size:100% var(--shore-photo-height,1800px),100% auto;
+  background-repeat:no-repeat,repeat-y;
+  background-color:#f3eee5;
   box-shadow:none;
 }
-/* Keep the original canvas beneath the pinned title and upper controls. */
+/* The document photo extends past the pinned controls; there is no fixed image. */
 html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:4px;
   scroll-padding-top:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
 }
-/* The heading remains above the pinned background and control rows. */
+/* The heading and controls retain their pinned positions. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
   position:fixed; inset:0 0 auto; z-index:25; isolation:isolate;
   background:transparent; box-shadow:none;
@@ -25,14 +29,6 @@ html body .layout main::before {
   content:''; display:block; flex:0 0 auto;
   height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
   pointer-events:none;
-}
-/* The rebuilt fixed background extends below the last visible control label. */
-html body .top-panel-background {
-  position:fixed; inset:0 0 auto; z-index:24; pointer-events:none;
-  width:100%; height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
-  background:#f3eee5 url('./assets/shore-canvas.svg?v=88') center top/100vw max(100svh,1100px) no-repeat;
-  -webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent 100%);
-  mask-image:linear-gradient(#000 calc(100% - 12px),transparent 100%);
 }
 @media(min-width:768px) {
   html { --foam-bottom:min(17.8vw,196px); }

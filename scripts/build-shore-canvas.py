@@ -16,13 +16,13 @@ phone = image('shore-phone.webp')
 desktop = image('shore-desktop.webp')
 sand = image('shore-sand-continuation.webp')
 
-# No viewBox: the photo scale depends on width, never on document length. The
-# capped photo heights keep the water above the dial even on wide screens.
+# No viewBox: the CSS background viewport determines the photo length. The app
+# sizes that viewport from the last pinned caption, independently of page length.
 svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
 <style>
-.coast {{ width:100%; height:min(300vw,1000px); }}
+.coast {{ width:100%; height:100%; }}
 .coast-wide,.sand-wide {{ display:none; }}
-@media(min-width:768px) {{ .coast-phone,.sand-phone {{ display:none; }} .sand-wide {{ display:block; }} .coast-wide {{ display:block; height:min(100vw,1100px); }} }}
+@media(min-width:768px) {{ .coast-phone,.sand-phone {{ display:none; }} .sand-wide {{ display:block; }} .coast-wide {{ display:block; }} }}
 </style>
 <defs>
 <image id="sand-photo" href="{sand}" width="1000" height="1000"/>

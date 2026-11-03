@@ -26,8 +26,11 @@ with sync_playwright() as p:
             visible = [label for label in labels.all() if label.is_visible()]
             if visible:
                 bottom = max(label.bounding_box()['y'] + label.bounding_box()['height'] for label in visible)
-                height = page.locator('.top-panel-background').bounding_box()['height']
+                height = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--top-panel-height"))')
                 assert abs(height - bottom - 12) < 1, (width, route, height, bottom)
+                photo_height = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shore-photo-height"))')
+                assert photo_height * (.13 if width >= 768 else .165) >= bottom + 17, (width, route)
+            assert page.locator('.top-panel-background,.shore-fixed-layer').count()==0
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         print('PASS pinned heading/menus/captions and 12px lower edge at', width, flush=True)
     page.set_viewport_size({'width': 390, 'height': 844})
