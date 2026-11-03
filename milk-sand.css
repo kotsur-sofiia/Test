@@ -44,7 +44,9 @@ html body :is(.food-grid,.sleep-grid)>.card+article :is(h3,h4,label,.fine,.muted
 html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--earth); }
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
 html body .diary-shell #add-widget .topic-orb { background:var(--glass-primary); }
-html body .diary-shell .mini.active .nature-topic-image { box-shadow:inset 0 1px 3px #ffffffe0,inset 0 -2px 4px #6d4e3833,0 0 0 4px #f1e9db,0 0 0 5px #b58a6a,0 0 16px #ffdbb380; }
+html body .diary-shell .mini.active .nature-topic-image {
+  border-color:var(--glass-rim); box-shadow:0 0 0 2px #fff8e8b3,var(--glass-shadow);
+}
 html body .day-sheet { background:#f3eee5 url('./assets/beach-sand-natural.webp') center/cover; box-shadow:inset 0 0 0 100vmax #fffaf0bb,0 20px 80px #091b1955; }
 html body .day-sheet::backdrop { background:#514c3e55; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
 /* The number itself is centred, independently of phase and countdown text. */
@@ -118,16 +120,20 @@ html body #cycle-dial-day { font-weight:650; }
 html body #cycle-phase-name { font-weight:800; }
 html body :is(#cycle-phase-word,.cycle-day-label,#cycle-countdown-label) { font-weight:550; }
 html body #cycle-countdown-value { font-weight:650; }
-html body .diary-shell :is(.day-widget .mini,#add-widget) .topic-label { font-weight:650; }
+/* Every topic, including Add, shares the same uppercase label typography. */
+html body .diary-shell :is(.day-widget .mini,#add-widget) .topic-label {
+  font:650 clamp(9px,2.3vw,11px)/1.45 var(--sans); letter-spacing:0;
+  text-transform:uppercase; white-space:normal; overflow-wrap:anywhere;
+}
 html body .topic-editor-description strong { font-weight:700; }
 
-/* Edit comes first, followed by four full topics and a half-visible next topic. */
-html body .topic-strip {
-  grid-template-columns:calc((100% - 40px)/5.5) minmax(0,1fr);
-  gap:8px;
+/* Add and every topic belong to one native scrolling row of 5.5 slots. */
+html body .topic-strip { display:block; }
+html body #day-widgets>:is(.day-widget,#add-widget) {
+  flex:0 0 calc((100% - 40px)/5.5); min-width:0;
+  scroll-snap-align:start; scroll-snap-stop:normal;
 }
-html body #day-widgets>.day-widget { flex-basis:calc((100% - 32px)/4.5); }
-html body .diary-shell #add-widget .topic-label { font-size:clamp(6.5px,1.8vw,9px); }
+html body .diary-shell #day-widgets #add-widget { padding:0; }
 
 /* Profile and friends share a pair of equally sized glass navigation buttons. */
 html body .profile-tabs {
@@ -144,3 +150,26 @@ html body .profile-tabs a {
 html body .profile-tabs a[aria-current=page] { background:var(--glass-primary); }
 html body .profile-tabs a:hover { filter:brightness(1.05); }
 html body .bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
+
+/* Half-strength frost reveals the actual milk sand behind the recommendation text. */
+html body .glass-recommendation-body {
+  --sand-frost:.5;
+  position:relative; isolation:isolate; overflow:hidden;
+  border-radius:48px; border:1px solid #fffaf0e6;
+  background:rgba(243,236,224,.5);
+  backdrop-filter:blur(calc(20px * var(--sand-frost))) saturate(.85);
+  -webkit-backdrop-filter:blur(calc(20px * var(--sand-frost))) saturate(.85);
+  box-shadow:inset 0 1px 2px #fffef5e6,inset 0 -1px 4px #9b806024,0 10px 28px #6954421f;
+}
+html body .glass-recommendation-body::before {
+  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  border-radius:inherit; background:url('./assets/glass-sand-grain.svg') 0 0/180px 180px repeat;
+  opacity:.3;
+}
+@media(min-width:768px) { html body .glass-recommendation-body { border-radius:56px; } }
+
+/* Touch, hover and keyboard interaction use the same light rim as glass buttons. */
+html body .diary-shell :is(.mini:hover,.mini:active,.mini:focus-visible,#add-widget:hover,#add-widget:active,#add-widget:focus-visible) .topic-orb {
+  border-color:var(--glass-rim); box-shadow:var(--glass-shadow);
+}
+html body .diary-shell :is(.mini,#add-widget) { -webkit-tap-highlight-color:transparent; }

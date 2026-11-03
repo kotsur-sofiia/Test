@@ -18,7 +18,7 @@
   const previousInitialOrder = ['cycle','food','water','skin','activity'];
   const grid = $('#day-widgets');
   const picker = $('#widget-picker');
-  const nodes = new Map([...grid.children].map(node => [node.dataset.widgetId, node]));
+  const nodes = new Map([...grid.querySelectorAll(':scope > .day-widget')].map(node => [node.dataset.widgetId, node]));
   let noteTopic = null;
   let activeTopic = 'cycle';
   const drafts = new Map();

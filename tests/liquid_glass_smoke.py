@@ -10,8 +10,8 @@ with sync_playwright() as p:
  def ids():return page.locator('#day-widgets>.day-widget:not([hidden])').evaluate_all('(es)=>es.map(e=>e.dataset.widgetId)')
  def row(id):return page.locator('#widget-options [data-topic="'+id+'"]')
  assert ids()==['cycle','food','skin','books']
- assert page.locator('.topic-strip>#add-widget').count()==1
- assert page.locator('#add-widget .topic-label').text_content()=='РЕДАКТИРОВАТЬ'
+ assert page.locator('#day-widgets>#add-widget:first-child').count()==1
+ assert page.locator('#add-widget .topic-label').text_content()=='ДОБАВИТЬ'
  page.locator('#add-widget').click()
  assert page.locator('#widget-options small,#widget-options .widget-choice-icon').count()==0
  titles=page.locator('.topic-editor-description strong').all_text_contents()
@@ -45,6 +45,8 @@ with sync_playwright() as p:
  page.set_viewport_size({'width':390,'height':844})
  # Every topic is on the same y coordinate; the following topic is partly visible initially.
  rail=page.locator('#day-widgets');rail.evaluate('(e)=>e.scrollLeft=0')
+ edit_before=page.locator('#add-widget').bounding_box()['x']
+ topic_before=page.locator('#day-widgets .day-widget').first.bounding_box()['x']
  ys=page.locator('#day-widgets .day-widget:not([hidden]) .topic-orb').evaluate_all('(es)=>es.map(e=>e.getBoundingClientRect().y)')
  assert max(ys)-min(ys)<1
  assert rail.evaluate('(e)=>e.scrollWidth>e.clientWidth')
@@ -54,6 +56,15 @@ with sync_playwright() as p:
  for i in range(1,9):touch('touchMove',start+(end-start)*i/8);page.wait_for_timeout(22)
  touch('touchEnd');page.wait_for_timeout(350)
  assert rail.evaluate('(e)=>e.scrollLeft')>40
+ edit_delta=page.locator('#add-widget').bounding_box()['x']-edit_before
+ topic_delta=page.locator('#day-widgets .day-widget').first.bounding_box()['x']-topic_before
+ assert edit_delta < -40 and abs(edit_delta-topic_delta)<1,(edit_delta,topic_delta)
+ # Reverse the real finger gesture: Edit returns with the topics.
+ after=rail.evaluate('(e)=>e.scrollLeft')
+ touch('touchStart',end)
+ for i in range(1,9):touch('touchMove',end+(start-end)*i/8);page.wait_for_timeout(22)
+ touch('touchEnd');page.wait_for_timeout(350)
+ assert rail.evaluate('(e)=>e.scrollLeft')<after-40
  expect(page.locator('#add-widget')).to_be_in_viewport()
  assert page.locator('#cycle-start-action').evaluate('(e)=>getComputedStyle(e).backgroundImage')!='none'
  assert 'blur' in page.locator('.glass-recommendation-body').evaluate('(e)=>getComputedStyle(e).backdropFilter')
@@ -65,4 +76,4 @@ with sync_playwright() as p:
   c=b.new_context();c.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],water:[{id:'kept',date:'2026-11-02',ml:250}],dayMap:{version:2,order:"+str(order).replace("'",'"')+",notes:[{id:'note',topic:'water',date:'2026-11-02',text:'kept'}]}}))")
   page=c.new_page();page.goto(URL);assert ids()==expected
   assert page.evaluate('state.water[0].ml')==250 and page.evaluate('state.dayMap.notes[0].text')=='kept';c.close()
- b.close();print('PASS: four default topics, first Edit and five-and-a-half visible slots, one-row uppercase editor, aligned glass switches, real horizontal touch, rounded translucent controls/recommendations, offline and non-destructive map upgrades')
+ b.close();print('PASS: four default topics, scrolling first Add and five-and-a-half visible slots, one-row uppercase editor, aligned glass switches, real horizontal touch, rounded translucent controls/recommendations, offline and non-destructive map upgrades')
