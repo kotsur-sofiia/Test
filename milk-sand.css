@@ -6,11 +6,21 @@ html body::before {
   background:#f3eee5 url('./assets/shore-canvas.svg?v=64') center top/100% 100% no-repeat;
   box-shadow:none;
 }
-/* Sand and sea share one document canvas; the dial travels with the same ground. */
+/* The shore stays anchored to the viewport while the content scrolls. */
+html { --shore-height:max(100svh,1100px); scroll-padding-top:200px; }
+html body::before {
+  position:fixed; min-height:var(--shore-height);
+  background-size:100% var(--shore-height);
+}
+/* Keep the current section title over the same opaque part of the sea.
+   Matching canvas dimensions avoid a seam and hide content passing below. */
+html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
+  position:sticky; top:0; z-index:25; flex-shrink:0;
+  background:#f3eee5 url('./assets/shore-canvas.svg?v=64') center top/100vw var(--shore-height) no-repeat;
+}
 html body::after { display:none!important; content:none!important; }
 html body .nature-panel { background:transparent!important; }
 html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+article::before { display:none; }
-html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header,
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell,
 html body .section-navigation { background:transparent; box-shadow:none; }
 /* Every section uses the same coffee-coloured editorial heading. */
@@ -86,10 +96,25 @@ html body #cycle-countdown-value { font-size:13px; }
 /* Relief blends into the real shore, inheriting its colour and visible sand texture. */
 html body .layout { z-index:auto; }
 html body #cycle .cycle-dial-card { isolation:auto; }
+/* A 26/320-wide, shallow groove follows the pearl's visible nacre body
+   (the 36/320 image also includes transparent padding). Keep the shore's
+   own grain visible through the relief rather than painting a solid ring. */
+html body .cycle-dial::before {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  border-radius:50%;
+  background:radial-gradient(closest-side,
+    transparent 77.5%,
+    #fff6e518 78.5%, #fff6e548 79.5%,
+    #a7805c16 81%, #89634432 83%,
+    #96704d24 86.5%, #b28a6118 89%,
+    #fff6e52e 92%, #fff6e55c 94%,
+    #fff6e51a 95%, transparent 96.5%);
+  mix-blend-mode:soft-light;
+}
 html body .sand-cycle-ring {
   /* Photo geometry is fitted to the unchanged 139/320 marker radius. */
   position:absolute; left:-.522%; top:.093%; width:102.689%; height:102.689%; max-width:none;
-  pointer-events:none; opacity:1; object-fit:fill;
+  pointer-events:none; opacity:.45; object-fit:fill;
   /* Neutral grey leaves the shore unchanged; the photographed groove adds relief. */
   filter:grayscale(1) brightness(.553) contrast(10); mix-blend-mode:soft-light;
   mask-image:radial-gradient(closest-side,#000 90%,transparent 100%);
@@ -159,7 +184,7 @@ html body .diary-shell #day-widgets #add-widget { padding:0; }
 /* One slim coffee oval contains the two equal profile destinations. */
 html body .profile-tabs {
   --profile-tab-height:23px;
-  display:block; margin:0; padding:5px clamp(8px,2vw,24px) 16px;
+  display:block; margin:0; padding:12px clamp(8px,2vw,24px) 16px;
 }
 html body .profile-tab-control {
   position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
