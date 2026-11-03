@@ -1,5 +1,13 @@
 /* Local, upright type. Regional Noto faces load only for the selected language. */
 @font-face {
+  font-family:'Lora'; font-style:normal; font-weight:400 700; font-display:swap;
+  src:url('./assets/fonts/Lora-Variable.woff') format('woff');
+}
+@font-face {
+  font-family:'Inter Light'; font-style:normal; font-weight:300; font-display:swap;
+  src:url('./assets/fonts/Inter-Light.woff') format('woff');
+}
+@font-face {
   font-family:'Cormorant Garamond'; font-style:normal; font-weight:300 700; font-display:swap;
   src:url('./assets/fonts/CormorantGaramond.woff') format('woff');
 }
@@ -183,4 +191,62 @@ html body .cycle-day-label {
 }
 html body #cycle-dial-countdown.is-delayed #cycle-countdown-label {
   font-weight:600!important;
+}
+
+/* Cycle reference: a 1080-square composition scaled uniformly with the dial.
+   Croogla/Circe are unavailable; the approved temporary fallbacks are explicit. */
+html body #cycle .cycle-dial { container-type:inline-size; }
+html body #cycle .cycle-dial-copy {
+  --cycle-unit:calc(100cqi / 1080);
+  --cycle-phase-font:'Croogla','Inter',sans-serif;
+  --cycle-label-font:'Croogla Light','Inter Light','Inter',sans-serif;
+  --cycle-caption-font:'Circe','Inter',sans-serif;
+  position:absolute; inset:0; display:block; text-align:center;
+}
+html body #cycle .cycle-dial-copy,
+html body #cycle .cycle-dial-copy * {
+  color:#532806!important; text-shadow:none!important;
+  font-style:normal!important; font-synthesis:none;
+}
+html body #cycle #cycle-dial-phase,
+html body #cycle #cycle-dial-countdown {
+  position:absolute; inset:0; width:100%; max-width:none;
+  display:block; margin:0; padding:0;
+}
+html body #cycle .cycle-dial-copy :is(#cycle-phase-word,#cycle-phase-name,#cycle-dial-day,.cycle-day-label,#cycle-countdown-label,#cycle-countdown-value) {
+  position:absolute; left:50%; width:max-content; max-width:96%; margin:0;
+  transform:translateX(-50%); line-height:1; white-space:nowrap;
+  text-box-trim:trim-both; text-box-edge:cap alphabetic;
+}
+html body #cycle #cycle-phase-word {
+  top:calc(192 * var(--cycle-unit));
+  font-family:'Lora',serif!important; font-weight:400!important;
+  font-size:calc(48 * var(--cycle-unit)); letter-spacing:0;
+}
+html body #cycle #cycle-phase-name {
+  top:calc(263 * var(--cycle-unit));
+  font-family:var(--cycle-phase-font)!important; font-weight:600!important;
+  font-size:calc(61 * var(--cycle-unit)); letter-spacing:.006em;
+}
+html body #cycle .cycle-dial-copy #cycle-dial-day {
+  top:50%; transform:translate(-50%,-50%);
+  font-family:'Lora',serif!important; font-weight:400!important;
+  font-size:calc(var(--cycle-number-size,340) * var(--cycle-unit)); letter-spacing:0;
+  font-variant-numeric:lining-nums proportional-nums;
+}
+html body #cycle .cycle-day-label {
+  top:calc(690 * var(--cycle-unit));
+  font-family:var(--cycle-label-font)!important; font-weight:300!important;
+  font-size:calc(55 * var(--cycle-unit)); letter-spacing:0;
+  text-transform:none; text-decoration:none;
+}
+html body #cycle .cycle-dial-copy #cycle-countdown-label {
+  top:calc(814 * var(--cycle-unit));
+  font-family:'Lora',serif!important; font-weight:700!important;
+  font-size:calc(52 * var(--cycle-unit)); letter-spacing:.025em;
+}
+html body #cycle #cycle-countdown-value {
+  top:calc(870 * var(--cycle-unit));
+  font-family:var(--cycle-caption-font)!important; font-weight:400!important;
+  font-size:calc(33 * var(--cycle-unit)); letter-spacing:0;
 }

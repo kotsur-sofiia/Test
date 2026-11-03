@@ -12,14 +12,14 @@ with sync_playwright() as p:
  assert page.locator('#cycle-care-source,.cycle-date-row').count()==0
  assert page.locator('#cycle-dial-day').text_content()=='34'
  assert page.locator('#cycle-phase-name').text_content()=='ЛЮТЕИНОВАЯ'
- assert page.locator('#cycle-countdown-label').text_content()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').text_content()=='1 день'
+ assert page.locator('#cycle-countdown-label').text_content()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').text_content()=='≈ 1 день'
  assert page.evaluate('WomanCycleModel.snapshot({date:localDate(),periods:state.periods,length:32,periodLength:5,predict:true}).phase') is None
  for width in [320,390,768,1280]:
   page.set_viewport_size({'width':width,'height':900});page.evaluate('document.fonts.ready')
   dial=page.locator('#cycle-dial').bounding_box();number=page.locator('#cycle-dial-day').bounding_box()
   assert abs(number['x']+number['width']/2-dial['x']-dial['width']/2)<1
   assert abs(number['y']+number['height']/2-dial['y']-dial['height']/2)<1
-  assert page.locator('#cycle-dial-day').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=96
+  assert abs(page.locator('#cycle-dial-day').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')-dial['width']*340/1080)<1
   assert page.locator('#cycle-pearl-marker image').get_attribute('href')=='./assets/sand-matched-cycle-pearl.webp'
   assert page.locator('.sand-cycle-ring').get_attribute('src')=='./assets/natural-sand-trail.webp'
   assert page.locator('#cycle-phase-name').bounding_box()['y']<number['y']
@@ -32,12 +32,12 @@ with sync_playwright() as p:
  assert page.evaluate('state.dayMap.notes[0].id')=='kept'
  # The presentation remains luteal through another midnight; a real new start resets it.
  page.clock.fast_forward(24*60*60*1000);assert page.locator('#cycle-phase-name').text_content()=='ЛЮТЕИНОВАЯ'
- assert page.locator('#cycle-dial-day').text_content()=='35' and page.locator('#cycle-countdown-value').text_content()=='2 дня'
+ assert page.locator('#cycle-dial-day').text_content()=='35' and page.locator('#cycle-countdown-value').text_content()=='≈ 2 дня'
  page.locator('#cycle-start-action').click();page.locator('#period-start').fill('04.11.2026');page.locator('#period-end').fill('');page.locator('#cycle-form button').click()
  assert page.locator('#cycle-dial-day').text_content()=='1' and page.locator('#cycle-phase-name').text_content()=='МЕНСТРУАЛЬНАЯ'
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-06'
  page.locator('.bottom-nav [data-view=diary]').click();assert page.evaluate('location.hash')=='#home'
  c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.locator('#cycle-dial-day').text_content()=='1'
- assert page.evaluate('caches.match(new URL("./milk-sand.css?v=99",location.href)).then(Boolean)')
+ assert page.evaluate('caches.match(new URL("./milk-sand.css?v=101",location.href)).then(Boolean)')
  assert not errors,errors;b.close();print('PASS: continuous milk sand, matching editorial heading, no obsolete labels, centred enlarged number, sand groove and warm pearl with contact shadow, quiet deactivation, conditional luteal delay, midnight/reset and offline')

@@ -5,11 +5,23 @@
 | Роль | Гарнитура | Начертание |
 | --- | --- | --- |
 | Главные заголовки h1/h2 | Cormorant Garamond | Medium 500 |
-| Названия фаз цикла | Cormorant Garamond | SemiBold 600 |
+| Названия фаз цикла | Croogla (временно Inter) | SemiBold 600 для аналога |
 | Подзаголовки h3–h6 и подписи групп | Noto Serif | Regular 400 |
-| Крупные числовые показатели | Noto Serif Display | Regular 400 |
+| Число дня цикла | Lora | Regular 400 |
+| Другие крупные числовые показатели | Noto Serif Display | Regular 400 |
 | Основной текст, темы, кнопки, навигация | Inter | Regular 400 |
-| Акцент «ЗАДЕРЖКА» | Inter | SemiBold 600 |
+| Акцент «ЗАДЕРЖКА» в блоке цикла | Lora | Bold 700 |
+
+Блок цикла воспроизводит отдельный референс 1080 × 1080: оригинальная Lora
+(локальный variable WOFF, 400/700) используется для «фаза», числа и «ЗАДЕРЖКА».
+Croogla Regular/Light и Circe Regular не предоставлены. С согласия пользователя
+временно используются Inter SemiBold 600, настоящий Inter Light 300 и Inter
+Regular 400 соответственно. Имена оригинальных гарнитур оставлены первыми в
+переменных `--cycle-phase-font`, `--cycle-label-font`, `--cycle-caption-font`.
+При появлении файлов оригиналов нужно подключить их и повторно сверить метрики.
+Lora и Inter получены из официальных `google/fonts/ofl/lora` и `ofl/inter`;
+лицензии SIL OFL находятся рядом. Контрольная композиция —
+`../../docs/cycle-type-reference.html`.
 
 Прямые статические WOFF-файлы получены из официальных variable TTF в [google/fonts](https://github.com/google/fonts/tree/main/ofl) с помощью fontTools `instantiateVariableFont`: ось `wght` установлена в 400/600, остальные оси — в значения по умолчанию. Искусственные жирность и курсив отключены. Лицензии SIL OFL лежат рядом с каждой гарнитурой.
 

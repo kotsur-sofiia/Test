@@ -52,14 +52,15 @@
     const s=snapshot(), context=key(s), busy=pending?.key===context;
     if (pending && !busy) cancel();
     $('#cycle-start-action').hidden=false;
-    $('#cycle-dial-day').textContent=s.day??'—';$('#cycle-dial').style.setProperty('--day-size',s.day>9999?'48px':s.day>999?'64px':'');
+    $('#cycle-dial-day').textContent=s.day??'—';
+    $('#cycle-dial').style.setProperty('--cycle-number-size',s.day>9999?'160':s.day>999?'200':s.day>99?'270':'340');
     const names={menstrual:'МЕНСТРУАЛЬНАЯ',follicular:'ФОЛЛИКУЛЯРНАЯ',ovulation:'ОВУЛЯТОРНАЯ',luteal:'ЛЮТЕИНОВАЯ'};
     $('#cycle-phase-name').textContent=names[s.displayPhase||s.phase]||(s.status==='empty'?'ОТМЕТЬ НАЧАЛО':'БЕЗ ПРОГНОЗА');
     $('#cycle-phase-word').textContent=s.phase||s.status==='awaiting'?'фаза':s.status==='empty'?'цикла':'фазы';
     const delayed=s.status==='awaiting'&&s.overdue>0;
     $('#cycle-dial-countdown').classList.toggle('is-delayed',delayed);
     $('#cycle-countdown-label').textContent=delayed?'ЗАДЕРЖКА':'до менструации';
-    $('#cycle-countdown-value').textContent=delayed?days(s.overdue):s.remaining>0?'≈ '+days(s.remaining):s.status==='awaiting'?'ожидается сегодня':s.status==='empty'?'нет данных':'без прогноза';
+    $('#cycle-countdown-value').textContent=delayed?'≈ '+days(s.overdue):s.remaining>0?'≈ '+days(s.remaining):s.status==='awaiting'?'ожидается сегодня':s.status==='empty'?'нет данных':'без прогноза';
     $('#cycle-dial-note').textContent=s.status==='awaiting'?'Лютеиновая фаза остаётся условной подписью до новой отметки менструации.':'Фаза и дата следующей менструации — ориентировочная оценка, а не подтверждение овуляции.';
     $('#cycle-dial').setAttribute('aria-label',[s.displayPhaseName||s.phaseName||'Фаза не определена',s.day?'День цикла '+s.day:'Нет отметки начала',$('#cycle-dial-countdown').textContent].join('. '));
     $('#cycle-dial').dataset.status=s.status;

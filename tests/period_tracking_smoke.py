@@ -12,8 +12,8 @@ with sync_playwright() as p:
  assert page.locator('#calendar,.cycle-calendar-area,#cycle .voice-card,#selected-date,.privacy-details,footer>span').count()==0
  assert page.locator('.voice-card').count()==7
  assert page.locator('#cycle-dial-day').inner_text()=='35'
- assert page.locator('.cycle-day-label').inner_text()=='день цикла'
- assert page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
+ assert page.locator('.cycle-day-label').inner_text()=='-день цикла-'
+ assert page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='≈ 2 дня'
  assert page.evaluate('state.periodEnds')=={}
  open_period_editor(page)
  assert page.locator('#period-start').input_value()=='01.10.2026'
@@ -22,7 +22,7 @@ with sync_playwright() as p:
  for value in ['31.04.2026','30.09.2026','05.11.2026']:
   page.locator('#period-end').fill(value);save();assert page.locator('#period-form-error').inner_text();assert page.evaluate('state.periodEnds')=={}
  page.locator('#period-end').fill('05102026');save();assert page.locator('#period-end').input_value()=='05.10.2026'
- assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-05' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
+ assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-05' and page.locator('#cycle-countdown-value').inner_text()=='≈ 2 дня'
  page.locator('#period-end-calendar').fill('2026-10-06');page.locator('#period-end-calendar').dispatch_event('change');assert page.locator('#period-end').input_value()=='06.10.2026';save();assert page.evaluate('state.periods.length')==1
  page.locator('#period-end').fill('');page.locator('#period-start').fill('20.10.2026');save();assert page.locator('#period-form-error').inner_text()==''
  assert page.evaluate('state.periods.length')==2 and page.evaluate('state.periodEnds["2026-10-20"]??null') is None
@@ -34,7 +34,7 @@ with sync_playwright() as p:
  before=page.evaluate('JSON.stringify([state.periods,state.periodEnds,state.cycleLength])');page.locator('#period-end').fill('08.10.2026')
  page.evaluate('()=>{window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw Error("full")}}');save();assert page.evaluate('JSON.stringify([state.periods,state.periodEnds,state.cycleLength])')==before;assert page.locator('#period-end').input_value()=='08.10.2026';assert 'Не удалось' in page.locator('#period-form-error').inner_text()
  page.evaluate('()=>{Storage.prototype.setItem=realSet}');save();assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-08'
- page.get_by_role('button',name='Удалить отметку 2026-10-20',exact=True).click();assert page.evaluate('state.periodEnds["2026-10-20"]??null') is None;assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
+ page.get_by_role('button',name='Удалить отметку 2026-10-20',exact=True).click();assert page.evaluate('state.periodEnds["2026-10-20"]??null') is None;assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-value').inner_text()=='≈ 2 дня'
  page.locator('#period-end').fill('');page.locator('#period-start').fill('04.11.2026');save();assert page.locator('#cycle-dial-day').inner_text()=='1';assert page.locator('#cycle-countdown-label').inner_text()=='до менструации'
  assert page.locator('#cycle-phase-name').inner_text()=='МЕНСТРУАЛЬНАЯ' and page.locator('#cycle-phase-word').inner_text()=='фаза'
  assert page.evaluate('state.periodEnds["2026-11-04"]??null') is None
@@ -52,5 +52,5 @@ with sync_playwright() as p:
  data=page.evaluate('JSON.parse(JSON.stringify(state))');assert data['periodEnds']['2026-10-01']=='2026-10-08' and data['legacyExtra']=='keep' and data['voiceNotes'][0]['id']=='old-cycle-note'
  ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible();assert page.evaluate('caches.match(new URL("./assets/pearl-topics.webp",location.href)).then(Boolean)')
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-08'
- page.clock.fast_forward(17*24*60*60*1000);page.clock.fast_forward(17*24*60*60*1000);assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
+ page.clock.fast_forward(17*24*60*60*1000);page.clock.fast_forward(17*24*60*60*1000);assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='≈ 2 дня'
  assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, continuous milk background, responsive surfaces, stored records/offline/midnight')
