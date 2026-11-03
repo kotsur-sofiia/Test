@@ -2,9 +2,22 @@
 'use strict';
 (() => {
   const profileSections = new Set(['account','settings','subscription','devices']);
-  function updateShoreFade() {
-    const bottom = $('#page-title').getBoundingClientRect().bottom;
-    document.documentElement.style.setProperty('--shore-fade-start',bottom+'px');
+  function updateTopPanel() {
+    const header = document.querySelector('main>header');
+    const navigation = document.querySelector('.section-navigation');
+    navigation.hidden = ![...navigation.querySelectorAll('nav')].some(nav=>!nav.hidden&&getComputedStyle(nav).display!=='none');
+    let cursor = header.getBoundingClientRect().bottom;
+    let bottom = $('#page-title').getBoundingClientRect().bottom;
+    for (const panel of [document.querySelector('.profile-tabs'),navigation,$('#diary-shell')]) {
+      if (panel.hidden) continue;
+      panel.style.top=cursor+'px';
+      cursor+=panel.getBoundingClientRect().height;
+      // Measure painted controls and captions, excluding transparent glow padding.
+      for (const label of panel.querySelectorAll('.topic-label,nav a,.profile-tab-control a')) {
+        if (label.checkVisibility()) bottom=Math.max(bottom,label.getBoundingClientRect().bottom);
+      }
+    }
+    document.documentElement.style.setProperty('--top-panel-height',Math.max(header.getBoundingClientRect().bottom,bottom+12)+'px');
   }
   function current() {
     if (location.hash === '#goals') history.replaceState(null,'','#profile');
@@ -28,7 +41,6 @@
     const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Библиотека',friends:'Друзья'};
     const heading=$('#page-title');
     heading.textContent=route.area==='diary'&&section!=='profile'?'Дневник':section==='profile'?'Обо мне':(titles[route.id]||titles[route.area]||'Профиль');
-    updateShoreFade();
     if(section!=='cycle')window.WomanPeriodEditor?.close();
     for (const panel of document.querySelectorAll('[data-main-view]')) {
       panel.hidden = panel.dataset.mainView !== route.area || panel.id !== (route.area === 'profile' ? route.profileSection : section);
@@ -55,6 +67,7 @@
     window.WomanDayMap?.routeChanged(route.topic);
     window.LunaVoice?.refresh();
     window.WomanCycleCare?.refresh();
+    updateTopPanel();
   }
   function navigate() {
     refresh();
@@ -67,9 +80,10 @@
   }
   window.addEventListener('load',navigate);
   window.addEventListener('hashchange',navigate);
-  window.addEventListener('resize',updateShoreFade);
-  new ResizeObserver(updateShoreFade).observe($('#page-title'));
-  document.fonts.ready.then(updateShoreFade);
+  window.addEventListener('resize',updateTopPanel);
+  const topPanelObserver = new ResizeObserver(updateTopPanel);
+  for (const panel of document.querySelectorAll('main>header,#page-title,.profile-tabs,.section-navigation,#diary-shell')) topPanelObserver.observe(panel);
+  document.fonts.ready.then(updateTopPanel);
   window.LunaNavigation = Object.freeze({refresh});
   refresh();
 })();

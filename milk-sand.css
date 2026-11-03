@@ -6,14 +6,13 @@ html body::before {
   background:#f3eee5 url('./assets/shore-canvas.svg?v=88') center top/100% 100% no-repeat;
   box-shadow:none;
 }
-/* Keep the original sand canvas; only the water and foam stay above content. */
+/* Keep the original canvas beneath the pinned title and upper controls. */
 html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:12px;
-  --shore-fade-start:140px;
-  scroll-padding-top:calc(var(--foam-bottom) + var(--shore-control-gap));
+  scroll-padding-top:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
 }
-/* The fixed photograph fades along the outer shadow of the foam. */
+/* The heading remains above the pinned background and control rows. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
   position:fixed; inset:0 0 auto; z-index:25; isolation:isolate;
   background:transparent; box-shadow:none;
@@ -24,34 +23,19 @@ html body .layout main>header,html body[data-view=diary][data-section=cycle] mai
    the height or scrolling bounds of the current section. */
 html body .layout main::before {
   content:''; display:block; flex:0 0 auto;
-  height:calc(var(--foam-bottom) + var(--shore-control-gap));
+  height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
   pointer-events:none;
 }
-/* A fresh, independent copy of the exact photo used in the document canvas. */
-html body .shore-fixed-layer {
+/* The rebuilt fixed background extends below the last visible control label. */
+html body .top-panel-background {
   position:fixed; inset:0 0 auto; z-index:24; pointer-events:none;
-  width:100%; height:min(300vw,1000px);
-  background:url('./assets/shore-phone.webp') center top/100% 100% no-repeat;
-  --shore-contour:url('./assets/shore-foam-phone.svg');
-  /* Keep the sea opaque through the heading, then fade toward the shadow. */
-  -webkit-mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start),transparent var(--foam-bottom));
-  mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start),transparent var(--foam-bottom));
-  -webkit-mask-position:center top;
-  mask-position:center top;
-  -webkit-mask-size:100% 100%;
-  mask-size:100% 100%;
-  -webkit-mask-repeat:no-repeat;
-  mask-repeat:no-repeat;
-  -webkit-mask-composite:source-in;
-  mask-composite:intersect;
+  width:100%; height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
+  background:#f3eee5 url('./assets/shore-canvas.svg?v=88') center top/100vw max(100svh,1100px) no-repeat;
+  -webkit-mask-image:linear-gradient(#000 calc(100% - 12px),transparent 100%);
+  mask-image:linear-gradient(#000 calc(100% - 12px),transparent 100%);
 }
 @media(min-width:768px) {
   html { --foam-bottom:min(17.8vw,196px); }
-  html body .shore-fixed-layer {
-    height:min(100vw,1100px);
-    background-image:url('./assets/shore-desktop.webp');
-    --shore-contour:url('./assets/shore-foam-desktop.svg');
-  }
 }
 html body::after { display:none!important; content:none!important; }
 html body .nature-panel { background:transparent!important; }
@@ -82,7 +66,7 @@ html body[data-view=profile][data-section=devices] #page-title {
 }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:0 0 8px; overflow:visible; isolation:auto;
-  position:relative; z-index:3; border:0; border-radius:0;
+  position:fixed; left:0; width:100%; z-index:26; margin:0; border:0; border-radius:0;
 }
 html body .topic-strip {
   padding:0; background:none; border:0; border-radius:0; box-shadow:none;
@@ -334,7 +318,7 @@ html body .diary-shell #day-widgets {
   border-radius:0; box-shadow:none; backdrop-filter:none; -webkit-backdrop-filter:none;
 }
 html body #day-widgets::after { content:''; flex:0 0 var(--topic-inset); }
-html body .section-navigation { position:relative; z-index:3; }
+html body .section-navigation { position:fixed; left:0; width:100%; z-index:26; }
 html body .section-navigation nav[data-menu] {
   width:calc(100% + 2 * var(--content-gutter)); max-width:none;
   margin:-20px calc(-1 * var(--content-gutter)) -16px;
@@ -344,4 +328,4 @@ html body .section-navigation nav[data-menu] {
   backdrop-filter:none; -webkit-backdrop-filter:none; scrollbar-width:none;
 }
 html body .section-navigation nav[data-menu]::-webkit-scrollbar { display:none; }
-html body .profile-tabs { position:relative; z-index:4; }
+html body .profile-tabs { position:fixed; left:0; width:100%; z-index:27; }
