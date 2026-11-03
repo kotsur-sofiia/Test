@@ -1,20 +1,13 @@
 /* Reference-inspired ivory beach; champagne glass and pearl details. */
 :root { background:#f1e9db; --coffee:#4b3025; --ink:var(--coffee); --forest:var(--coffee); --earth:var(--coffee); --glass-ink:var(--coffee); --muted:#715547; }
-body { position:relative; isolation:isolate; background:transparent; }
+body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
-  display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:#f3e5d4 url('./assets/beach-sand-natural.webp') center/cover no-repeat;
+  display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
+  background:#efd8b9 url('./assets/shore-canvas.svg') center top/100% 100% no-repeat;
   box-shadow:none;
 }
-/* A translucent shoreline washes over the existing sand at the top of every view. */
-html body::after {
-  display:block!important; content:''!important;
-  position:fixed; top:0; right:0; left:0; bottom:auto;
-  width:100%; height:calc(clamp(260px,35svh,340px) + env(safe-area-inset-top,0px));
-  z-index:-1; pointer-events:none;
-  background:url('./assets/beach-water.webp') center top/100% 100% no-repeat;
-  opacity:.85;
-}
+/* Sand and sea share one document canvas; the dial travels with the same ground. */
+html body::after { display:none!important; content:none!important; }
 html body .nature-panel { background:transparent!important; }
 html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+article::before { display:none; }
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header,
@@ -79,6 +72,7 @@ html body #cycle-dial-countdown {
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
 /* Warm nacre with a tight contact shadow and a soft shadow cast onto the sand. */
+html body .sand-cycle-ring { opacity:.72; }
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
 html body #cycle-pearl-marker { filter:none; }
