@@ -6,8 +6,10 @@
     const header = document.querySelector('main>header');
     const navigation = document.querySelector('.section-navigation');
     navigation.hidden = ![...navigation.querySelectorAll('nav')].some(nav=>!nav.hidden&&getComputedStyle(nav).display!=='none');
-    let cursor = header.getBoundingClientRect().bottom;
-    let bottom = $('#page-title').getBoundingClientRect().bottom;
+    const headingBottom = $('#page-title').getBoundingClientRect().bottom;
+    const headingGap = Math.max(0,header.getBoundingClientRect().bottom-headingBottom);
+    let cursor = headingBottom+headingGap/1.5;
+    let bottom = headingBottom;
     let controlsTop = null;
     for (const panel of [document.querySelector('.profile-tabs'),navigation,$('#diary-shell')]) {
       if (panel.hidden) continue;
