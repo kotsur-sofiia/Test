@@ -19,9 +19,8 @@ html body #page-title {
   font:500 clamp(42px,7vw,66px)/1.12 var(--display); letter-spacing:.015em;
   color:var(--coffee); text-transform:uppercase; white-space:normal;
   background:none; -webkit-text-fill-color:currentColor; -webkit-text-stroke:0;
-  text-shadow:none; filter:none; animation:none;
+  text-shadow:var(--glass-text-glow); filter:none; animation:none;
 }
-html body[data-view=diary]:not([data-section=profile]) main>header { padding-bottom:2px; }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:0 clamp(8px,2vw,24px) 8px;
 }
@@ -122,10 +121,26 @@ html body #cycle-countdown-value { font-weight:650; }
 html body .diary-shell :is(.day-widget .mini,#add-widget) .topic-label { font-weight:650; }
 html body .topic-editor-description strong { font-weight:700; }
 
-/* Edit comes first, followed by three full topics and a half-visible next topic. */
+/* Edit comes first, followed by four full topics and a half-visible next topic. */
 html body .topic-strip {
-  grid-template-columns:calc((100% - 32px)/4.5) minmax(0,1fr);
+  grid-template-columns:calc((100% - 40px)/5.5) minmax(0,1fr);
   gap:8px;
 }
-html body #day-widgets>.day-widget { flex-basis:calc((100% - 24px)/3.5); }
-html body .diary-shell #add-widget .topic-label { font-size:clamp(7px,2vw,10px); }
+html body #day-widgets>.day-widget { flex-basis:calc((100% - 32px)/4.5); }
+html body .diary-shell #add-widget .topic-label { font-size:clamp(6.5px,1.8vw,9px); }
+
+/* Profile and friends share a pair of equally sized glass navigation buttons. */
+html body .profile-tabs {
+  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
+  margin:0; padding:5px var(--content-gutter) 16px;
+}
+html body .profile-tabs a {
+  display:flex; align-items:center; justify-content:center; min-width:0; min-height:68px;
+  padding:16px 12px; border:1px solid var(--glass-rim); border-radius:999px;
+  background:var(--glass-clear); color:var(--coffee); font:650 16px/1.4 var(--sans);
+  text-align:center; text-decoration:none; box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(18px) saturate(.8); -webkit-backdrop-filter:blur(18px) saturate(.8);
+}
+html body .profile-tabs a[aria-current=page] { background:var(--glass-primary); }
+html body .profile-tabs a:hover { filter:brightness(1.05); }
+html body .bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }

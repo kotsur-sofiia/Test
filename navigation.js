@@ -30,8 +30,15 @@
     }
     $('#diary-shell').hidden = route.area !== 'diary' || section === 'profile';
     for (const menu of document.querySelectorAll('.section-navigation nav[data-menu]')) menu.hidden = menu.dataset.menu !== route.area;
+    const profileArea = route.area === 'profile' || route.area === 'friends';
+    const profileTabs = document.querySelector('.profile-tabs');
+    profileTabs.hidden = !profileArea;
+    for (const link of profileTabs.querySelectorAll('a')) {
+      const selected = link.hash === (route.area === 'friends' ? '#friends' : '#account');
+      if (selected) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
+    }
     for (const link of document.querySelectorAll('.bottom-nav a')) {
-      const active = link.dataset.view === route.area;
+      const active = link.dataset.view === (profileArea ? 'profile' : route.area);
       link.classList.toggle('active',active);
       if (active) link.setAttribute('aria-current','page'); else link.removeAttribute('aria-current');
     }
