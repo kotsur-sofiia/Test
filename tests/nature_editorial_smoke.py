@@ -27,7 +27,7 @@ with sync_playwright() as p:
  assert 'Manrope' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert 'Manrope' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
  # One fixed milk-sand image continues beneath every transparent section.
- assert 'beach-sand.webp' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
+ assert 'beach-sand-horizontal.webp' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  assert page.locator('.cycle-dial-card').evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
  def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
  glass=page.locator('.glass-recommendation-body');glass_shot=Image.open(BytesIO(glass.screenshot()))
@@ -44,7 +44,7 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=45','./milk-sand.css?v=56','./liquid-glass.css?v=47','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/beach-sand.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/cycle-pearl-warm.webp','./assets/beach-water.webp','./assets/pearl-rolled-ring.webp']:
+ for path in ['./nature-editorial.css?v=45','./milk-sand.css?v=58','./liquid-glass.css?v=47','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/beach-sand-horizontal.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/cycle-pearl-warm.webp','./assets/beach-water.webp','./assets/pearl-rolled-ring.webp']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
  assert 'Manrope' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
