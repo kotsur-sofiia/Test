@@ -75,7 +75,20 @@ html body #cycle-dial-countdown {
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
 /* Warm nacre with a tight contact shadow and a soft shadow cast onto the sand. */
-html body .sand-cycle-ring { opacity:.94; filter:none; }
+/* Relief blends into the real shore, inheriting its colour and visible sand texture. */
+html body .layout { z-index:auto; }
+html body #cycle .cycle-dial-card { isolation:auto; }
+html body .sand-cycle-ring {
+  /* Photo geometry is fitted to the unchanged 139/320 marker radius. */
+  position:absolute; left:-.522%; top:.093%; width:102.689%; height:102.689%; max-width:none;
+  pointer-events:none; opacity:1; object-fit:fill;
+  /* Neutral grey leaves the shore unchanged; the photographed groove adds relief. */
+  filter:grayscale(1) brightness(.553) contrast(10); mix-blend-mode:soft-light;
+  mask-image:radial-gradient(closest-side,#000 90%,transparent 100%);
+  -webkit-mask-image:radial-gradient(closest-side,#000 90%,transparent 100%);
+}
+html body .cycle-dial>svg { position:relative; z-index:1; }
+html body .cycle-dial-copy { z-index:2; }
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
 html body #cycle-pearl-marker { filter:none; }
