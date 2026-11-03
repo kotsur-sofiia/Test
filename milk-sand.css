@@ -8,11 +8,11 @@ html body::before {
 }
 /* Keep the original sand canvas; only the water and foam stay above content. */
 html {
-  --foam-bottom:min(55.5vw,185px);
+  --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:24px;
   scroll-padding-top:calc(var(--foam-bottom) + var(--shore-control-gap));
 }
-/* The fixed photograph ends at the foam, not at the title's rectangular box. */
+/* The fixed photograph fades along the outer shadow of the foam. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
   position:sticky; top:0; z-index:25; flex-shrink:0; isolation:isolate;
   background:transparent; box-shadow:none;
@@ -27,7 +27,7 @@ html body .layout main>header::before {
   -webkit-mask:url('./assets/shore-foam-phone.svg') center top/100% 100% no-repeat;
 }
 @media(min-width:768px) {
-  html { --foam-bottom:min(15.8vw,174px); }
+  html { --foam-bottom:min(17.8vw,196px); }
   html body .layout main>header::before {
     height:min(100vw,1100px);
     background-image:url('./assets/shore-desktop.webp');
