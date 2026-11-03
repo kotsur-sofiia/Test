@@ -12,7 +12,7 @@ with sync_playwright() as p:
  bottom=page.get_by_role('navigation',name='Основная навигация',exact=True)
  assert bottom.evaluate('(e)=>getComputedStyle(e).position')=='fixed'
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e).fontFamily').strip('"').startswith('Inter')
- assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Запись','Библиотека']
+ assert bottom.get_by_role('link').all_text_contents()==['Профиль','Дневник','Запись','Медиатека']
  assert page.locator('#profile').is_visible() and not page.locator('#sleep').is_visible()
  assert page.locator('[data-menu="profile"] a').all_text_contents()==['◉Аккаунт','⚙Настройки','◇Подписка','⌁Подключённые девайсы']
  page.locator('#profile-name').fill('Несохранённое имя');assert bottom.locator('[aria-current="page"]').inner_text()=='Дневник';bottom.get_by_role('link',name='Профиль',exact=True).click();expect(page.locator('#account')).to_be_visible()
@@ -41,7 +41,7 @@ with sync_playwright() as p:
  page.evaluate('location.hash="food"');page.wait_for_function('document.querySelector("#food").hidden===false');page.locator('#food-product').select_option('oats');page.locator('#food-form button').click();assert page.locator('#food-calories').inner_text()=='379 ккал'
  page.evaluate('location.hash="sleep"');page.wait_for_function('document.querySelector("#sleep").hidden===false');voice=page.locator('[data-voice-section="sleep"]');voice.evaluate('(e)=>e.open=true');voice.locator('.voice-editor').fill('Черновик дневника сна')
  voice.locator('.voice-start').click();assert page.evaluate('__speech.at(-1).aborted') is None
- bottom.get_by_role('link',name='Библиотека',exact=True).click();expect(page.locator('#library')).to_be_visible() and not page.locator('#sleep').is_visible()
+ bottom.get_by_role('link',name='Медиатека',exact=True).click();expect(page.locator('#library')).to_be_visible() and not page.locator('#sleep').is_visible()
  assert page.evaluate('__speech.at(-1).aborted') is True
  bottom.get_by_role('link',name='Профиль',exact=True).click();page.locator('.profile-tabs a[href="#friends"]').click();expect(page.locator('#friends')).to_be_visible() and not page.locator('#library').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
@@ -57,7 +57,7 @@ with sync_playwright() as p:
  page.evaluate('location.hash="cycle"');page.wait_for_function('location.hash==="#cycle"')
  assert not page.locator('#cycle').is_visible()
  # Browser history and direct routes select the appropriate main area and contextual menu.
- bottom.get_by_role('link',name='Профиль',exact=True).click();page.locator('.profile-tabs a[href="#friends"]').click();bottom.get_by_role('link',name='Библиотека',exact=True).click()
+ bottom.get_by_role('link',name='Профиль',exact=True).click();page.locator('.profile-tabs a[href="#friends"]').click();bottom.get_by_role('link',name='Медиатека',exact=True).click()
  page.go_back();expect(page.locator('#friends')).to_be_visible()
  page.goto(URL.split('#')[0]+'#settings');expect(page.locator('#settings')).to_be_visible() and bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
  ctx.set_offline(True);page.reload();expect(page.locator('#settings')).to_be_visible() and page.evaluate('navigator.onLine') is False

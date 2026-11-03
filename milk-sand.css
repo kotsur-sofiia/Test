@@ -9,7 +9,7 @@ html body::before {
 /* Keep the original canvas beneath the pinned title and upper controls. */
 html {
   --foam-bottom:min(58.8vw,196px);
-  --shore-control-gap:12px;
+  --shore-control-gap:4px;
   scroll-padding-top:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
 }
 /* The heading remains above the pinned background and control rows. */

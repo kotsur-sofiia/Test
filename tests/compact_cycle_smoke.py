@@ -31,7 +31,7 @@ with sync_playwright() as p:
  page.locator('#cycle-start-action').click();page.keyboard.press('Escape');expect(page.locator('#period-dialog')).not_to_be_visible()
  for width in [320,390,768,1280]:
   page.set_viewport_size({'width':width,'height':844})
-  for route,title in [('account','Профиль'),('settings','Настройки'),('library','Библиотека'),('friends','Друзья'),('capture','Голосовая запись'),('cycle','Дневник')]:
+  for route,title in [('account','Профиль'),('settings','Настройки'),('library','Медиатека'),('friends','Друзья'),('capture','Голосовая запись'),('cycle','Дневник')]:
    page.goto(URL+'#'+route);expect(page.locator('#page-title')).to_have_text(title)
    assert page.locator('#page-title').bounding_box()['y']<80 and page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(width,route)
   gap=page.locator('#cycle-dial').bounding_box()['y']-sum(page.locator('#diary-shell').bounding_box()[key] for key in ['y','height'])

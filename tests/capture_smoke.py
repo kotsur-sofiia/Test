@@ -9,7 +9,7 @@ with sync_playwright() as p:
  b=p.chromium.launch(executable_path='/usr/bin/chromium',args=['--no-sandbox']);ctx=b.new_context(viewport={'width':390,'height':844},has_touch=True,is_mobile=True)
  ctx.add_init_script(MOCK);page=ctx.new_page();errors=[];page.on('pageerror',lambda e:errors.append(str(e)));page.goto(URL)
  page.wait_for_function('navigator.serviceWorker.controller!==null');nav=page.locator('.bottom-nav')
- assert nav.locator('a').all_text_contents()==['Профиль','Дневник','Запись','Библиотека']
+ assert nav.locator('a').all_text_contents()==['Профиль','Дневник','Запись','Медиатека']
  nav.locator('[href="#capture"]').click();expect(page.locator('#capture')).to_be_visible();assert page.evaluate('__speech.length')==0
  root=page.locator('[data-voice-section="capture"]');editor=root.locator('.voice-editor');day=(datetime.now()-timedelta(days=1)).strftime('%Y-%m-%d');root.locator('.voice-date').fill(day)
  root.locator('.voice-start').click();assert page.evaluate('__speech.at(-1).continuous') is False

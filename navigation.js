@@ -38,7 +38,7 @@
     document.body.dataset.view = route.area;
     document.body.dataset.section = route.area === 'diary' ? section : route.profileSection;
     document.body.dataset.topic = route.topic;
-    const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Библиотека',friends:'Друзья'};
+    const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Медиатека',friends:'Друзья'};
     const heading=$('#page-title');
     heading.textContent=route.area==='diary'&&section!=='profile'?'Дневник':section==='profile'?'Обо мне':(titles[route.id]||titles[route.area]||'Профиль');
     if(section!=='cycle')window.WomanPeriodEditor?.close();
