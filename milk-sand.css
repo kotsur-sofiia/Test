@@ -87,7 +87,25 @@ html body :is(.food-grid,.sleep-grid)>.card+article { background:transparent; co
 html body :is(.food-grid,.sleep-grid)>.card+article :is(h3,h4,label,.fine,.muted,.nutrient-label,.nutrient-note,.nutrient-label small,.nutrient-source,.nutrient-subtype,.nutrient-group>summary,.nutrient-fieldset legend,.bar-wrap small,.big-number,.reference-details>summary) { color:var(--ink); }
 html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--earth); }
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
-html body .diary-shell #add-widget .topic-orb { background:var(--glass-primary); }
+/* Clear glass: the actual sand grain remains visible through the centre. */
+html body .diary-shell #add-widget .topic-orb {
+  position:relative; isolation:isolate; overflow:hidden;
+  background:linear-gradient(145deg,#ffffff24 0%,#ffffff08 38%,#ffffff03 65%,#ffffff18 100%);
+  border:1px solid #ffffffbd;
+  box-shadow:inset 0 1px 1px #ffffffe0,inset 0 -1px 2px #755a4429,0 3px 9px #4b30251a;
+  backdrop-filter:blur(.35px) saturate(1.02);
+  -webkit-backdrop-filter:blur(.35px) saturate(1.02);
+}
+html body .diary-shell #add-widget .topic-orb::before {
+  content:''; position:absolute; inset:1px; border-radius:inherit; pointer-events:none;
+  background:linear-gradient(155deg,#ffffff73,transparent 32%,transparent 72%,#ffffff24);
+  border-top:1px solid #ffffffc2; border-bottom:1px solid #ffffff45;
+}
+html body .diary-shell #add-widget .topic-add-plus { position:relative; z-index:1; }
+html body #diary-shell #add-widget:is(:hover,:active,:focus-visible) .topic-orb {
+  border-color:#fffffff0;
+  box-shadow:inset 0 1px 2px #fff,inset 0 -1px 2px #755a4429,0 3px 10px #4b302522,0 0 0 1px #ffffff40;
+}
 html body .diary-shell .mini.active .nature-topic-image {
   border-color:var(--glass-rim); box-shadow:0 0 0 2px #fff8e8b3,var(--glass-shadow);
 }
