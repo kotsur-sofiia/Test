@@ -1,0 +1,171 @@
+/* Local, upright type. Regional Noto faces load only for the selected language. */
+@font-face {
+  font-family:'Noto Serif'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerif-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif Display'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifDisplay-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Inter'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/Inter-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Inter'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/Inter-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Arabic'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansArabic-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Arabic'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansArabic-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Naskh Arabic'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoNaskhArabic-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Hebrew'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansHebrew-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Hebrew'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansHebrew-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif Hebrew'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifHebrew-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Devanagari'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansDevanagari-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans Devanagari'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansDevanagari-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif Devanagari'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifDevanagari-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans SC'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansSC-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans SC'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansSC-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif SC'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifSC-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans TC'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansTC-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans TC'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansTC-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif TC'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifTC-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans JP'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansJP-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans JP'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansJP-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif JP'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifJP-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans KR'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSansKR-Regular.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Sans KR'; font-style:normal; font-weight:600; font-display:swap;
+  src:url('./assets/fonts/NotoSansKR-SemiBold.woff') format('woff');
+}
+@font-face {
+  font-family:'Noto Serif KR'; font-style:normal; font-weight:400; font-display:swap;
+  src:url('./assets/fonts/NotoSerifKR-Regular.woff') format('woff');
+}
+
+:root {
+  --sans:'Inter',sans-serif;
+  --display:'Noto Serif',serif;
+  --numbers:'Noto Serif Display',serif;
+}
+/* Keep each script's native shapes, including the separate CJK regional forms. */
+:lang(ar),:lang(fa),:lang(ur) {
+  --sans:'Noto Sans Arabic','Inter',sans-serif;
+  --display:'Noto Naskh Arabic','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Naskh Arabic',serif;
+}
+:lang(he),:lang(yi) {
+  --sans:'Noto Sans Hebrew','Inter',sans-serif;
+  --display:'Noto Serif Hebrew','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif Hebrew',serif;
+}
+:lang(hi),:lang(mr),:lang(ne) {
+  --sans:'Noto Sans Devanagari','Inter',sans-serif;
+  --display:'Noto Serif Devanagari','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif Devanagari',serif;
+}
+:lang(zh) {
+  --sans:'Noto Sans SC','Inter',sans-serif;
+  --display:'Noto Serif SC','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif SC',serif;
+}
+:lang(zh-Hant),:lang(zh-TW),:lang(zh-HK),:lang(zh-MO) {
+  --sans:'Noto Sans TC','Inter',sans-serif;
+  --display:'Noto Serif TC','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif TC',serif;
+}
+:lang(ja) {
+  --sans:'Noto Sans JP','Inter',sans-serif;
+  --display:'Noto Serif JP','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif JP',serif;
+}
+:lang(ko) {
+  --sans:'Noto Sans KR','Inter',sans-serif;
+  --display:'Noto Serif KR','Noto Serif',serif;
+  --numbers:'Noto Serif Display','Noto Serif KR',serif;
+}
+/* These typography rules intentionally replace weights in older visual layers. */
+html body,html body * {
+  font-family:var(--sans)!important;
+  font-weight:400!important;
+  font-style:normal!important;
+  font-synthesis:none;
+}
+html body :is(h1,h2,h3,h4,h5,h6,legend),
+html body :is(h1,h2,h3,h4,h5,h6,legend) *,
+html body #cycle-phase-name {
+  font-family:var(--display)!important;
+}
+html body :is(#cycle-dial-day,.big-number,#water-total,.macro strong,.profile-bmi output) {
+  font-family:var(--numbers)!important;
+  font-variant-numeric:lining-nums tabular-nums;
+}
+html body #cycle-phase-name,html body #cycle-phase-word {
+  color:var(--coffee);
+}
+html body .cycle-day-label {
+  text-transform:lowercase;
+  text-decoration-line:underline;
+  text-decoration-thickness:.5px;
+  text-underline-offset:3px;
+}
+html body #cycle-dial-countdown.is-delayed #cycle-countdown-label {
+  font-weight:600!important;
+}
