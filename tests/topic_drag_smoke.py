@@ -10,9 +10,9 @@ with sync_playwright() as p:
  assert page.locator('#widget-options [data-action=up],#widget-options [data-action=down]').count()==0
  def row(id):return page.locator('#widget-options [data-topic="'+id+'"]')
  toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='true'
- assert toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(109, 134, 83)'
+ assert toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(216, 179, 145)'
  assert '24' in toggle.locator('.switch-knob').evaluate('(e)=>getComputedStyle(e).transform')
- toggle.click();toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='false' and toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(213, 214, 201)';toggle.click()
+ toggle.click();toggle=row('skin').locator('[data-action=toggle]');assert toggle.get_attribute('aria-checked')=='false' and toggle.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgb(210, 200, 187)';toggle.click()
  page.evaluate('()=>{window.writes=0;window.realSet=Storage.prototype.setItem;Storage.prototype.setItem=function(...args){if(args[0]==="luna-diary-v1")writes++;return realSet.apply(this,args)}}')
  page.locator('#widget-picker').evaluate('(e)=>e.scrollTop=0')
  cdp=ctx.new_cdp_session(page)
@@ -41,4 +41,4 @@ with sync_playwright() as p:
  touch('touchEnd');page.wait_for_timeout(80);assert page.evaluate('state.dayMap.order.indexOf("cycle")')>1
  assert page.locator('.topic-drag-ghost').count()==0
  expected=page.evaluate('JSON.stringify(state.dayMap.order)');page.locator('#widget-picker [data-close-dialog]').click();page.reload();assert page.evaluate('JSON.stringify(state.dayMap.order)')==expected
- assert not errors,errors;b.close();print('PASS: green/gray thumb switches, real touch long-press, no save during preview, one save on drop, normal scrolling, keyboard cancel/drop, rollback, auto-scroll and persisted order')
+ assert not errors,errors;b.close();print('PASS: peach/neutral thumb switches, real touch long-press, no save during preview, one save on drop, normal scrolling, keyboard cancel/drop, rollback, auto-scroll and persisted order')
