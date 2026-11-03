@@ -6,6 +6,16 @@ html body::before {
   background:url('./assets/sand-waterfall.webp') center/cover no-repeat;
   box-shadow:inset 0 0 0 100vmax #f8f0e499;
 }
+/* A translucent shoreline washes over the existing sand at the top of every view. */
+html body::after {
+  display:block!important; content:''!important;
+  position:fixed; top:0; right:0; left:0; bottom:auto;
+  /* The transparent lower margin places the irregular waterline about 2 cm down. */
+  width:100%; height:calc(2.65cm + env(safe-area-inset-top,0px));
+  z-index:-1; pointer-events:none;
+  background:url('./assets/shoreline-water.webp') center top/100% 100% no-repeat;
+  opacity:.6;
+}
 html body .nature-panel { background:transparent!important; }
 html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+article::before { display:none; }
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header,
