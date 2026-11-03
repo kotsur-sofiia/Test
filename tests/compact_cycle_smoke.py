@@ -34,7 +34,7 @@ with sync_playwright() as p:
   for route,title in [('account','Профиль'),('settings','Настройки'),('library','Библиотека'),('friends','Друзья'),('capture','Голосовая запись'),('cycle','Дневник')]:
    page.goto(URL+'#'+route);expect(page.locator('#page-title')).to_have_text(title)
    assert page.locator('#page-title').bounding_box()['y']<80 and page.evaluate('document.documentElement.scrollWidth<=innerWidth'),(width,route)
-  gap=page.locator('.cycle-date-row').bounding_box()['y']-sum(page.locator('#diary-shell').bounding_box()[key] for key in ['y','height'])
+  gap=page.locator('#cycle-dial').bounding_box()['y']-sum(page.locator('#diary-shell').bounding_box()[key] for key in ['y','height'])
   assert gap<=90,(width,gap)
   page.locator('#cycle-start-action').click();box=page.locator('#period-dialog').bounding_box();assert box['x']>=0 and box['width']<=width and box['height']<=844
   page.evaluate('location.hash="library"');expect(page.locator('#period-dialog')).not_to_be_visible()

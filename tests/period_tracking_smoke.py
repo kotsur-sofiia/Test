@@ -53,4 +53,4 @@ with sync_playwright() as p:
  ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible();assert page.evaluate('caches.match(new URL("./assets/nature-topics.webp",location.href)).then(Boolean)')
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-08'
  page.clock.fast_forward(17*24*60*60*1000);page.clock.fast_forward(17*24*60*60*1000);assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
- assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, direct texture boundaries, responsive surfaces, stored records/offline/midnight')
+ assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, continuous milk background, responsive surfaces, stored records/offline/midnight')

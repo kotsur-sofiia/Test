@@ -14,12 +14,11 @@ with sync_playwright() as p:
   main=page.locator('.layout main');box=main.bounding_box();assert box['x']==0 and abs(box['width']-width)<1
   assert main.evaluate('(e)=>getComputedStyle(e).borderRadius')=='0px'
   assert main.evaluate('(e)=>getComputedStyle(e).boxShadow')=='none'
-  glyph=page.locator('#page-title').evaluate('(e)=>{const r=document.createRange();r.selectNodeContents(e);return r.getBoundingClientRect().width}')
-  assert .88*width<=glyph<=.98*width,(width,glyph)
-  assert int(page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontWeight'))>=700
-  for selector,asset in [('#diary-shell','dew-monstera.webp'),('.cycle-dial-card','sand-waterfall.webp'),('.cycle-recommendations','clay-grain.svg')]:
-   item=page.locator(selector);style=item.evaluate('(e)=>{const s=getComputedStyle(e,"::before");return {image:s.backgroundImage,mask:s.maskImage}}')
-   assert asset in style['image'] and 'gradient' not in style['image'] and style['mask']=='none',style
+  button=page.locator('.diary-title-button');button_box=button.bounding_box()
+  assert 140<=button_box['width']<=min(width*.8,250)
+  assert button_box['height']>=48
+  for selector in ['#diary-shell','.cycle-dial-card','.cycle-recommendations']:
+   item=page.locator(selector);assert item.evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
    rect=item.bounding_box();assert rect['x']==0 and abs(rect['width']-width)<1,(width,selector,rect)
   end=page.locator('.cycle-recommendations').bounding_box()
   assert abs(end['y']+end['height']-page.evaluate('document.documentElement.scrollHeight-scrollY'))<2
@@ -35,5 +34,5 @@ with sync_playwright() as p:
  expect(page.locator('#install')).to_be_visible();page.locator('#install').click();assert page.evaluate('installed') is True
  page.goto(URL+'#cycle');c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.evaluate('state.water[0].id')=='keep'
- assert page.evaluate('caches.match(new URL("./nature-editorial.css?v=43",location.href)).then(Boolean)')
- assert not errors,errors;b.close();print('PASS: full-width unframed scenes, no background fades, foliage/sand/clay, 92% bold title, removed download UI, retained install and unchanged local/offline records')
+ assert page.evaluate('caches.match(new URL("./nature-editorial.css?v=44",location.href)).then(Boolean)')
+ assert not errors,errors;b.close();print('PASS: full-width unframed scenes, no background fades, milk-sand throughout, compact glass title, removed download UI, retained install and unchanged local/offline records')

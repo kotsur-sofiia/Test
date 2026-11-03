@@ -1,0 +1,71 @@
+/* One continuous milk-sand backdrop; green glass and terracotta remain accents. */
+:root { background:#f1e9db; }
+body { position:relative; isolation:isolate; background:transparent; }
+html body::before {
+  display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
+  background:url('./assets/sand-waterfall.webp') center/cover no-repeat;
+  box-shadow:inset 0 0 0 100vmax #f8f0e499;
+}
+html body .nature-panel { background:transparent!important; }
+html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+article::before { display:none; }
+html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header,
+html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell,
+html body .section-navigation { background:transparent; box-shadow:none; }
+html body #page-title { color:var(--forest); }
+html body[data-view=diary]:not([data-section=profile]) #page-title {
+  display:inline-flex; align-items:center; justify-content:center; width:auto;
+  font:600 24px/1.2 var(--sans); letter-spacing:0; white-space:normal;
+}
+html body .diary-title-button {
+  padding:13px 30px; min-height:50px; font:650 20px/1.2 var(--sans); letter-spacing:.055em;
+  text-transform:uppercase;
+}
+html body .nature-dark { --muted:#60624c; color:var(--ink); }
+html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
+html body .nature-dark #phase-title,html body .nature-dark #phase-description,
+html body .nature-clay :is(.fine,.muted,.tip p,.callout) { color:var(--ink); }
+html body .profile-card .nature-dark .fine { color:var(--muted); }
+html body :is(.food-grid,.sleep-grid)>.card+article { background:transparent; color:var(--ink); }
+html body :is(.food-grid,.sleep-grid)>.card+article :is(h3,h4,label,.fine,.muted,.nutrient-label,.nutrient-note,.nutrient-label small,.nutrient-source,.nutrient-subtype,.nutrient-group>summary,.nutrient-fieldset legend,.bar-wrap small,.big-number,.reference-details>summary) { color:var(--ink); }
+html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--earth); }
+html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
+html body .diary-shell #add-widget .topic-orb { background:var(--glass-green); }
+html body .diary-shell .mini.active .nature-topic-image { box-shadow:inset 0 1px 3px #ffffffe0,inset 0 -2px 4px #1d301f4d,0 0 0 4px #f1e9db,0 0 0 5px #8a9d68; }
+html body .day-sheet { background:url('./assets/sand-waterfall.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e4c9,0 20px 80px #091b1955; }
+html body .day-sheet::backdrop { background:#514c3e55; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+/* The number itself is centred, independently of phase and countdown text. */
+html body .cycle-dial { --day-size:clamp(96px,28vw,132px); }
+html body .cycle-dial-copy { position:absolute; inset:0; display:block; text-align:center; }
+html body #cycle-dial-day {
+  position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0;
+  display:block; font:600 var(--day-size)/1 var(--sans); letter-spacing:-.045em;
+  color:var(--forest); font-variant-numeric:lining-nums tabular-nums;
+  text-box-trim:trim-both; text-box-edge:cap alphabetic;
+}
+html body #cycle-dial-phase {
+  position:absolute; top:17%; left:0; width:100%; max-width:none;
+  display:flex; flex-direction:column; align-items:center; gap:2px;
+}
+html body #cycle-phase-name { font:750 15px/1.3 var(--sans); letter-spacing:.035em; color:var(--clay); }
+html body #cycle-phase-word { font:500 12px/1.4 var(--sans); color:var(--clay); }
+html body .cycle-day-label {
+  position:absolute; top:calc(50% + var(--day-size)/2 + 3px); left:0; width:100%;
+  font:500 12px/1.5 var(--sans); color:var(--muted);
+}
+html body #cycle-dial-countdown {
+  position:absolute; top:calc(50% + var(--day-size)/2 + 27px); left:0; width:100%;
+  display:flex; flex-direction:column; align-items:center; gap:1px; margin:0;
+}
+html body #cycle-countdown-label { font-size:11px; }
+html body #cycle-countdown-value { font-size:13px; }
+html body .cycle-dial[data-status=awaiting] .dial-progress { stroke:var(--olive); }
+@media(max-width:360px) {
+  html body #cycle-phase-name { font-size:12px; }
+  html body #cycle-phase-word { font-size:11px; }
+  html body .cycle-day-label { font-size:11px; }
+  html body #cycle-countdown-label { font-size:10px; }
+  html body #cycle-countdown-value { font-size:12px; }
+}
+@supports not (text-box-trim:trim-both) {
+  html body #cycle-dial-day { transform:translate(-50%,calc(-50% - .06em)); }
+}

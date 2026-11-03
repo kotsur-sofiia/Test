@@ -15,14 +15,14 @@
     const elapsed = target-serial(base), day = elapsed+1;
     const valid = Number.isInteger(length) && length>=21 && length<=45 && Number.isInteger(periodLength) && periodLength>=1 && periodLength<=10;
     if (!predict || !valid) return {status:'unavailable',date,base,day,phase:null,remaining:null,progress:valid?Math.min(1,elapsed/length):0};
-    if (elapsed >= length) return {status:'awaiting',date,base,day,length,periodLength,phase:null,remaining:0,overdue:elapsed-length,progress:1};
+    if (elapsed >= length) return {status:'awaiting',date,base,day,length,periodLength,phase:null,displayPhase:'luteal',displayPhaseName:names.luteal,remaining:0,overdue:elapsed-length,progress:1};
     const ov = Math.max(periodLength+2,length-14);
     const phase = day<=periodLength ? 'menstrual' : day<ov-1 ? 'follicular' : day<=ov+1 ? 'ovulation' : 'luteal';
     return {status:'estimated',date,base,day,length,periodLength,phase,phaseName:names[phase],remaining:length-elapsed,progress:elapsed/length};
   }
   function advice(s) {
     if (s.status !== 'estimated') return {
-      summary:s.status==='empty'?'Отметь первый день последней менструации, чтобы видеть день цикла.':s.status==='awaiting'?'Начало следующей менструации ещё не отмечено. Фазу автоматически не определяем.':'По сведениям анкеты календарная схема фаз сейчас неприменима.',
+      summary:s.status==='empty'?'Отметь первый день последней менструации, чтобы видеть день цикла.':s.status==='awaiting'?'Новая менструация пока не отмечена. Подпись «лютеиновая фаза» сохраняется условно; ориентируйся на самочувствие.':'По сведениям анкеты календарная схема фаз сейчас неприменима.',
       tips:[{title:'Ориентируйся на ощущения',text:'Отмечай самочувствие, сон и необычные изменения. Не нужно подстраивать день под календарный прогноз.'},{title:'Сохраняй привычную заботу',text:'Регулярная еда, вода по жажде и достаточный отдых полезны независимо от предполагаемой фазы.'},{title:'Замечай изменения',text:'Если цикл изменился или симптомы мешают обычной жизни, обсуди это с врачом. При сильной боли или очень обильном кровотечении обратись за медицинской помощью.'}]
     };
     const focus = {

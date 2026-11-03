@@ -11,7 +11,7 @@ with sync_playwright() as p:
  expect(page.locator('#cycle')).to_be_visible();assert page.locator('#page-title').text_content()=='Дневник'
  assert page.locator('#cycle-dial-day').inner_text()=='21' and page.locator('#cycle-phase-name').inner_text()=='ЛЮТЕИНОВАЯ' and page.locator('#cycle-phase-word').inner_text()=='фаза'
  assert '8 дней' in page.locator('#cycle-dial-countdown').inner_text()
- assert page.locator('#cycle-care-source').inner_text()=='Справочные' and page.locator('#cycle-ai-request').is_hidden()
+ assert page.locator('#cycle').get_attribute('data-guidance-source')=='reference' and page.locator('#cycle-ai-request').is_hidden()
  assert 'ИИ пока не подключён' in page.locator('#cycle-ai-status').inner_text()
  assert page.locator('#cycle-dial-ticks line').count()==28
  assert page.locator('#cycle-dial svg text').count()==0
@@ -21,7 +21,7 @@ with sync_playwright() as p:
  open_period_editor(page);page.locator('#period-start').fill('2026-10-13');page.locator('#cycle-form button').click();assert page.locator('#cycle-dial-day').inner_text()=='21'
  page.evaluate("selected='2026-11-10';renderCycle()")
  assert page.locator('#cycle-dial-day').inner_text()=='29' and page.locator('#cycle-dial').get_attribute('data-status')=='awaiting'
- assert page.locator('#cycle-phase-name').inner_text()=='НЕИЗВЕСТНАЯ'
+ assert page.locator('#cycle-phase-name').inner_text()=='ЛЮТЕИНОВАЯ'
  page.evaluate("selected='2026-11-02';renderCycle()")
  before=page.evaluate('JSON.stringify(state.periods)');page.evaluate('()=>{window.originalSet=Storage.prototype.setItem;Storage.prototype.setItem=function(){throw Error("full")}}');open_period_editor(page);page.locator('#period-start').fill('2026-10-14');page.locator('#cycle-form button').click();assert page.evaluate('JSON.stringify(state.periods)')==before and page.locator('#cycle-dial-day').inner_text()=='21';page.evaluate('()=>{Storage.prototype.setItem=originalSet}');page.locator('#period-dialog-close').click()
  page.locator('[data-widget-id=food] a').click();expect(page.locator('#food')).to_be_visible();expect(page.locator('#diary-shell')).to_be_visible();assert not page.locator('#cycle').is_visible()
@@ -38,17 +38,17 @@ with sync_playwright() as p:
  requests=[];answer={'source':'ai','summary':'ИИ: спокойный ритм дня','tips':[{'title':'<img src=x>','text':'Оставь время для пауз.'},{'title':'Питание','text':'Ешь регулярно.'},{'title':'Отдых','text':'Замечай ощущения.'}]}
  page.route('https://guidance.example/**',lambda route:(requests.append(route.request.post_data_json),route.fulfill(status=200,content_type='application/json',body=json.dumps(answer))))
  page.evaluate("window.WOMAN_CONFIG={cycleGuidanceUrl:'https://guidance.example/api/cycle-guidance'};WomanCycleCare.refresh()")
- assert requests==[];page.locator('#cycle-ai-request').click();expect(page.locator('#cycle-care-source')).to_have_text('ИИ')
+ assert requests==[];page.locator('#cycle-ai-request').click();expect(page.locator('#cycle')).to_have_attribute('data-guidance-source','ai')
  assert requests==[{'cycleDay':21,'cycleLength':28,'periodLength':5,'phase':'luteal'}]
  assert page.locator('#phase-tips img').count()==0 and '<img' in page.locator('#phase-tips').inner_text()
- page.evaluate('()=>{window.fetch=async()=>new Response("failed",{status:503})}');page.locator('#cycle-ai-request').click();expect(page.locator('#cycle-care-source')).to_have_text('Справочные')
+ page.evaluate('()=>{window.fetch=async()=>new Response("failed",{status:503})}');page.locator('#cycle-ai-request').click();expect(page.locator('#cycle')).to_have_attribute('data-guidance-source','reference')
  # A slow result from a previous date must not paint a new day's recommendations.
  page.evaluate('''()=>{window.fetch=()=>new Promise(resolve=>{window.deliver=()=>resolve(new Response(JSON.stringify({source:'ai',summary:'Stale reply',tips:[{title:'A',text:'A'},{title:'B',text:'B'},{title:'C',text:'C'}]}),{headers:{'Content-Type':'application/json'}}))})}''')
  page.locator('#cycle-ai-request').click();page.evaluate("selected='2026-10-14';renderCycle();deliver()")
- expect(page.locator('#cycle-care-source')).to_have_text('Справочные');assert 'Stale' not in page.locator('#phase-description').inner_text()
+ expect(page.locator('#cycle')).to_have_attribute('data-guidance-source','reference');assert 'Stale' not in page.locator('#phase-description').inner_text()
  page.evaluate('()=>{window.fetch=async()=>new Response("failed",{status:503})}')
- page.locator('#cycle-ai-request').click();expect(page.locator('#cycle-ai-status')).to_contain_text('Не удалось');assert page.locator('#cycle-care-source').inner_text()=='Справочные'
+ page.locator('#cycle-ai-request').click();expect(page.locator('#cycle-ai-status')).to_contain_text('Не удалось');assert page.locator('#cycle').get_attribute('data-guidance-source')=='reference'
  page.evaluate("state.profile.health.cyclePattern='irregular';save()")
  assert page.locator('#cycle-dial').get_attribute('data-status')=='unavailable' and page.locator('#cycle-ai-request').is_hidden()
- c.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();assert page.locator('#cycle-care-source').inner_text()=='Справочные'
+ c.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();assert page.locator('#cycle').get_attribute('data-guidance-source')=='reference'
  assert not errors,errors;b.close();print('PASS: diary title/circles, inline topics, clockwise cycle dial and boundaries, unknown phases, responsive content, honest reference/AI labels, minimal AI payload, safe text, stale/error responses and offline')

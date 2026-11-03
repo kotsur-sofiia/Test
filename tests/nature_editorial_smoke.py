@@ -24,24 +24,12 @@ with sync_playwright() as p:
  page.goto(URL+'#cycle');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  assert page.locator('#cycle-dial-day').inner_text()=='21'
  assert page.locator('.app-backdrop,#today,#cycle-dial-date,#cycle-length,#period-length').count()==0
- assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert 'Manrope' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert 'Manrope' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
- # Natural scenes now meet directly; there is no fade mask or colour gradient.
- dial=page.locator('.cycle-dial-card');dial.scroll_into_view_if_needed()
- shot=Image.open(BytesIO(dial.screenshot()))
- inset=dial.evaluate('(e)=>parseFloat(getComputedStyle(e).paddingTop)')
- assert inset<=32
- assert dial.evaluate('(e)=>getComputedStyle(e,"::before").maskImage')=='none'
- assert 'gradient' not in dial.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
+ # One fixed milk-sand image continues beneath every transparent section.
+ assert 'sand-waterfall.webp' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
+ assert page.locator('.cycle-dial-card').evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
  def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
- light_text=rgb(page.locator('.cycle-date-row h2').evaluate('(e)=>getComputedStyle(e).color'))
- assert contrast(light_text,shot.getpixel((4,round(inset)+20))[:3])>7
- date_text=rgb(page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).color'))
- header_background=rgb(page.locator('main>header').evaluate('(e)=>getComputedStyle(e).backgroundColor'))
- assert contrast(date_text,header_background)>7 and header_background[1]-header_background[2]>20
- assert 'sand-waterfall.webp' in dial.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
- care=page.locator('.cycle-recommendations');care_shot=Image.open(BytesIO(care.screenshot()))
- assert 'clay-grain.svg' in care.evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  glass=page.locator('.glass-recommendation-body');glass_shot=Image.open(BytesIO(glass.screenshot()))
  glass_background=glass_shot.getpixel((5,80))[:3]
  assert contrast(rgb(page.locator('.cycle-recommendations h2').evaluate('(e)=>getComputedStyle(e).color')),glass_background)>4.5,glass_background
@@ -56,9 +44,9 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=43','./liquid-glass.css?v=43','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
+ for path in ['./nature-editorial.css?v=44','./milk-sand.css?v=44','./liquid-glass.css?v=44','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/sand-waterfall.webp']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
- assert 'Cormorant' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert 'Manrope' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
  assert not errors,errors
- b.close();print('PASS: direct texture boundaries, sand/clay textures, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
+ b.close();print('PASS: continuous milk-sand background, warm green and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')

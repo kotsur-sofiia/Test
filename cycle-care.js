@@ -29,16 +29,16 @@
     const s=snapshot(), context=key(s), busy=pending?.key===context;
     if (pending && !busy) cancel();
     $('#cycle-start-action').hidden=false;
-    $('#cycle-dial-day').textContent=s.day??'—';$('#cycle-dial-day').style.fontSize=s.day>9999?'36px':s.day>999?'44px':'';
+    $('#cycle-dial-day').textContent=s.day??'—';$('#cycle-dial').style.setProperty('--day-size',s.day>9999?'48px':s.day>999?'64px':'');
     const names={menstrual:'МЕНСТРУАЛЬНАЯ',follicular:'ФОЛЛИКУЛЯРНАЯ',ovulation:'ОВУЛЯТОРНАЯ',luteal:'ЛЮТЕИНОВАЯ'};
-    $('#cycle-phase-name').textContent=names[s.phase]||(s.status==='empty'?'ОТМЕТЬ НАЧАЛО':s.status==='awaiting'?'НЕИЗВЕСТНАЯ':'БЕЗ ПРОГНОЗА');
+    $('#cycle-phase-name').textContent=names[s.displayPhase||s.phase]||(s.status==='empty'?'ОТМЕТЬ НАЧАЛО':'БЕЗ ПРОГНОЗА');
     $('#cycle-phase-word').textContent=s.phase||s.status==='awaiting'?'фаза':s.status==='empty'?'цикла':'фазы';
     const delayed=s.status==='awaiting'&&s.overdue>0;
     $('#cycle-dial-countdown').classList.toggle('is-delayed',delayed);
     $('#cycle-countdown-label').textContent=delayed?'ЗАДЕРЖКА':'до менструации';
     $('#cycle-countdown-value').textContent=delayed?days(s.overdue):s.remaining>0?'≈ '+days(s.remaining):s.status==='awaiting'?'ожидается сегодня':s.status==='empty'?'нет данных':'без прогноза';
-    $('#cycle-dial-note').textContent=s.status==='awaiting'?'Новый цикл начнётся с твоей следующей отметки. Ожидаемая дата — не подтверждение менструации.':'Фаза и дата следующей менструации — ориентировочная оценка, а не подтверждение овуляции.';
-    $('#cycle-dial').setAttribute('aria-label',[s.phaseName||'Фаза не определена',s.day?'День цикла '+s.day:'Нет отметки начала',$('#cycle-dial-countdown').textContent].join('. '));
+    $('#cycle-dial-note').textContent=s.status==='awaiting'?'Лютеиновая фаза остаётся условной подписью до новой отметки менструации.':'Фаза и дата следующей менструации — ориентировочная оценка, а не подтверждение овуляции.';
+    $('#cycle-dial').setAttribute('aria-label',[s.displayPhaseName||s.phaseName||'Фаза не определена',s.day?'День цикла '+s.day:'Нет отметки начала',$('#cycle-dial-countdown').textContent].join('. '));
     $('#cycle-dial').dataset.status=s.status;
     const progress=$('#cycle-dial-progress');progress.style.strokeDasharray=(s.progress*100)+' 100';
     const angle=s.progress*2*Math.PI-Math.PI/2;
@@ -49,9 +49,9 @@
       for (const [name,value] of Object.entries({x1:160+123*Math.cos(a),y1:160+123*Math.sin(a),x2:160+128*Math.cos(a),y2:160+128*Math.sin(a)})) line.setAttribute(name,value);
       ticks.append(line);
     }
-    $('#phase-title').textContent=s.phaseName||'Забота о себе';
+    $('#phase-title').textContent=s.displayPhaseName||s.phaseName||'Забота о себе';
     const answer=answers.get(context);showTips(answer||model.advice(s));
-    $('#cycle-care-source').textContent=answer?'ИИ':'Справочные';
+    $('#cycle').dataset.guidanceSource=answer?'ai':'reference';
     const configured=Boolean(endpoint());
     $('#cycle-ai-request').hidden=!configured||s.status!=='estimated';
     $('#cycle-ai-request').disabled=Boolean(busy)||!navigator.onLine;

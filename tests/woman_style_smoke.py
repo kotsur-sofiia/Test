@@ -12,7 +12,7 @@ with sync_playwright() as p:
  assert page.evaluate('fetch("./manifest.webmanifest").then(r=>r.json()).then(m=>m.name==="Woman"&&m.short_name==="Woman"&&m.id==="./")')
  assert page.locator('[href*=wet-glass]').count()==0
  styles=page.evaluate('''()=>{const header=getComputedStyle(document.querySelector('main>header')),text=getComputedStyle(document.querySelector('#daily-affirmation')),date=getComputedStyle(document.querySelector('#page-title'));return {headerBg:header.backgroundColor,textShadow:text.textShadow,dateShadow:date.textShadow,color:text.color,dateColor:date.color,drop:getComputedStyle(document.body,'::after').content}}''')
- assert styles['headerBg']=='rgb(53, 67, 41)',styles
+ assert styles['headerBg']=='rgba(0, 0, 0, 0)',styles
  assert styles['textShadow']=='none' and styles['dateShadow']=='none'
  assert styles['drop'] in ['none','normal']
  original=page.locator('#daily-affirmation').inner_text()

@@ -52,7 +52,7 @@
   function announce(text, error = false) {
     for (const id of ['day-builder-status','widget-picker-status']) {
       const element = $('#'+id);
-      element.textContent = text;
+      element.textContent = id==='day-builder-status'&&!error?'':text;
       element.classList.toggle('error', error);
     }
   }
@@ -194,7 +194,7 @@
     if (enabled) map.order.splice(index,1);
     else if (id==='cycle') map.order.unshift(id);
     else map.order.push(id);
-    if (commit(map,enabled?'Тема выключена. Все записи сохранены.':'Тема включена.')) {
+    if (commit(map,enabled?'':'Тема включена.')) {
       if (enabled && activeTopic===id) { history.replaceState(null,'','#home'); window.LunaNavigation.refresh(); }
       focusEditorRow(id);
     }

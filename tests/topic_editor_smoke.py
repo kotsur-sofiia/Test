@@ -33,7 +33,7 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':width,'height':height});page.evaluate('document.fonts.ready');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
   h=page.locator('#page-title');parent=h.locator('..').bounding_box();box=h.bounding_box();assert abs(box['x']+box['width']/2-(parent['x']+parent['width']/2))<1
   assert h.evaluate('(e)=>getComputedStyle(e).textAlign')=='center'
-  assert h.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=40
+  assert page.locator('.diary-title-button').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=20
   open_editor();box=page.locator('#widget-picker').bounding_box();assert box['x']>=0 and box['x']+box['width']<=width+1 and box['y']+box['height']<=height+1
   for control in row('cycle').locator('button').all():
    bounds=control.bounding_box();assert bounds['width']>=44 and bounds['height']>=44

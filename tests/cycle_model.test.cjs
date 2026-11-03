@@ -8,6 +8,11 @@ assert.equal(get('2026-11-02').remaining,8); // Nov 2 -> expected Nov 10; count 
 assert.equal(get('2026-11-09').remaining,1);
 assert.equal(get('2026-11-10').status,'awaiting');assert.equal(get('2026-11-10').day,29);
 assert.equal(get('2026-11-11').overdue,1);assert.equal(get('2026-11-11').phase,null);
+assert.equal(get('2026-11-11').displayPhase,'luteal');
+assert.equal(get('2026-11-30').displayPhase,'luteal');
+assert.equal(get('2026-11-30').day,49);assert.equal(get('2026-11-30').overdue,20);
+assert.equal(snapshot({...base,date:'2026-11-11',predict:false}).displayPhase,undefined);
+assert.equal(snapshot({...base,date:'2026-11-11',periods:[...base.periods,'2026-11-10']}).phase,'menstrual');
 assert.equal(get('2026-10-12').day,null);assert.equal(get('2026-02-30').status,'empty');
 assert.equal(snapshot({...base,date:'2026-11-02',predict:false}).phase,null);
 assert.equal(snapshot({...base,date:'2026-11-02',length:0}).status,'unavailable');
