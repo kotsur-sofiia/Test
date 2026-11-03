@@ -1,5 +1,5 @@
 /* One continuous milk-sand backdrop; champagne glass and terracotta remain accents. */
-:root { background:#f1e9db; }
+:root { background:#f1e9db; --ink:#4b392f; --forest:#4b392f; --glass-ink:#4b392f; --muted:#6b5545; }
 body { position:relative; isolation:isolate; background:transparent; }
 html body::before {
   display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
@@ -14,10 +14,12 @@ html body .section-navigation { background:transparent; box-shadow:none; }
 html body #page-title { color:var(--forest); }
 html body[data-view=diary]:not([data-section=profile]) #page-title {
   display:inline-flex; align-items:center; justify-content:center; width:auto;
-  font:650 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.055em; white-space:normal;
-  color:var(--glass-ink); text-shadow:var(--glass-text-glow);
+  font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
+  color:#fff8e8;
+  -webkit-text-stroke:.35px #b7855a80;
+  text-shadow:0 1px 2px #704b2bcc,0 0 1px #b17a4773,0 0 5px #fff8e8,0 0 11px #ffe2b8e6,0 0 23px #ffd9adb3,0 0 36px #ffd9ad66;
 }
-html body .nature-dark { --muted:#60624c; color:var(--ink); }
+html body .nature-dark { --muted:#6b5545; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
 html body .nature-dark #phase-title,html body .nature-dark #phase-description,
 html body .nature-clay :is(.fine,.muted,.tip p,.callout) { color:var(--ink); }
@@ -68,3 +70,13 @@ html body .cycle-dial[data-status=awaiting] .dial-progress { stroke:var(--olive)
 }
 
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--glass-ink); }
+
+/* Legacy sections share the same warm-brown text palette. */
+html body :is(.record,.voice-note,.voice-note p,.voice-card>summary,.voice-status,.voice-interim,.voice-profile-result,.profile-bmi,.profile-bmi output,.nutrient-label,.nutrient-group>summary,.nutrient-fieldset legend,.salt-summary,.salt-block,.ai-note,.ai-note span) { color:var(--ink); }
+html body :is(.voice-privacy,.voice-body .fine) { color:var(--muted)!important; }
+html body :is(.catalog-item p,.catalog-item small,.product-tools details,.nutrient-label small,.nutrient-note,.nutrient-source,.nutrient-subtype,.bar-wrap small,.empty,.empty-view,.empty-view p,.empty-symbol,.macro span) { color:var(--muted); }
+html body #cycle-dial-countdown,html body #cycle-countdown-label,
+html body .profile-card .profile-group label,
+html body .voice-editor,html body :is(input,select,textarea,output)[id] { color:var(--ink); }
+html body .profile-card>#profile-advice { color:var(--muted); }
+html body input::placeholder,html body textarea::placeholder { color:var(--muted); opacity:1; }
