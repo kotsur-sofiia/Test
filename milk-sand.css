@@ -3,7 +3,7 @@
 body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
   display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:#f3eee5 url('./assets/shore-canvas.svg?v=63') center top/100% 100% no-repeat;
+  background:#f3eee5 url('./assets/shore-canvas.svg?v=64') center top/100% 100% no-repeat;
   box-shadow:none;
 }
 /* Sand and sea share one document canvas; the dial travels with the same ground. */
@@ -13,7 +13,14 @@ html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+arti
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header,
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell,
 html body .section-navigation { background:transparent; box-shadow:none; }
-html body #page-title { color:var(--forest); }
+/* Every section uses the same coffee-coloured editorial heading. */
+html body #page-title {
+  display:block; width:100%; height:auto; margin:0; text-align:center;
+  font:500 clamp(42px,7vw,66px)/1.12 var(--display); letter-spacing:.015em;
+  color:var(--coffee); text-transform:uppercase; white-space:normal;
+  background:none; -webkit-text-fill-color:currentColor; -webkit-text-stroke:0;
+  text-shadow:none; filter:none; animation:none;
+}
 html body[data-view=diary]:not([data-section=profile]) main>header { padding-bottom:2px; }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:0 clamp(8px,2vw,24px) 8px;
@@ -22,36 +29,11 @@ html body .topic-strip {
   padding:0; background:none; border:0; border-radius:0; box-shadow:none;
   backdrop-filter:none; -webkit-backdrop-filter:none;
 }
-html body[data-view=diary]:not([data-section=profile]) #page-title {
-  display:inline-flex; align-items:center; justify-content:center;
-  width:clamp(210px,56vw,240px); height:54px;
-  font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
-  background-image:linear-gradient(110deg,#eadbc0a6 0%,#fffef8f5 18%,#f6e8cea6 32%,#fffffffa 44%,#ddc8a780 57%,#fffdf7f5 72%,#f0dfbda6 88%,#fffef8f5),url('./assets/shore-desktop.webp?v=63');
-  background-size:240% 100%,240% 1000%;
-  background-position:0% 50%,0% 0%; background-repeat:no-repeat;
-  background-blend-mode:screen;
-  background-clip:text; -webkit-background-clip:text;
-  color:transparent;
-  -webkit-text-fill-color:transparent; -webkit-text-stroke:.18px #79563755;
-  text-shadow:none;
-  filter:drop-shadow(0 1px 1.1px #66503d99) drop-shadow(0 0 6px #fff9e6e6);
-  animation:shore-letter-light 9s ease-in-out infinite alternate;
-}
-@keyframes shore-letter-light {
-  from { background-position:0% 50%,0% 0%; }
-  to { background-position:100% 50%,100% 2%; }
-}
-@media(prefers-reduced-motion:reduce) {
-  html body[data-view=diary]:not([data-section=profile]) #page-title { animation:none; background-position:50% 50%,50% 1%; }
-}
 html body .diary-shell .day-widget .mini .nature-topic-image,
 html body .topic-editor-info .nature-topic-image { background-image:url('./assets/pearl-topics.webp'); }
 html body .topic-editor-info .topic-editor-thumb {
   display:block; flex:0 0 32px; width:32px; height:32px; border-radius:50%;
   border:1px solid var(--glass-rim); box-shadow:inset 0 1px 2px #fff9eecc,0 2px 5px #79573f22;
-}
-@media(forced-colors:active) {
-  html body[data-view=diary]:not([data-section=profile]) #page-title { background:none; color:CanvasText; -webkit-text-fill-color:CanvasText; -webkit-text-stroke:0; filter:none; animation:none; }
 }
 html body .nature-dark { --muted:#715547; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
@@ -124,3 +106,26 @@ html body .text-link,html body #cycle .glass-recommendation-body .tip>span { col
 html body button.topic-drag-handle { color:var(--ink)!important; }
 html body .ai-note p { color:var(--muted); }
 html body .salt-block>h5 { color:var(--ink); }
+
+/* A small weight increase keeps the existing heading/body hierarchy. */
+html body { font-weight:500; }
+html body :is(p,small,.fine,.muted,.privacy,.record,.voice-note,.voice-editor,.nutrient-note,.nutrient-source,.nutrient-subtype,.bar-wrap small,.empty,.empty-view,.macro span,.tip p,.reference-details,.privacy-details) { font-weight:500; }
+html body :is(h1,h2,h3,h4,h5,h6,.section-title h2,.phase-card h3,.empty-view h3) { font-weight:600; }
+html body #page-title { font-weight:500; }
+html body :is(label,legend,input,select,textarea,summary,.eyebrow,.pill,.badge,.profile-group label,.profile-card .about-label,.profile-card .profile-group>legend) { font-weight:600; }
+html body :is(button,.voice-start,.bottom-nav a span,.section-navigation nav a) { font-weight:650; }
+html body :is(strong,b,.tip b) { font-weight:700; }
+html body #cycle-dial-day { font-weight:650; }
+html body #cycle-phase-name { font-weight:800; }
+html body :is(#cycle-phase-word,.cycle-day-label,#cycle-countdown-label) { font-weight:550; }
+html body #cycle-countdown-value { font-weight:650; }
+html body .diary-shell :is(.day-widget .mini,#add-widget) .topic-label { font-weight:650; }
+html body .topic-editor-description strong { font-weight:700; }
+
+/* Edit comes first, followed by three full topics and a half-visible next topic. */
+html body .topic-strip {
+  grid-template-columns:calc((100% - 32px)/4.5) minmax(0,1fr);
+  gap:8px;
+}
+html body #day-widgets>.day-widget { flex-basis:calc((100% - 24px)/3.5); }
+html body .diary-shell #add-widget .topic-label { font-size:clamp(7px,2vw,10px); }

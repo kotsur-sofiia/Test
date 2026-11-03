@@ -20,12 +20,11 @@ with sync_playwright() as p:
   assert abs(number['x']+number['width']/2-dial['x']-dial['width']/2)<1
   assert abs(number['y']+number['height']/2-dial['y']-dial['height']/2)<1
   assert page.locator('#cycle-dial-day').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=96
-  assert page.locator('#cycle-pearl-marker image').get_attribute('href')=='./assets/cycle-pearl-champagne.webp'
+  assert page.locator('#cycle-pearl-marker image').get_attribute('href')=='./assets/cycle-pearl-milk.webp'
   assert page.locator('.sand-cycle-ring').get_attribute('href')=='./assets/milk-sand-ring.webp'
   assert page.locator('#cycle-phase-name').bounding_box()['y']<number['y']
   assert page.locator('.cycle-day-label').bounding_box()['y']>number['y']+number['height']
   assert 'shore-canvas.svg' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
-  assert page.locator('#page-title').bounding_box()['width']<250
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
  # Deactivation stays quiet on the diary and keeps personal notes.
  page.locator('#add-widget').click();page.locator('[data-topic=books] [role=switch]').click();page.locator('#widget-picker [data-close-dialog]').click()
@@ -40,5 +39,5 @@ with sync_playwright() as p:
  page.locator('.bottom-nav [data-view=diary]').click();assert page.evaluate('location.hash')=='#home'
  c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.locator('#cycle-dial-day').text_content()=='1'
- assert page.evaluate('caches.match(new URL("./milk-sand.css?v=63",location.href)).then(Boolean)')
- assert not errors,errors;b.close();print('PASS: continuous milk sand, compact glass heading, no obsolete labels, centred enlarged number, sand groove and warm pearl with contact shadow, quiet deactivation, conditional luteal delay, midnight/reset and offline')
+ assert page.evaluate('caches.match(new URL("./milk-sand.css?v=64",location.href)).then(Boolean)')
+ assert not errors,errors;b.close();print('PASS: continuous milk sand, matching editorial heading, no obsolete labels, centred enlarged number, sand groove and warm pearl with contact shadow, quiet deactivation, conditional luteal delay, midnight/reset and offline')

@@ -287,7 +287,4 @@ body .glass-recommendation-body { max-width:880px; margin-inline:auto; }
 body .topic-strip { max-width:1080px; margin-inline:auto; }
 body .section-navigation { background:url('./assets/dew-monstera.webp') center/cover; box-shadow:inset 0 0 0 100vmax #35432980; }
 body .section-navigation:has(nav:not([hidden])) { padding-inline:var(--content-gutter); }
-body[data-view=diary]:not([data-section=profile]) #page-title {
-  font-size:19.5vw; font-weight:700; line-height:1; letter-spacing:-.015em; white-space:nowrap;
-}
 body #notice:empty { display:none; }

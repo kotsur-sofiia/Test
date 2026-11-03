@@ -34,5 +34,5 @@ with sync_playwright() as p:
  expect(page.locator('#install')).to_be_visible();page.locator('#install').click();assert page.evaluate('installed') is True
  page.goto(URL+'#cycle');c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.evaluate('state.water[0].id')=='keep'
- assert page.evaluate('caches.match(new URL("./nature-editorial.css?v=45",location.href)).then(Boolean)')
+ assert page.evaluate('caches.match(new URL("./nature-editorial.css?v=64",location.href)).then(Boolean)')
  assert not errors,errors;b.close();print('PASS: full-width unframed scenes, no background fades, milk-sand throughout, compact glass title, removed download UI, retained install and unchanged local/offline records')

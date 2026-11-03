@@ -1,4 +1,4 @@
-"""Compact glass editor, five-slot rail, real horizontal touch and safe upgrades."""
+"""Compact glass editor, four-and-a-half-slot rail, real horizontal touch and safe upgrades."""
 from playwright.sync_api import sync_playwright,expect
 import os
 URL=os.environ.get('LUNA_TEST_URL','http://127.0.0.1:8043/Test/').split('#')[0]
@@ -11,6 +11,19 @@ with sync_playwright() as p:
  def row(id):return page.locator('#widget-options [data-topic="'+id+'"]')
  assert ids()==['cycle','food','skin','books']
  assert page.locator('.topic-strip>#add-widget').count()==1
+ # Edit precedes all topics; a partly visible fourth topic invites swiping.
+ for width in [320,390,768,1280]:
+  page.set_viewport_size({'width':width,'height':844})
+  page.locator('#day-widgets').evaluate('(e)=>e.scrollLeft=0')
+  edit=page.locator('#add-widget').bounding_box()
+  rail_box=page.locator('#day-widgets').bounding_box()
+  topics=page.locator('#day-widgets>.day-widget:not([hidden])').all()
+  first=topics[0].bounding_box();last=topics[3].bounding_box()
+  assert edit['x']+edit['width']<first['x']
+  assert abs(edit['width']-first['width'])<1
+  visible=(rail_box['x']+rail_box['width']-last['x'])/last['width']
+  assert .47<visible<.53,(width,visible)
+ page.set_viewport_size({'width':390,'height':844})
  assert page.locator('#add-widget .topic-label').text_content()=='РЕДАКТИРОВАТЬ'
  page.locator('#add-widget').click()
  assert page.locator('#widget-options small,#widget-options .widget-choice-icon').count()==0
@@ -30,7 +43,7 @@ with sync_playwright() as p:
  assert 'gradient' in on.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backgroundImage')
  assert 'blur' in on.locator('.switch-track').evaluate('(e)=>getComputedStyle(e).backdropFilter')
  page.locator('#widget-picker [data-close-dialog]').click()
- # Every topic is on the same y coordinate; only the first four slots are visible initially.
+ # Every topic is on the same y coordinate; the following topic is partly visible initially.
  rail=page.locator('#day-widgets');rail.evaluate('(e)=>e.scrollLeft=0')
  ys=page.locator('#day-widgets .day-widget:not([hidden]) .topic-orb').evaluate_all('(es)=>es.map(e=>e.getBoundingClientRect().y)')
  assert max(ys)-min(ys)<1
@@ -52,4 +65,4 @@ with sync_playwright() as p:
   c=b.new_context();c.add_init_script("if(!localStorage.getItem('luna-diary-v1'))localStorage.setItem('luna-diary-v1',JSON.stringify({periods:[],sleep:[],meals:[],water:[{id:'kept',date:'2026-11-02',ml:250}],dayMap:{version:2,order:"+str(order).replace("'",'"')+",notes:[{id:'note',topic:'water',date:'2026-11-02',text:'kept'}]}}))")
   page=c.new_page();page.goto(URL);assert ids()==expected
   assert page.evaluate('state.water[0].ml')==250 and page.evaluate('state.dayMap.notes[0].text')=='kept';c.close()
- b.close();print('PASS: four default topics plus fixed Edit, one-row uppercase editor, aligned glass switches, real horizontal touch, rounded translucent controls/recommendations, offline and non-destructive map upgrades')
+ b.close();print('PASS: four default topics, first Edit and four-and-a-half visible slots, one-row uppercase editor, aligned glass switches, real horizontal touch, rounded translucent controls/recommendations, offline and non-destructive map upgrades')
