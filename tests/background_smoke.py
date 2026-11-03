@@ -17,15 +17,18 @@ with sync_playwright() as p:
  assert page.locator('.app-backdrop,#today').count()==0
  assert 'shore-canvas.svg' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").display')=='block'
- # Only the title and controls are pinned; the sole image is the document canvas.
+ # The fixed copy uses the same extended photo, softly cropped through its shadow.
  assert page.locator('main>header').evaluate('(e)=>getComputedStyle(e).position')=='fixed'
  assert page.locator('main>header').evaluate('(e)=>getComputedStyle(e).boxShadow')=='none'
- assert page.locator('.top-panel-background,.shore-fixed-layer').count()==0
+ assert page.locator('.top-panel-background').count()==0
+ assert page.locator('.shore-fixed-layer').count()==1
+ assert page.locator('.shore-fixed-layer').evaluate('(e)=>getComputedStyle(e).position')=='fixed'
+ assert 'linear-gradient' in page.locator('.shore-fixed-layer').evaluate('(e)=>getComputedStyle(e).maskImage')
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").position')=='absolute'
  assert page.locator('main>header').evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
  page.evaluate("state.water.push({id:'background-test',date:localDate(),ml:200,container:'glass'});save()")
  # Simulate a stale cached HTML shell. Online navigation must still load the actual app.
- page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v95');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
+ page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v96');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
  page.reload();assert page.locator('.app-backdrop').count()==0;expect(page.locator('#diary-shell')).to_be_visible()
  page.wait_for_function('''async()=>{const r=await caches.match(new URL('./index.html',location.href));return r&&(await r.text()).includes('page-title')}''')
  ctx.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();assert page.evaluate('state.water.some(r=>r.id==="background-test")')

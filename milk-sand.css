@@ -10,7 +10,7 @@ html body::before {
   background-color:#f3eee5;
   box-shadow:none;
 }
-/* The document photo extends past the pinned controls; there is no fixed image. */
+/* The document and fixed sea share the same extended photo geometry. */
 html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:4px;
@@ -30,8 +30,28 @@ html body .layout main::before {
   height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
   pointer-events:none;
 }
+html body .shore-fixed-layer {
+  position:fixed; inset:0 0 auto; z-index:24; pointer-events:none;
+  width:100%; height:var(--shore-photo-height,1800px);
+  background:url('./assets/shore-phone.webp') center top/100% 100% no-repeat;
+  --shore-contour:url('./assets/shore-foam-phone.svg');
+  -webkit-mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start,200px),transparent var(--shore-fade-end,360px));
+  mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start,200px),transparent var(--shore-fade-end,360px));
+  -webkit-mask-position:center top;
+  mask-position:center top;
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
+}
 @media(min-width:768px) {
   html { --foam-bottom:min(17.8vw,196px); }
+  html body .shore-fixed-layer {
+    background-image:url('./assets/shore-desktop.webp');
+    --shore-contour:url('./assets/shore-foam-desktop.svg');
+  }
 }
 html body::after { display:none!important; content:none!important; }
 html body .nature-panel { background:transparent!important; }

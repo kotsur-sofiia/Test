@@ -30,7 +30,10 @@ with sync_playwright() as p:
                 assert abs(height - bottom - 12) < 1, (width, route, height, bottom)
                 photo_height = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shore-photo-height"))')
                 assert photo_height * (.13 if width >= 768 else .165) >= bottom + 17, (width, route)
-            assert page.locator('.top-panel-background,.shore-fixed-layer').count()==0
+            assert page.locator('.top-panel-background').count()==0
+            assert page.locator('.shore-fixed-layer').count()==1
+            fade_start = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shore-fade-start"))')
+            assert abs(fade_start - page.locator('main>header').bounding_box()['height']) < 1
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         print('PASS pinned heading/menus/captions and 12px lower edge at', width, flush=True)
     page.set_viewport_size({'width': 390, 'height': 844})

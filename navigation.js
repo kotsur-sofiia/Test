@@ -8,8 +8,10 @@
     navigation.hidden = ![...navigation.querySelectorAll('nav')].some(nav=>!nav.hidden&&getComputedStyle(nav).display!=='none');
     let cursor = header.getBoundingClientRect().bottom;
     let bottom = $('#page-title').getBoundingClientRect().bottom;
+    let controlsTop = null;
     for (const panel of [document.querySelector('.profile-tabs'),navigation,$('#diary-shell')]) {
       if (panel.hidden) continue;
+      if (controlsTop===null) controlsTop=cursor;
       panel.style.top=cursor+'px';
       cursor+=panel.getBoundingClientRect().height;
       // Measure painted controls and captions, excluding transparent glow padding.
@@ -20,8 +22,11 @@
     document.documentElement.style.setProperty('--top-panel-height',Math.max(header.getBoundingClientRect().bottom,bottom+12)+'px');
     // Stretch the actual document photo so even the highest part of the foam
     // passes below the last caption, including the second profile menu.
-    const foamEdgeRatio=matchMedia('(min-width:768px)').matches ? .13 : .165;
-    document.documentElement.style.setProperty('--shore-photo-height',((Math.max(header.getBoundingClientRect().bottom,bottom)+18)/foamEdgeRatio)+'px');
+    const wide=matchMedia('(min-width:768px)').matches;
+    const photoHeight=(Math.max(header.getBoundingClientRect().bottom,bottom)+18)/(wide ? .13 : .165);
+    document.documentElement.style.setProperty('--shore-photo-height',photoHeight+'px');
+    document.documentElement.style.setProperty('--shore-fade-start',(controlsTop??header.getBoundingClientRect().bottom)+'px');
+    document.documentElement.style.setProperty('--shore-fade-end',(photoHeight*(wide ? .181 : .198))+'px');
   }
   function current() {
     if (location.hash === '#goals') history.replaceState(null,'','#profile');
