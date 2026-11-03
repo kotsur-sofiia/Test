@@ -78,10 +78,12 @@ html body #cycle-dial-countdown {
 }
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
-/* A reference-style pearl marks the day on the photographed sand groove. */
+/* Warm nacre with a tight contact shadow and a soft shadow cast onto the sand. */
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
-html body #cycle-pearl-marker { filter:drop-shadow(1px 2px 1.3px #4b302544); }
+html body #cycle-pearl-marker { filter:none; }
+html body .pearl-ground-shadow { fill:#936d51; opacity:.25; }
+html body .pearl-contact-shadow { fill:#735139; opacity:.22; }
 @media(max-width:360px) {
   html body #cycle-phase-name { font-size:12px; }
   html body #cycle-phase-word { font-size:11px; }
