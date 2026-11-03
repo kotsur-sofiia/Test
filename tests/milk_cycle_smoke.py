@@ -21,7 +21,7 @@ with sync_playwright() as p:
   assert abs(number['y']+number['height']/2-dial['y']-dial['height']/2)<1
   assert page.locator('#cycle-dial-day').evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=96
   assert page.locator('#cycle-pearl-marker image').get_attribute('href')=='./assets/cycle-pearl-warm.webp'
-  assert page.locator('.sand-cycle-ring').get_attribute('href')=='./assets/sand-cycle-ring.webp'
+  assert page.locator('.sand-cycle-ring').get_attribute('href')=='./assets/pearl-rolled-ring.webp'
   assert page.locator('#cycle-phase-name').bounding_box()['y']<number['y']
   assert page.locator('.cycle-day-label').bounding_box()['y']>number['y']+number['height']
   assert 'beach-sand.webp' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
