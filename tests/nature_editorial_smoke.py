@@ -30,8 +30,11 @@ with sync_playwright() as p:
  assert 'shore-canvas.svg' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
  assert page.locator('.cycle-dial-card').evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
  def rgb(value):return tuple(map(int,re.findall(r'\d+',value)[:3]))
- glass=page.locator('.glass-recommendation-body');glass_shot=Image.open(BytesIO(glass.screenshot()))
- glass_background=glass_shot.getpixel((5,80))[:3]
+ glass=page.locator('.glass-recommendation-body');heading=page.locator('.cycle-recommendations h2')
+ # Sample the actual shore under the heading, above the photographic card row.
+ heading.evaluate('(e)=>e.style.opacity="0"');glass_shot=Image.open(BytesIO(glass.screenshot()))
+ heading.evaluate('(e)=>e.style.removeProperty("opacity")')
+ glass_background=glass_shot.getpixel((5,15))[:3]
  assert contrast(rgb(page.locator('.cycle-recommendations h2').evaluate('(e)=>getComputedStyle(e).color')),glass_background)>4.5,glass_background
  # Each major route must remain navigable at narrow, tablet, desktop and landscape sizes.
  for width,height in [(320,844),(390,844),(768,1024),(1280,900),(844,390)]:
@@ -44,7 +47,7 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=64','./milk-sand.css?v=70','./liquid-glass.css?v=47','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/glass-sand-grain.svg','./assets/beach-sand-natural.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/natural-cycle-pearl.webp','./assets/beach-water.webp','./assets/natural-sand-trail.webp','./assets/shore-canvas.svg?v=64']:
+ for path in ['./nature-editorial.css?v=64','./milk-sand.css?v=71','./liquid-glass.css?v=47','./assets/fonts/Manrope.woff','./assets/fonts/CormorantGaramond.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/glass-sand-grain.svg','./assets/recommendation-shore.webp','./assets/recommendation-food.webp','./assets/recommendation-rest.webp','./assets/beach-sand-natural.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/natural-cycle-pearl.webp','./assets/beach-water.webp','./assets/natural-sand-trail.webp','./assets/shore-canvas.svg?v=64']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
  assert 'Cormorant Garamond' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'

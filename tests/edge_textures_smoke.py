@@ -24,8 +24,9 @@ with sync_playwright() as p:
   assert abs(end['y']+end['height']-page.evaluate('document.documentElement.scrollHeight-scrollY'))<2
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  assert page.locator('footer,#export-data,#settings-export').count()==0
- # The glass components keep their own rounded shapes inside unframed scene backgrounds.
- assert float(page.locator('.glass-recommendation-body').evaluate('(e)=>getComputedStyle(e).borderRadius').replace('px',''))>=30
+ # Only the photographic buttons retain rounded surfaces; the group uses the shore.
+ assert page.locator('.glass-recommendation-body').evaluate('(e)=>getComputedStyle(e).backgroundColor')=='rgba(0, 0, 0, 0)'
+ assert float(page.locator('.recommendation-card').first.evaluate('(e)=>getComputedStyle(e).borderRadius').replace('px',''))>=30
  for route in ['account','settings','library','friends','food','water','profile']:
   page.goto(URL+'#'+route);assert page.get_by_role('button',name='Скачать мои данные',exact=True).count()==0
   assert page.locator('#export-data,#settings-export').count()==0

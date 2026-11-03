@@ -16,6 +16,16 @@ with sync_playwright() as p:
  assert page.locator('#cycle-dial-ticks line').count()==28
  assert page.locator('#cycle-dial svg text').count()==0
  marker=page.locator('#cycle-dial-marker');assert float(marker.get_attribute('cx'))<160
+ # Each photo opens its full guidance; all guidance is also available together.
+ card=page.locator('.recommendation-card').first;title=card.inner_text();unchanged=page.evaluate('JSON.stringify(state)')
+ card.click();expect(page.locator('#recommendation-dialog')).to_be_visible()
+ assert page.locator('#recommendation-dialog-title').inner_text()==title
+ assert page.locator('.recommendation-detail').count()==1 and page.locator('.recommendation-detail p').inner_text()
+ page.keyboard.press('Escape');expect(page.locator('#recommendation-dialog')).not_to_be_visible()
+ page.locator('#recommendation-view-all').click();assert page.locator('.recommendation-detail').count()==3
+ page.evaluate('location.hash="library"');expect(page.locator('#recommendation-dialog')).not_to_be_visible()
+ page.evaluate('location.hash="cycle"');expect(page.locator('#cycle')).to_be_visible()
+ assert page.evaluate('JSON.stringify(state)')==unchanged
  page.evaluate("selected='2026-10-13';renderCycle()")
  assert page.locator('#cycle-dial-day').inner_text()=='1';assert abs(float(marker.get_attribute('cx'))-160)<.01 and float(marker.get_attribute('cy'))==21
  open_period_editor(page);page.locator('#period-start').fill('2026-10-13');page.locator('#cycle-form button').click();assert page.locator('#cycle-dial-day').inner_text()=='21'
@@ -41,6 +51,10 @@ with sync_playwright() as p:
  assert requests==[];page.locator('#cycle-ai-request').click();expect(page.locator('#cycle')).to_have_attribute('data-guidance-source','ai')
  assert requests==[{'cycleDay':21,'cycleLength':28,'periodLength':5,'phase':'luteal'}]
  assert page.locator('#phase-tips img').count()==0 and '<img' in page.locator('#phase-tips').inner_text()
+ page.locator('.recommendation-card').first.click()
+ assert page.locator('#recommendation-dialog img').count()==0 and '<img' in page.locator('#recommendation-dialog-title').inner_text()
+ assert page.locator('.recommendation-detail p').inner_text()=='Оставь время для пауз.'
+ page.locator('#recommendation-dialog-close').click()
  page.evaluate('()=>{window.fetch=async()=>new Response("failed",{status:503})}');page.locator('#cycle-ai-request').click();expect(page.locator('#cycle')).to_have_attribute('data-guidance-source','reference')
  # A slow result from a previous date must not paint a new day's recommendations.
  page.evaluate('''()=>{window.fetch=()=>new Promise(resolve=>{window.deliver=()=>resolve(new Response(JSON.stringify({source:'ai',summary:'Stale reply',tips:[{title:'A',text:'A'},{title:'B',text:'B'},{title:'C',text:'C'}]}),{headers:{'Content-Type':'application/json'}}))})}''')

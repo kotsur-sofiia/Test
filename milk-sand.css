@@ -149,41 +149,89 @@ html body #day-widgets>:is(.day-widget,#add-widget) {
 }
 html body .diary-shell #day-widgets #add-widget { padding:0; }
 
-/* Profile and friends share a pair of equally sized glass navigation buttons. */
+/* One slim coffee oval contains the two equal profile destinations. */
 html body .profile-tabs {
-  display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;
-  margin:0; padding:5px var(--content-gutter) 16px;
+  --profile-tab-height:23px;
+  display:block; margin:0; padding:5px clamp(8px,2vw,24px) 16px;
+}
+html body .profile-tab-control {
+  position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr));
+  height:var(--profile-tab-height); background:var(--coffee); border-radius:999px;
+  box-shadow:0 0 16px #ffdbb35c,inset 0 1px 1px #ffffff30;
+}
+html body .profile-tab-control::after {
+  content:''; position:absolute; inset-block:0; left:50%; width:1px;
+  background:#fff5e680; pointer-events:none;
 }
 html body .profile-tabs a {
-  display:flex; align-items:center; justify-content:center; min-width:0; min-height:46px; height:46px;
-  padding:0 12px; border:1px solid var(--glass-rim); border-radius:999px;
-  background:rgba(249,246,235,.18); color:var(--coffee); font:650 16px/1.4 var(--sans);
-  text-align:center; text-decoration:none; box-shadow:var(--glass-shadow);
-  backdrop-filter:blur(6px) saturate(.9); -webkit-backdrop-filter:blur(6px) saturate(.9);
+  position:relative; display:flex; align-items:center; justify-content:center; min-width:0;
+  height:var(--profile-tab-height); min-height:0; padding:0 10px;
+  background:none; border:0; border-radius:0; box-shadow:none;
+  color:#eadfce; font:650 13px/1 var(--sans); text-align:center; text-decoration:none;
+  backdrop-filter:none; -webkit-backdrop-filter:none; -webkit-tap-highlight-color:transparent;
 }
-html body .profile-tabs a[aria-current=page] { background:rgba(255,251,242,.3); }
+/* Transparent hit areas keep touch targets comfortable around the slim visible oval. */
+html body .profile-tabs a::before { content:''; position:absolute; inset:-11px 0; }
+html body .profile-tabs a[aria-current=page] { background:none; color:#fffaf0; font-weight:750; }
+html body .profile-tabs a:hover { color:#fffdf7; text-shadow:0 0 6px #fff2d980; }
 @media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
-  html body .profile-tabs a { min-height:44px; height:44px; }
+  html body .profile-tabs { --profile-tab-height:22px; }
 }
-html body .profile-tabs a:hover { filter:brightness(1.05); }
 html body .bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
 
-/* A light 10% frost reveals the actual milk sand behind the recommendation text. */
+/* Recommendations sit directly on the shore; only the photo cards have a surface. */
 html body .glass-recommendation-body {
-  --sand-frost:.1;
-  position:relative; isolation:isolate; overflow:hidden;
-  border-radius:48px; border:1px solid #fffaf0e6;
-  background:rgba(243,236,224,.5);
-  backdrop-filter:blur(calc(20px * var(--sand-frost))) saturate(.85);
-  -webkit-backdrop-filter:blur(calc(20px * var(--sand-frost))) saturate(.85);
-  box-shadow:inset 0 1px 2px #fffef5e6,inset 0 -1px 4px #9b806024,0 10px 28px #6954421f;
+  position:relative; isolation:auto; overflow:visible; padding:0;
+  border:0; border-radius:0; background:transparent; box-shadow:none;
+  backdrop-filter:none; -webkit-backdrop-filter:none;
 }
-html body .glass-recommendation-body::before {
-  content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  border-radius:inherit; background:url('./assets/glass-sand-grain.svg') 0 0/180px 180px repeat;
-  opacity:.3;
+html body .glass-recommendation-body::before { display:none; content:none; }
+html body #cycle .cycle-recommendation-heading {
+  display:flex; align-items:center; justify-content:space-between; flex-wrap:nowrap; gap:12px; margin-bottom:18px;
 }
-@media(min-width:768px) { html body .glass-recommendation-body { border-radius:56px; } }
+html body #cycle .glass-recommendation-body .cycle-recommendation-heading h2 {
+  margin:0; min-width:0; font-size:clamp(26px,8vw,40px);
+}
+html body #cycle .recommendation-all {
+  flex:none; display:flex; align-items:center; gap:8px; min-height:44px; padding:0;
+  background:none!important; border:0!important; border-radius:0; box-shadow:none;
+  color:var(--coffee)!important; font:600 clamp(12px,3vw,16px)/1.35 var(--sans);
+  backdrop-filter:none; -webkit-backdrop-filter:none;
+}
+html body #cycle .recommendation-all:hover { box-shadow:none; }
+html body #cycle .recommendation-all span { font-size:28px; line-height:1; }
+html body #phase-tips {
+  display:grid; grid-auto-flow:column; grid-auto-columns:calc((100% - 24px)/3); gap:12px;
+  overflow-x:auto; overscroll-behavior-x:contain; scroll-snap-type:x proximity;
+  scrollbar-width:none; padding:4px 0 14px; margin:0; background:none;
+}
+html body #phase-tips::-webkit-scrollbar { display:none; }
+html body #cycle .recommendation-card {
+  position:relative; display:flex; flex-direction:column; justify-content:flex-end;
+  min-width:0; min-height:220px; aspect-ratio:1/1.08; margin:0; padding:18px;
+  background:var(--recommendation-image) center/cover no-repeat!important;
+  border:1px solid #fff9ede6!important; border-radius:30px;
+  overflow:hidden; text-align:left; scroll-snap-align:start;
+  box-shadow:0 4px 14px #79573f14,inset 0 1px 1px #ffffffe6;
+  backdrop-filter:none; -webkit-backdrop-filter:none; -webkit-tap-highlight-color:transparent;
+}
+html body #cycle .recommendation-card::after {
+  content:''; position:absolute; inset:0; pointer-events:none;
+  background:linear-gradient(180deg,transparent 35%,#eee0ce4d 52%,#efe3d2e6 76%,#f0e5d7f5);
+}
+html body #cycle .recommendation-card .recommendation-card-title {
+  position:relative; z-index:1; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3;
+  overflow:hidden; font:600 clamp(16px,2vw,19px)/1.35 var(--sans); color:var(--coffee);
+}
+html body .recommendation-sheet { width:min(600px,calc(100vw - 24px)); border-radius:32px; }
+html body #recommendation-dialog-title { margin:0; font:600 30px/1.15 var(--display); overflow-wrap:anywhere; }
+html body .recommendation-detail { padding:18px 0; border-top:1px solid #977a5f33; }
+html body .recommendation-detail h3 { margin:0 0 12px; font:600 24px/1.25 var(--display); }
+html body .recommendation-detail p { margin:0; line-height:1.8; overflow-wrap:anywhere; }
+html body #recommendation-dialog-summary { margin:12px 0; overflow-wrap:anywhere; }
+@media(max-width:639px) {
+  html body #phase-tips { grid-auto-columns:clamp(184px,62vw,250px); }
+}
 
 /* Touch, hover and keyboard interaction use the same light rim as glass buttons. */
 html body .diary-shell :is(.mini:hover,.mini:active,.mini:focus-visible,#add-widget:hover,#add-widget:active,#add-widget:focus-visible) .topic-orb {

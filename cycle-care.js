@@ -5,6 +5,8 @@
   const ns = 'http://www.w3.org/2000/svg';
   const answers = new Map();
   let pending = null, sequence = 0, lastDay = localDate();
+  const detailDialog = $('#recommendation-dialog');
+  let guidance = null, detailIndex = null;
   function snapshot() { return model.snapshot({date:selected,periods:state.periods,length:state.cycleLength,periodLength:state.periodLength,predict:canPredictCycle(state.profile)}); }
   function key(s) { return JSON.stringify([s.date,s.base,s.day,s.length,s.periodLength,s.phase,s.status]); }
   function endpoint() {
@@ -16,14 +18,35 @@
   }
   function cancel() { sequence++; pending?.controller.abort(); pending=null; }
   function days(n) { const t=n%100,d=n%10;return n+' '+(t>=11&&t<=14?'дней':d===1?'день':d>=2&&d<=4?'дня':'дней'); }
+  function renderDetails() {
+    if (!guidance) return;
+    $('#recommendation-dialog-title').textContent=detailIndex===null?'Рекомендации':guidance.tips[detailIndex].title;
+    $('#recommendation-dialog-summary').textContent=guidance.summary;
+    const content=$('#recommendation-dialog-content');content.replaceChildren();
+    const tips=detailIndex===null?guidance.tips:[guidance.tips[detailIndex]];
+    for (const tip of tips) {
+      const article=document.createElement('article');article.className='recommendation-detail';
+      if (detailIndex===null) article.append(textEl('h3',tip.title));
+      article.append(textEl('p',tip.text));content.append(article);
+    }
+  }
+  function openDetails(index=null) {
+    detailIndex=index;renderDetails();
+    if (!detailDialog.open) detailDialog.showModal();
+  }
   function showTips(value) {
+    guidance=value;
     $('#phase-description').textContent=value.summary;
     const list=$('#phase-tips');list.replaceChildren();
+    const photographs=['recommendation-shore.webp','recommendation-food.webp','recommendation-rest.webp'];
     for (const [index,tip] of value.tips.entries()) {
-      const row=document.createElement('div');row.className='tip';
-      const icon=textEl('span',['♡','♧','☾'][index]||'♡');icon.setAttribute('aria-hidden','true');
-      const body=document.createElement('div');body.append(textEl('b',tip.title),textEl('p',tip.text));row.append(icon,body);list.append(row);
+      const card=document.createElement('button');card.type='button';card.className='tip recommendation-card';
+      card.style.setProperty('--recommendation-image','url("./assets/'+photographs[index%photographs.length]+'")');
+      card.setAttribute('aria-haspopup','dialog');card.setAttribute('aria-controls','recommendation-dialog');
+      card.append(textEl('span',tip.title,'recommendation-card-title'));
+      card.onclick=()=>openDetails(index);list.append(card);
     }
+    if (detailDialog.open) renderDetails();
   }
   function render() {
     const s=snapshot(), context=key(s), busy=pending?.key===context;
@@ -60,7 +83,7 @@
     $('#cycle-ai-request').textContent=busy?'Подбираем рекомендации…':answer?'Обновить рекомендации ИИ':'Подобрать рекомендации с ИИ';
     $('#cycle-ai-status').textContent=busy?'Подбираем мягкие подсказки для этого дня цикла.':!configured?'ИИ пока не подключён. Эти подсказки справочные.':!navigator.onLine?'Без интернета доступны справочные подсказки.':s.status==='estimated'?'По нажатию ИИ получит только день, предполагаемую фазу и обычную длительность цикла. Ответ не заменяет медицинскую консультацию.':'';
   }
-  function refresh() { if ($('#cycle').hidden) { if(pending)cancel();return; } render(); }
+  function refresh() { if ($('#cycle').hidden) { if(pending)cancel();if(detailDialog.open)detailDialog.close();return; } render(); }
   async function request() {
     const url=endpoint(), s=snapshot();
     if (!url || !navigator.onLine || s.status!=='estimated' || pending) return;
@@ -86,6 +109,13 @@
     else refresh();
   }
   $('#cycle-ai-request').onclick=request;
+  $('#recommendation-view-all').onclick=()=>openDetails();
+  $('#recommendation-dialog-close').onclick=()=>detailDialog.close();
+  detailDialog.addEventListener('click',event=>{
+    if (event.target!==detailDialog) return;
+    const rect=detailDialog.getBoundingClientRect();
+    if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)detailDialog.close();
+  });
   window.addEventListener('offline',()=>{cancel();refresh();});window.addEventListener('online',refresh);
   window.WomanCycleCare=Object.freeze({render,refresh,refreshDay});
   render();
