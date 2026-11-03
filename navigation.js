@@ -7,8 +7,8 @@
     const navigation = document.querySelector('.section-navigation');
     navigation.hidden = ![...navigation.querySelectorAll('nav')].some(nav=>!nav.hidden&&getComputedStyle(nav).display!=='none');
     const headingBottom = $('#page-title').getBoundingClientRect().bottom;
-    const headingGap = Math.max(0,header.getBoundingClientRect().bottom-headingBottom);
-    let cursor = headingBottom+headingGap/1.5;
+    const headingGap = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--heading-controls-gap'));
+    let cursor = headingBottom+headingGap;
     let bottom = headingBottom;
     let controlsTop = null;
     for (const panel of [document.querySelector('.profile-tabs'),navigation,$('#diary-shell')]) {
@@ -21,11 +21,11 @@
         if (label.checkVisibility()) bottom=Math.max(bottom,label.getBoundingClientRect().bottom);
       }
     }
-    document.documentElement.style.setProperty('--top-panel-height',Math.max(header.getBoundingClientRect().bottom,bottom+12)+'px');
+    document.documentElement.style.setProperty('--top-panel-height',(controlsTop===null ? header.getBoundingClientRect().bottom : bottom+12)+'px');
     // Stretch the actual document photo so even the highest part of the foam
     // passes below the last caption, including the second profile menu.
     const wide=matchMedia('(min-width:768px)').matches;
-    const photoHeight=(Math.max(header.getBoundingClientRect().bottom,bottom)+18)/(wide ? .13 : .165);
+    const photoHeight=((controlsTop===null ? Math.max(header.getBoundingClientRect().bottom,bottom) : bottom)+18)/(wide ? .13 : .165);
     document.documentElement.style.setProperty('--shore-photo-height',photoHeight+'px');
     document.documentElement.style.setProperty('--shore-fade-start',(controlsTop??header.getBoundingClientRect().bottom)+'px');
     document.documentElement.style.setProperty('--shore-fade-end',(photoHeight*(wide ? .181 : .198))+'px');

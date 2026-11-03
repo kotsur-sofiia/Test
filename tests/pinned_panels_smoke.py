@@ -25,6 +25,8 @@ with sync_playwright() as p:
             labels = page.locator('.profile-tabs a,.section-navigation nav a,#diary-shell .topic-label')
             visible = [label for label in labels.all() if label.is_visible()]
             if visible:
+                title = page.locator('#page-title').bounding_box()
+                assert abs(positions[1] - title['y'] - title['height'] - 16) < 1, (width, route)
                 bottom = max(label.bounding_box()['y'] + label.bounding_box()['height'] for label in visible)
                 height = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--top-panel-height"))')
                 assert abs(height - bottom - 12) < 1, (width, route, height, bottom)
@@ -33,11 +35,9 @@ with sync_playwright() as p:
             assert page.locator('.top-panel-background').count()==0
             assert page.locator('.shore-fixed-layer').count()==1
             fade_start = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shore-fade-start"))')
-            header_bottom = page.locator('main>header').bounding_box()['height']
             title = page.locator('#page-title').bounding_box()
-            title_bottom = title['y'] + title['height']
-            expected_start = title_bottom + (header_bottom-title_bottom)/1.5 if visible else header_bottom
-            assert abs(fade_start - expected_start) < 1, (width, route, fade_start, expected_start)
+            expected_start = title['y'] + title['height'] + 16 if visible else page.locator('main>header').bounding_box()['height']
+            assert abs(fade_start - expected_start) < 1, (width, route)
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         print('PASS pinned heading/menus/captions and 12px lower edge at', width, flush=True)
     page.set_viewport_size({'width': 390, 'height': 844})

@@ -14,6 +14,7 @@ html body::before {
 html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:4px;
+  --heading-controls-gap:16px;
   scroll-padding-top:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
 }
 /* The heading and controls retain their pinned positions. */
