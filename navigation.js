@@ -2,6 +2,10 @@
 'use strict';
 (() => {
   const profileSections = new Set(['account','settings','subscription','devices']);
+  function updateShoreFade() {
+    const bottom = $('#page-title').getBoundingClientRect().bottom;
+    document.documentElement.style.setProperty('--shore-fade-start',bottom+'px');
+  }
   function current() {
     if (location.hash === '#goals') history.replaceState(null,'','#profile');
     let raw;
@@ -24,6 +28,7 @@
     const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Библиотека',friends:'Друзья'};
     const heading=$('#page-title');
     heading.textContent=route.area==='diary'&&section!=='profile'?'Дневник':section==='profile'?'Обо мне':(titles[route.id]||titles[route.area]||'Профиль');
+    updateShoreFade();
     if(section!=='cycle')window.WomanPeriodEditor?.close();
     for (const panel of document.querySelectorAll('[data-main-view]')) {
       panel.hidden = panel.dataset.mainView !== route.area || panel.id !== (route.area === 'profile' ? route.profileSection : section);
@@ -62,6 +67,9 @@
   }
   window.addEventListener('load',navigate);
   window.addEventListener('hashchange',navigate);
+  window.addEventListener('resize',updateShoreFade);
+  new ResizeObserver(updateShoreFade).observe($('#page-title'));
+  document.fonts.ready.then(updateShoreFade);
   window.LunaNavigation = Object.freeze({refresh});
   refresh();
 })();

@@ -39,5 +39,5 @@ with sync_playwright() as p:
  page.locator('.bottom-nav [data-view=diary]').click();assert page.evaluate('location.hash')=='#home'
  c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.locator('#cycle-dial-day').text_content()=='1'
- assert page.evaluate('caches.match(new URL("./milk-sand.css?v=83",location.href)).then(Boolean)')
+ assert page.evaluate('caches.match(new URL("./milk-sand.css?v=85",location.href)).then(Boolean)')
  assert not errors,errors;b.close();print('PASS: continuous milk sand, matching editorial heading, no obsolete labels, centred enlarged number, sand groove and warm pearl with contact shadow, quiet deactivation, conditional luteal delay, midnight/reset and offline')

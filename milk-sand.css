@@ -10,6 +10,7 @@ html body::before {
 html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:24px;
+  --shore-fade-start:140px;
   scroll-padding-top:calc(var(--foam-bottom) + var(--shore-control-gap));
 }
 /* The fixed photograph fades along the outer shadow of the foam. */
@@ -30,16 +31,25 @@ html body .layout main>header::before {
   content:''; display:block; position:fixed; inset:0 0 auto; z-index:-1; pointer-events:none;
   width:100%; height:min(300vw,1000px);
   background:url('./assets/shore-phone.webp') center top/100% 100% no-repeat;
-  mask:url('./assets/shore-foam-phone.svg') center top/100% 100% no-repeat;
-  -webkit-mask:url('./assets/shore-foam-phone.svg') center top/100% 100% no-repeat;
+  --shore-contour:url('./assets/shore-foam-phone.svg');
+  /* Keep the sea opaque through the heading, then fade toward the shadow. */
+  -webkit-mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start),transparent var(--foam-bottom));
+  mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start),transparent var(--foam-bottom));
+  -webkit-mask-position:center top;
+  mask-position:center top;
+  -webkit-mask-size:100% 100%;
+  mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;
+  mask-repeat:no-repeat;
+  -webkit-mask-composite:source-in;
+  mask-composite:intersect;
 }
 @media(min-width:768px) {
   html { --foam-bottom:min(17.8vw,196px); }
   html body .layout main>header::before {
     height:min(100vw,1100px);
     background-image:url('./assets/shore-desktop.webp');
-    mask-image:url('./assets/shore-foam-desktop.svg');
-    -webkit-mask-image:url('./assets/shore-foam-desktop.svg');
+    --shore-contour:url('./assets/shore-foam-desktop.svg');
   }
 }
 html body::after { display:none!important; content:none!important; }
