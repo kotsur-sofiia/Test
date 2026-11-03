@@ -3,7 +3,7 @@
 body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
   display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:#efd8b9 url('./assets/shore-canvas.svg') center top/100% 100% no-repeat;
+  background:#efd8b9 url('./assets/shore-canvas.svg?v=61') center top/100% 100% no-repeat;
   box-shadow:none;
 }
 /* Sand and sea share one document canvas; the dial travels with the same ground. */
@@ -72,7 +72,7 @@ html body #cycle-dial-countdown {
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
 /* Warm nacre with a tight contact shadow and a soft shadow cast onto the sand. */
-html body .sand-cycle-ring { opacity:.72; }
+html body .sand-cycle-ring { opacity:.94; }
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
 html body #cycle-pearl-marker { filter:none; }

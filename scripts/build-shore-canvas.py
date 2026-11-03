@@ -14,16 +14,23 @@ phone = image('shore-phone.webp')
 desktop = image('shore-desktop.webp')
 details = image('shore-details.webp')
 symbols = '\n'.join(
-    f'<symbol id="treasure-{i}" viewBox="{i % 4 * 250} {i // 4 * 250} 250 250">'
-    '<use href="#treasure-atlas"/></symbol>' for i in range(8)
+    f'<symbol id="treasure-{i}" viewBox="{i % 4 * 300} {i // 4 * 300} 300 300">'
+    '<use href="#treasure-atlas"/></symbol>' for i in range(12)
 )
-placements = [(0, '7%', 120, 33), (1, '84%', 310, 35),
-              (2, '9%', 530, 26), (3, '81%', 720, 36),
-              (4, '6%', 940, 36), (5, '85%', 1150, 29),
-              (6, '10%', 1370, 28), (7, '80%', 1510, 34)]
+placements = [(0, '4%', 85, 34, -12), (7, '78%', 160, 19, 15),
+              (10, '85%', 310, 34, -23), (5, '10%', 440, 38, 28),
+              (4, '82%', 565, 17, -18), (2, '6%', 625, 23, 9),
+              (3, '76%', 790, 36, 33), (6, '87%', 925, 30, -25),
+              (9, '12%', 1030, 20, 42), (1, '5%', 1190, 32, 16),
+              (7, '84%', 1315, 17, -11), (11, '9%', 1455, 26, 27),
+              (8, '79%', 1580, 29, -19), (2, '14%', 1710, 21, -7),
+              (5, '5%', 1860, 35, -30), (0, '85%', 1990, 28, 39),
+              (4, '10%', 2135, 15, -16), (6, '76%', 2260, 33, 21)]
 treasures = '\n'.join(
-    f'<use href="#treasure-{i}" x="{x}" y="{y}" width="{size}" height="{size}"/>'
-    for i, x, y, size in placements
+    f'<svg x="{x}" y="{y}" width="{size}" height="{size}" viewBox="0 0 300 300" overflow="visible" '
+    f'opacity="{.72 if i in (5, 6) else 1}">'
+    f'<g transform="rotate({angle} 150 150)"><use href="#treasure-{i}" width="300" height="300"/></g></svg>'
+    for i, x, y, size, angle in placements
 )
 
 # No viewBox: geometry uses the actual paint viewport. Only the width controls the
@@ -43,9 +50,9 @@ svg = f'''<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%">
 <pattern id="sand-grain" patternUnits="userSpaceOnUse" width="180" height="180">
 <rect width="180" height="180" filter="url(#fine-grain)" opacity=".055"/>
 </pattern>
-<image id="treasure-atlas" href="{details}" width="1000" height="500"/>
+<image id="treasure-atlas" href="{details}" width="1200" height="900"/>
 {symbols}
-<pattern id="sand-treasures" patternUnits="userSpaceOnUse" width="100%" height="1680">
+<pattern id="sand-treasures" patternUnits="userSpaceOnUse" width="100%" height="2400">
 {treasures}
 </pattern>
 <linearGradient id="sand-join" x1="0" y1="0" x2="0" y2="1">

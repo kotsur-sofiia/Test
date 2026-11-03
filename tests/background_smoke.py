@@ -16,7 +16,7 @@ with sync_playwright() as p:
  assert page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").display')=='block'
  page.evaluate("state.water.push({id:'background-test',date:localDate(),ml:200,container:'glass'});save()")
  # Simulate a stale cached HTML shell. Online navigation must still load the actual app.
- page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v60');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
+ page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v61');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
  page.reload();assert page.locator('.app-backdrop').count()==0;expect(page.locator('#diary-shell')).to_be_visible()
  page.wait_for_function('''async()=>{const r=await caches.match(new URL('./index.html',location.href));return r&&(await r.text()).includes('page-title')}''')
  ctx.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();assert page.evaluate('state.water.some(r=>r.id==="background-test")')
@@ -25,7 +25,7 @@ with sync_playwright() as p:
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
  page.set_viewport_size({'width':390,'height':844});page.evaluate('document.fonts.ready');page.evaluate('scrollTo({top:0,behavior:"instant"})')
  # Growing a section must not rescale the sea, sand or decorations already visible.
- page.evaluate('''()=>new Promise(resolve=>{const image=new Image();image.onload=resolve;image.src='./assets/shore-canvas.svg'})''')
+ page.evaluate('''()=>new Promise(resolve=>{const image=new Image();image.onload=resolve;image.src='./assets/shore-canvas.svg?v=61'})''')
  before=page.screenshot()
  page.evaluate('''()=>{const extra=document.createElement('div');extra.id='long-page-check';extra.style.height='6000px';document.body.append(extra)}''')
  assert same_ground(before,page.screenshot()),'beach rescaled when the document became longer'
