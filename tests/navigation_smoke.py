@@ -25,7 +25,8 @@ with sync_playwright() as p:
   page.set_viewport_size({'width':width,'height':1000})
   first,second=[link.bounding_box() for link in tabs.locator('a').all()]
   assert abs(first['width']-second['width'])<1 and first['height']>=64
-  menu=page.locator('[data-menu="profile"]').bounding_box()
+  # The scroll viewport includes transparent space for glow above the real buttons.
+  menu=page.locator('[data-menu="profile"] a').first.bounding_box()
   assert first['y']+first['height']<=menu['y']
  page.set_viewport_size({'width':1280,'height':1000})
  data=page.evaluate('JSON.parse(JSON.stringify(state))');assert 'meals' in data and 'sleep' in data
