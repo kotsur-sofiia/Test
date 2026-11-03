@@ -14,10 +14,17 @@ html {
 }
 /* The fixed photograph fades along the outer shadow of the foam. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
-  position:sticky; top:0; z-index:25; flex-shrink:0; isolation:isolate;
+  position:fixed; inset:0 0 auto; z-index:25; isolation:isolate;
   background:transparent; box-shadow:none;
   min-height:calc(var(--foam-bottom) + var(--shore-control-gap));
   align-items:flex-start; pointer-events:none;
+}
+/* Reserve the same space in the document without tying the sea/title to
+   the height or scrolling bounds of the current section. */
+html body .layout main::before {
+  content:''; display:block; flex:0 0 auto;
+  height:calc(var(--foam-bottom) + var(--shore-control-gap));
+  pointer-events:none;
 }
 html body .layout main>header::before {
   content:''; display:block; position:fixed; inset:0 0 auto; z-index:-1; pointer-events:none;
