@@ -1,5 +1,5 @@
 /* One continuous milk-sand backdrop; champagne glass and terracotta remain accents. */
-:root { background:#f1e9db; --ink:#4b392f; --forest:#4b392f; --glass-ink:#4b392f; --muted:#6b5545; }
+:root { background:#f1e9db; --coffee:#4b3025; --ink:var(--coffee); --forest:var(--coffee); --earth:var(--coffee); --glass-ink:var(--coffee); --muted:#715547; }
 body { position:relative; isolation:isolate; background:transparent; }
 html body::before {
   display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
@@ -15,11 +15,11 @@ html body #page-title { color:var(--forest); }
 html body[data-view=diary]:not([data-section=profile]) #page-title {
   display:inline-flex; align-items:center; justify-content:center; width:auto;
   font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
-  color:#fff8e8;
-  -webkit-text-stroke:.35px #b7855a80;
-  text-shadow:0 1px 2px #704b2bcc,0 0 1px #b17a4773,0 0 5px #fff8e8,0 0 11px #ffe2b8e6,0 0 23px #ffd9adb3,0 0 36px #ffd9ad66;
+  color:var(--coffee);
+  -webkit-text-stroke:0;
+  text-shadow:var(--glass-text-glow);
 }
-html body .nature-dark { --muted:#6b5545; color:var(--ink); }
+html body .nature-dark { --muted:#715547; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
 html body .nature-dark #phase-title,html body .nature-dark #phase-description,
 html body .nature-clay :is(.fine,.muted,.tip p,.callout) { color:var(--ink); }
@@ -80,3 +80,7 @@ html body .profile-card .profile-group label,
 html body .voice-editor,html body :is(input,select,textarea,output)[id] { color:var(--ink); }
 html body .profile-card>#profile-advice { color:var(--muted); }
 html body input::placeholder,html body textarea::placeholder { color:var(--muted); opacity:1; }
+html body .text-link,html body #cycle .glass-recommendation-body .tip>span { color:var(--ink); }
+html body button.topic-drag-handle { color:var(--ink)!important; }
+html body .ai-note p { color:var(--muted); }
+html body .salt-block>h5 { color:var(--ink); }
