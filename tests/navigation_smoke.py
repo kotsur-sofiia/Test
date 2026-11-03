@@ -18,16 +18,17 @@ with sync_playwright() as p:
  page.locator('#profile-name').fill('Несохранённое имя');assert bottom.locator('[aria-current="page"]').inner_text()=='Дневник';bottom.get_by_role('link',name='Профиль',exact=True).click();expect(page.locator('#account')).to_be_visible()
  page.locator('[data-menu="profile"] a[href="#settings"]').click();expect(page.locator('#settings')).to_be_visible() and not page.locator('#profile').is_visible()
  assert bottom.locator('[aria-current="page"]').inner_text()=='Профиль'
- # Equal, large profile tabs precede the account/settings menu.
+ # Equal profile tabs match the height of the account/settings buttons.
  tabs=page.locator('.profile-tabs');expect(tabs).to_be_visible()
  assert tabs.locator('a').all_text_contents()==['Мой профиль','Друзья']
  for width in [320,390,768,1280]:
   page.set_viewport_size({'width':width,'height':1000})
   first,second=[link.bounding_box() for link in tabs.locator('a').all()]
-  assert abs(first['width']-second['width'])<1 and first['height']>=64
+  assert abs(first['width']-second['width'])<1 and first['height']>=44
   # The scroll viewport includes transparent space for glow above the real buttons.
   menu=page.locator('[data-menu="profile"] a').first.bounding_box()
   assert first['y']+first['height']<=menu['y']
+  assert abs(first['height']-menu['height'])<1 and abs(second['height']-menu['height'])<1
  page.set_viewport_size({'width':1280,'height':1000})
  data=page.evaluate('JSON.parse(JSON.stringify(state))');assert 'meals' in data and 'sleep' in data
  page.locator('[data-menu="profile"] a[href="#account"]').click();expect(page.locator('#account')).to_be_visible();page.locator('[data-menu="profile"] a[href="#subscription"]').click();expect(page.locator('#subscription')).to_be_visible()

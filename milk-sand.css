@@ -155,13 +155,16 @@ html body .profile-tabs {
   margin:0; padding:5px var(--content-gutter) 16px;
 }
 html body .profile-tabs a {
-  display:flex; align-items:center; justify-content:center; min-width:0; min-height:68px;
-  padding:16px 12px; border:1px solid var(--glass-rim); border-radius:999px;
-  background:var(--glass-clear); color:var(--coffee); font:650 16px/1.4 var(--sans);
+  display:flex; align-items:center; justify-content:center; min-width:0; min-height:46px; height:46px;
+  padding:0 12px; border:1px solid var(--glass-rim); border-radius:999px;
+  background:rgba(249,246,235,.18); color:var(--coffee); font:650 16px/1.4 var(--sans);
   text-align:center; text-decoration:none; box-shadow:var(--glass-shadow);
-  backdrop-filter:blur(18px) saturate(.8); -webkit-backdrop-filter:blur(18px) saturate(.8);
+  backdrop-filter:blur(6px) saturate(.9); -webkit-backdrop-filter:blur(6px) saturate(.9);
 }
-html body .profile-tabs a[aria-current=page] { background:var(--glass-primary); }
+html body .profile-tabs a[aria-current=page] { background:rgba(255,251,242,.3); }
+@media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
+  html body .profile-tabs a { min-height:44px; height:44px; }
+}
 html body .profile-tabs a:hover { filter:brightness(1.05); }
 html body .bottom-nav { grid-template-columns:repeat(4,minmax(0,1fr)); }
 
