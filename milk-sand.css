@@ -23,11 +23,23 @@ html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-she
 html body .section-navigation { background:transparent; box-shadow:none; }
 html body #page-title { color:var(--forest); }
 html body[data-view=diary]:not([data-section=profile]) #page-title {
-  display:inline-flex; align-items:center; justify-content:center; width:auto;
+  display:inline-flex; align-items:center; justify-content:center;
+  width:clamp(210px,56vw,240px); height:54px;
   font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
-  color:var(--coffee);
+  background:url('./assets/pearl-diary.webp') center/100% auto no-repeat;
+  color:transparent;
   -webkit-text-stroke:0;
-  text-shadow:var(--glass-text-glow);
+  text-shadow:none;
+  filter:drop-shadow(0 0 6px #fff5e9a6);
+}
+html body .diary-shell .day-widget .mini .nature-topic-image,
+html body .topic-editor-info .nature-topic-image { background-image:url('./assets/pearl-topics.webp'); }
+html body .topic-editor-info .topic-editor-thumb {
+  display:block; flex:0 0 32px; width:32px; height:32px; border-radius:50%;
+  border:1px solid var(--glass-rim); box-shadow:inset 0 1px 2px #fff9eecc,0 2px 5px #79573f22;
+}
+@media(forced-colors:active) {
+  html body[data-view=diary]:not([data-section=profile]) #page-title { background:none; color:CanvasText; filter:none; }
 }
 html body .nature-dark { --muted:#715547; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),

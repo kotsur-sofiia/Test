@@ -40,7 +40,7 @@ with sync_playwright() as p:
  assert page.evaluate('state.periodEnds["2026-11-04"]??null') is None
  page.locator('#period-dialog-close').click()
  assert page.locator('.mini .nature-topic-image').count()>=11
- first=page.locator('[data-widget-id=cycle] .nature-topic-image');assert 'nature-topics.webp' in first.evaluate('(e)=>getComputedStyle(e).backgroundImage')
+ first=page.locator('[data-widget-id=cycle] .nature-topic-image');assert 'pearl-topics.webp' in first.evaluate('(e)=>getComputedStyle(e).backgroundImage')
  for width in [320,375,390,430,768,1280]:
   page.set_viewport_size({'width':width,'height':1000});page.evaluate('document.fonts.ready');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
   assert page.locator('#cycle-phase-name').evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),width
@@ -50,7 +50,7 @@ with sync_playwright() as p:
   for field in page.locator('#cycle-form input').all():assert field.evaluate('(e)=>parseFloat(getComputedStyle(e).fontSize)')>=16
   assert float(page.locator('.bottom-nav').evaluate('(e)=>getComputedStyle(e).borderTopLeftRadius').replace('px',''))>=38
  data=page.evaluate('JSON.parse(JSON.stringify(state))');assert data['periodEnds']['2026-10-01']=='2026-10-08' and data['legacyExtra']=='keep' and data['voiceNotes'][0]['id']=='old-cycle-note'
- ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible();assert page.evaluate('caches.match(new URL("./assets/nature-topics.webp",location.href)).then(Boolean)')
+ ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible();assert page.evaluate('caches.match(new URL("./assets/pearl-topics.webp",location.href)).then(Boolean)')
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-08'
  page.clock.fast_forward(17*24*60*60*1000);page.clock.fast_forward(17*24*60*60*1000);assert page.locator('#cycle-dial-day').inner_text()=='35' and page.locator('#cycle-countdown-label').inner_text()=='ЗАДЕРЖКА' and page.locator('#cycle-countdown-value').inner_text()=='2 дня'
  assert not errors,errors;b.close();print('PASS: separate start/end dates, manual and native date entry, validation/overlap/rollback, no invented end, 32-day delay and reset, no cycle dictation/calendar, photo tiles, continuous milk background, responsive surfaces, stored records/offline/midnight')

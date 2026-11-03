@@ -216,7 +216,8 @@
       const info=document.createElement('div');info.className='topic-editor-info';
       const description=document.createElement('div');description.className='topic-editor-description';
       description.append(textEl('strong',topic.title.toLocaleUpperCase('ru')));description.title=topic.title;
-      info.append(description);
+      const image=document.createElement('span');image.className='topic-editor-thumb';image.setAttribute('aria-hidden','true');natureIcon(image,id);
+      info.append(image,description);
       const toggle=button((enabled?'Выключить: ':'Включить: ')+topic.title,'',()=>toggleTopic(id));
       toggle.className='topic-toggle';toggle.dataset.action='toggle';toggle.setAttribute('role','switch');toggle.setAttribute('aria-checked',String(enabled));
       toggle.disabled=!enabled&&!available(id);const track=document.createElement('span');track.className='switch-track';track.setAttribute('aria-hidden','true');track.append(textEl('span','','switch-knob'));toggle.append(track);info.append(toggle);row.append(info);
