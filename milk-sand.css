@@ -9,7 +9,7 @@ html body::before {
 /* Keep the original sand canvas; only the water and foam stay above content. */
 html {
   --foam-bottom:min(58.8vw,196px);
-  --shore-control-gap:24px;
+  --shore-control-gap:12px;
   --shore-fade-start:140px;
   scroll-padding-top:calc(var(--foam-bottom) + var(--shore-control-gap));
 }

@@ -23,7 +23,7 @@ with sync_playwright() as p:
  assert 'shore-foam-phone.svg' in page.locator('.shore-fixed-layer').evaluate('(e)=>getComputedStyle(e).maskImage')
  page.evaluate("state.water.push({id:'background-test',date:localDate(),ml:200,container:'glass'});save()")
  # Simulate a stale cached HTML shell. Online navigation must still load the actual app.
- page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v89');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
+ page.evaluate('''async()=>{const name=(await caches.keys()).find(k=>k==='luna-diary-v90');const cache=await caches.open(name);await cache.put(new URL('./index.html',location.href),new Response('<h1>Old cached page</h1>',{headers:{'Content-Type':'text/html'}}))}''')
  page.reload();assert page.locator('.app-backdrop').count()==0;expect(page.locator('#diary-shell')).to_be_visible()
  page.wait_for_function('''async()=>{const r=await caches.match(new URL('./index.html',location.href));return r&&(await r.text()).includes('page-title')}''')
  ctx.set_offline(True);page.reload();expect(page.locator('#diary-shell')).to_be_visible();assert page.evaluate('state.water.some(r=>r.id==="background-test")')
