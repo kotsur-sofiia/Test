@@ -78,7 +78,7 @@ html body #cycle-dial-countdown {
 }
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
-/* The pointed end of a dry twig marks progress along the photographed groove. */
+/* The cut stem of a leafy olive sprig marks progress along the photographed groove. */
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
 html body #cycle-twig-marker { filter:drop-shadow(.8px 1.2px .8px #4b302544); }
