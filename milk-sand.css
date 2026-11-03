@@ -3,7 +3,7 @@
 body { position:relative; isolation:isolate; background:transparent; }
 html body::before {
   display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:#f3e5d4 url('./assets/beach-sand-horizontal.webp') center/cover no-repeat;
+  background:#f3e5d4 url('./assets/beach-sand-natural.webp') center/cover no-repeat;
   box-shadow:none;
 }
 /* A translucent shoreline washes over the existing sand at the top of every view. */
@@ -51,7 +51,7 @@ html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--ear
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
 html body .diary-shell #add-widget .topic-orb { background:var(--glass-primary); }
 html body .diary-shell .mini.active .nature-topic-image { box-shadow:inset 0 1px 3px #ffffffe0,inset 0 -2px 4px #6d4e3833,0 0 0 4px #f1e9db,0 0 0 5px #b58a6a,0 0 16px #ffdbb380; }
-html body .day-sheet { background:#f3e5d4 url('./assets/beach-sand-horizontal.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499,0 20px 80px #091b1955; }
+html body .day-sheet { background:#f3e5d4 url('./assets/beach-sand-natural.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499,0 20px 80px #091b1955; }
 html body .day-sheet::backdrop { background:#514c3e55; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
 /* The number itself is centred, independently of phase and countdown text. */
 html body .cycle-dial { --day-size:clamp(96px,28vw,132px); }
