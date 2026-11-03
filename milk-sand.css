@@ -25,7 +25,7 @@ html body[data-view=diary]:not([data-section=profile]) #page-title {
   display:inline-flex; align-items:center; justify-content:center;
   width:clamp(210px,56vw,240px); height:54px;
   font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
-  background:url('./assets/pearl-diary.webp') center/100% auto no-repeat;
+  background:url('./assets/wild-pearl-diary.webp') center/100% auto no-repeat;
   color:transparent;
   -webkit-text-stroke:0;
   text-shadow:none;
@@ -78,9 +78,10 @@ html body #cycle-dial-countdown {
 }
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
-/* The photographed groove stays complete; the pearl alone marks cycle progress. */
+/* The pointed end of a dry twig marks progress along the photographed groove. */
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
-html body #cycle-dial-marker { fill:url(#cycle-pearl); stroke:#fff5e2; stroke-width:.65; filter:url(#cycle-pearl-shadow); }
+html body #cycle-dial-marker { opacity:0; }
+html body #cycle-twig-marker { filter:drop-shadow(.8px 1.2px .8px #4b302544); }
 @media(max-width:360px) {
   html body #cycle-phase-name { font-size:12px; }
   html body #cycle-phase-word { font-size:11px; }
