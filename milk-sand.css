@@ -18,8 +18,15 @@ html body #page-title {
   display:block; width:100%; height:auto; margin:0; text-align:center;
   font:500 clamp(42px,7vw,66px)/1.12 var(--display); letter-spacing:.015em;
   color:var(--coffee); text-transform:uppercase; white-space:normal;
+  min-width:0; overflow-wrap:anywhere;
   background:none; -webkit-text-fill-color:currentColor; -webkit-text-stroke:0;
   text-shadow:var(--glass-text-glow); filter:none; animation:none;
+}
+/* Reserve status-bar space even when a phone reports no safe-area inset. */
+@media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
+  html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
+    padding-top:calc(16px + max(24px,env(safe-area-inset-top,0px)));
+  }
 }
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
   padding:0 0 8px; overflow:visible; isolation:auto;
