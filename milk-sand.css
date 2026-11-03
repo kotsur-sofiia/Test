@@ -3,7 +3,7 @@
 body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
   display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:#efd8b9 url('./assets/shore-canvas.svg?v=61') center top/100% 100% no-repeat;
+  background:#f3eee5 url('./assets/shore-canvas.svg?v=62') center top/100% 100% no-repeat;
   box-shadow:none;
 }
 /* Sand and sea share one document canvas; the dial travels with the same ground. */
@@ -14,15 +14,35 @@ html body .layout main>header,html body[data-view=diary][data-section=cycle] mai
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell,
 html body .section-navigation { background:transparent; box-shadow:none; }
 html body #page-title { color:var(--forest); }
+html body[data-view=diary]:not([data-section=profile]) main>header { padding-bottom:2px; }
+html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell {
+  padding:0 clamp(8px,2vw,24px) 8px;
+}
+html body .topic-strip {
+  padding:0; background:none; border:0; border-radius:0; box-shadow:none;
+  backdrop-filter:none; -webkit-backdrop-filter:none;
+}
 html body[data-view=diary]:not([data-section=profile]) #page-title {
   display:inline-flex; align-items:center; justify-content:center;
   width:clamp(210px,56vw,240px); height:54px;
   font:750 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.09em; white-space:normal;
-  background:url('./assets/wild-pearl-diary.webp') center/100% auto no-repeat;
+  background-image:linear-gradient(110deg,#eadbc0a6 0%,#fffef8f5 18%,#f6e8cea6 32%,#fffffffa 44%,#ddc8a780 57%,#fffdf7f5 72%,#f0dfbda6 88%,#fffef8f5),url('./assets/beach-water.webp');
+  background-size:240% 100%,240% 260%;
+  background-position:0% 50%,0% 25%; background-repeat:no-repeat;
+  background-blend-mode:screen;
+  background-clip:text; -webkit-background-clip:text;
   color:transparent;
-  -webkit-text-stroke:0;
+  -webkit-text-fill-color:transparent; -webkit-text-stroke:.18px #79563755;
   text-shadow:none;
-  filter:drop-shadow(0 0 6px #fff5e9a6);
+  filter:drop-shadow(0 1px 1.1px #66503d99) drop-shadow(0 0 6px #fff9e6e6);
+  animation:shore-letter-light 9s ease-in-out infinite alternate;
+}
+@keyframes shore-letter-light {
+  from { background-position:0% 50%,0% 25%; }
+  to { background-position:100% 50%,100% 55%; }
+}
+@media(prefers-reduced-motion:reduce) {
+  html body[data-view=diary]:not([data-section=profile]) #page-title { animation:none; background-position:50% 50%,50% 40%; }
 }
 html body .diary-shell .day-widget .mini .nature-topic-image,
 html body .topic-editor-info .nature-topic-image { background-image:url('./assets/pearl-topics.webp'); }
@@ -31,7 +51,7 @@ html body .topic-editor-info .topic-editor-thumb {
   border:1px solid var(--glass-rim); box-shadow:inset 0 1px 2px #fff9eecc,0 2px 5px #79573f22;
 }
 @media(forced-colors:active) {
-  html body[data-view=diary]:not([data-section=profile]) #page-title { background:none; color:CanvasText; filter:none; }
+  html body[data-view=diary]:not([data-section=profile]) #page-title { background:none; color:CanvasText; -webkit-text-fill-color:CanvasText; -webkit-text-stroke:0; filter:none; animation:none; }
 }
 html body .nature-dark { --muted:#715547; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
@@ -44,7 +64,7 @@ html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--ear
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
 html body .diary-shell #add-widget .topic-orb { background:var(--glass-primary); }
 html body .diary-shell .mini.active .nature-topic-image { box-shadow:inset 0 1px 3px #ffffffe0,inset 0 -2px 4px #6d4e3833,0 0 0 4px #f1e9db,0 0 0 5px #b58a6a,0 0 16px #ffdbb380; }
-html body .day-sheet { background:#f3e5d4 url('./assets/beach-sand-natural.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499,0 20px 80px #091b1955; }
+html body .day-sheet { background:#f3eee5 url('./assets/beach-sand-natural.webp') center/cover; box-shadow:inset 0 0 0 100vmax #fffaf0bb,0 20px 80px #091b1955; }
 html body .day-sheet::backdrop { background:#514c3e55; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
 /* The number itself is centred, independently of phase and countdown text. */
 html body .cycle-dial { --day-size:clamp(96px,28vw,132px); }
@@ -72,7 +92,7 @@ html body #cycle-dial-countdown {
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
 /* Warm nacre with a tight contact shadow and a soft shadow cast onto the sand. */
-html body .sand-cycle-ring { opacity:.94; }
+html body .sand-cycle-ring { opacity:.94; filter:saturate(.55) brightness(1.03); }
 html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
 html body #cycle-dial-marker { opacity:0; }
 html body #cycle-pearl-marker { filter:none; }
