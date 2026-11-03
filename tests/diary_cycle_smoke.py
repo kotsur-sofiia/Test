@@ -39,6 +39,10 @@ with sync_playwright() as p:
  page.locator('[data-widget-id=cycle] a').click();assert page.locator('[data-widget-id=cycle] a').get_attribute('aria-current')=='page'
  for width in [320,375,390,430,768,1280]:
   page.set_viewport_size({'width':width,'height':1000});page.evaluate('document.fonts.ready');assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
+  # All three photo buttons must be square and visible together without a horizontal swipe.
+  cards=[card.bounding_box() for card in page.locator('.recommendation-card').all()]
+  assert len(cards)==3 and max(card['y'] for card in cards)-min(card['y'] for card in cards)<1
+  assert all(abs(card['width']-card['height'])<1 and card['x']>=0 and card['x']+card['width']<=width+1 for card in cards),(width,cards)
   box=page.locator('#cycle-dial').bounding_box();assert box['x']>=0 and box['x']+box['width']<=width
   bounds=page.locator('.cycle-dial-copy').bounding_box()
   for field in ['cycle-dial-phase','cycle-dial-day','cycle-dial-countdown']:
