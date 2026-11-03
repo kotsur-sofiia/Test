@@ -6,17 +6,27 @@ html body::before {
   background:#f3eee5 url('./assets/shore-canvas.svg?v=64') center top/100% 100% no-repeat;
   box-shadow:none;
 }
-/* The shore stays anchored to the viewport while the content scrolls. */
-html { --shore-height:max(100svh,1100px); scroll-padding-top:200px; }
-html body::before {
-  position:fixed; min-height:var(--shore-height);
-  background-size:100% var(--shore-height);
-}
-/* Keep the current section title over the same opaque part of the sea.
-   Matching canvas dimensions avoid a seam and hide content passing below. */
+/* Keep the original sand canvas; only the water and foam stay above content. */
+html { scroll-padding-top:200px; }
+/* The fixed photograph ends at the foam, not at the title's rectangular box. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
-  position:sticky; top:0; z-index:25; flex-shrink:0;
-  background:#f3eee5 url('./assets/shore-canvas.svg?v=64') center top/100vw var(--shore-height) no-repeat;
+  position:sticky; top:0; z-index:25; flex-shrink:0; isolation:isolate;
+  background:transparent; box-shadow:none;
+}
+html body .layout main>header::before {
+  content:''; display:block; position:fixed; inset:0 0 auto; z-index:-1; pointer-events:none;
+  width:100%; height:min(300vw,1000px);
+  background:url('./assets/shore-phone.webp') center top/100% 100% no-repeat;
+  mask:url('./assets/shore-foam-phone.svg') center top/100% 100% no-repeat;
+  -webkit-mask:url('./assets/shore-foam-phone.svg') center top/100% 100% no-repeat;
+}
+@media(min-width:768px) {
+  html body .layout main>header::before {
+    height:min(100vw,1100px);
+    background-image:url('./assets/shore-desktop.webp');
+    mask-image:url('./assets/shore-foam-desktop.svg');
+    -webkit-mask-image:url('./assets/shore-foam-desktop.svg');
+  }
 }
 html body::after { display:none!important; content:none!important; }
 html body .nature-panel { background:transparent!important; }
