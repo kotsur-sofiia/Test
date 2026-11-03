@@ -285,7 +285,8 @@ html body #phase-tips {
 html body #phase-tips::-webkit-scrollbar { display:none; }
 html body #cycle .recommendation-card {
   position:relative; display:flex; flex-direction:column; justify-content:flex-end;
-  min-width:0; min-height:0; aspect-ratio:1; margin:0; padding:clamp(7px,1.8vw,18px);
+  min-width:0; min-height:0; aspect-ratio:1; margin:0;
+  padding:clamp(11px,3vw,20px) clamp(10px,3.1vw,22px);
   background:var(--recommendation-image) center/cover no-repeat!important;
   border:1px solid #fff9ede6!important; border-radius:clamp(14px,4vw,30px);
   overflow:hidden; text-align:left; scroll-snap-align:start;
@@ -297,8 +298,9 @@ html body #cycle .recommendation-card::after {
   background:linear-gradient(180deg,#fffaf200 30%,#fff9ef0f 43%,#fff7eb3b 55%,#fcf0e0a3 69%,#fbefdee6 83%,#fdf5eaf5 100%);
 }
 html body #cycle .recommendation-card .recommendation-card-title {
-  position:relative; z-index:1; display:-webkit-box; -webkit-box-orient:vertical; -webkit-line-clamp:3;
-  overflow:hidden; font:600 clamp(10px,3vw,19px)/1.25 var(--sans); color:var(--coffee);
+  position:relative; z-index:1; display:block; width:100%; min-height:2.3em;
+  font:400 clamp(10px,3.05vw,18px)/1.15 var(--sans); color:var(--coffee);
+  letter-spacing:-.025em; text-align:start; text-wrap:pretty;
 }
 html body .recommendation-sheet { width:min(600px,calc(100vw - 24px)); border-radius:32px; }
 html body #recommendation-dialog-title { margin:0; font:600 30px/1.15 var(--display); overflow-wrap:anywhere; }
@@ -308,7 +310,6 @@ html body .recommendation-detail p { margin:0; line-height:1.8; overflow-wrap:an
 html body #recommendation-dialog-summary { margin:12px 0; overflow-wrap:anywhere; }
 @media(max-width:639px) {
   html body #cycle .cycle-recommendations { padding-inline:clamp(10px,2.6vw,18px); }
-  html body #cycle .recommendation-card-title { min-height:2.5em; }
 }
 
 /* Touch, hover and keyboard interaction use the same light rim as glass buttons. */
