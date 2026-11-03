@@ -43,8 +43,8 @@
     const progress=$('#cycle-dial-progress');progress.style.strokeDasharray=(s.progress*100)+' 100';
     const angle=s.progress*2*Math.PI-Math.PI/2;
     $('#cycle-dial-marker').setAttribute('cx',160+139*Math.cos(angle));$('#cycle-dial-marker').setAttribute('cy',160+139*Math.sin(angle));
-    // Keep the cut stem on the groove and the leafy olive sprig along its tangent.
-    $('#cycle-twig-marker').setAttribute('transform','translate('+(160+139*Math.cos(angle))+' '+(160+139*Math.sin(angle))+') rotate('+(angle*180/Math.PI+180)+')');
+    // Centre the pearl on the groove; keep its photographed reflection facing the light.
+    $('#cycle-pearl-marker').setAttribute('transform','translate('+(160+139*Math.cos(angle))+' '+(160+139*Math.sin(angle))+')');
     const ticks=$('#cycle-dial-ticks');ticks.replaceChildren();
     for (let i=0;i<(s.length||28);i++) {
       const a=i/(s.length||28)*2*Math.PI-Math.PI/2,line=document.createElementNS(ns,'line');
