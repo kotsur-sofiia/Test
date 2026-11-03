@@ -1,20 +1,19 @@
-/* One continuous milk-sand backdrop; champagne glass and terracotta remain accents. */
+/* Reference-inspired ivory beach; champagne glass and pearl details. */
 :root { background:#f1e9db; --coffee:#4b3025; --ink:var(--coffee); --forest:var(--coffee); --earth:var(--coffee); --glass-ink:var(--coffee); --muted:#715547; }
 body { position:relative; isolation:isolate; background:transparent; }
 html body::before {
   display:block; content:''; position:fixed; inset:0; z-index:-1; pointer-events:none;
-  background:url('./assets/sand-waterfall.webp') center/cover no-repeat;
-  box-shadow:inset 0 0 0 100vmax #f8f0e499;
+  background:#f3e5d4 url('./assets/beach-sand.webp') center/cover no-repeat;
+  box-shadow:none;
 }
 /* A translucent shoreline washes over the existing sand at the top of every view. */
 html body::after {
   display:block!important; content:''!important;
   position:fixed; top:0; right:0; left:0; bottom:auto;
-  /* The transparent lower margin places the irregular waterline about 2 cm down. */
-  width:100%; height:calc(2.65cm + env(safe-area-inset-top,0px));
+  width:100%; height:calc(clamp(260px,35svh,340px) + env(safe-area-inset-top,0px));
   z-index:-1; pointer-events:none;
-  background:url('./assets/shoreline-water.webp') center top/100% 100% no-repeat;
-  opacity:.6;
+  background:url('./assets/beach-water.webp') center top/100% 100% no-repeat;
+  opacity:.85;
 }
 html body .nature-panel { background:transparent!important; }
 html body .nature-panel::before,html body :is(.food-grid,.sleep-grid)>.card+article::before { display:none; }
@@ -52,7 +51,7 @@ html body :is(.food-grid,.sleep-grid)>.card+article .text-link { color:var(--ear
 html body .diary-shell .day-widget .mini .topic-label,html body .diary-shell #add-widget .topic-label { color:var(--forest); }
 html body .diary-shell #add-widget .topic-orb { background:var(--glass-primary); }
 html body .diary-shell .mini.active .nature-topic-image { box-shadow:inset 0 1px 3px #ffffffe0,inset 0 -2px 4px #6d4e3833,0 0 0 4px #f1e9db,0 0 0 5px #b58a6a,0 0 16px #ffdbb380; }
-html body .day-sheet { background:url('./assets/sand-waterfall.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e4c9,0 20px 80px #091b1955; }
+html body .day-sheet { background:#f3e5d4 url('./assets/beach-sand.webp') center/cover; box-shadow:inset 0 0 0 100vmax #f8f0e499,0 20px 80px #091b1955; }
 html body .day-sheet::backdrop { background:#514c3e55; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
 /* The number itself is centred, independently of phase and countdown text. */
 html body .cycle-dial { --day-size:clamp(96px,28vw,132px); }
@@ -79,7 +78,9 @@ html body #cycle-dial-countdown {
 }
 html body #cycle-countdown-label { font-size:11px; }
 html body #cycle-countdown-value { font-size:13px; }
-html body .cycle-dial[data-status=awaiting] .dial-progress { stroke:var(--olive); }
+/* The photographed groove stays complete; the pearl alone marks cycle progress. */
+html body .cycle-dial :is(.dial-track,.dial-progress,#cycle-dial-ticks,.dial-start) { opacity:0; }
+html body #cycle-dial-marker { fill:url(#cycle-pearl); stroke:#fff5e2; stroke-width:.65; filter:url(#cycle-pearl-shadow); }
 @media(max-width:360px) {
   html body #cycle-phase-name { font-size:12px; }
   html body #cycle-phase-word { font-size:11px; }
