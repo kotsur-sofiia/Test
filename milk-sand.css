@@ -15,7 +15,12 @@ html {
   --foam-bottom:min(58.8vw,196px);
   --shore-control-gap:4px;
   --heading-controls-gap:16px;
-  scroll-padding-top:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
+  --page-title-size:clamp(42px,7vw,66px);
+  --device-title-size:clamp(28px,4.5vw,58px);
+  --topic-label-gap:10px;
+  --profile-row-gap:16px;
+  --content-top:max(var(--top-panel-height,200px),calc(var(--shore-fade-end,360px) + 12px));
+  scroll-padding-top:var(--content-top);
 }
 /* The heading and controls retain their pinned positions. */
 html body .layout main>header,html body[data-view=diary][data-section=cycle] main>header {
@@ -28,7 +33,7 @@ html body .layout main>header,html body[data-view=diary][data-section=cycle] mai
    the height or scrolling bounds of the current section. */
 html body .layout main::before {
   content:''; display:block; flex:0 0 auto;
-  height:var(--top-panel-height,calc(var(--foam-bottom) + var(--shore-control-gap)));
+  height:var(--content-top);
   pointer-events:none;
 }
 html body .shore-fixed-layer {
@@ -62,7 +67,7 @@ html body .section-navigation { background:transparent; box-shadow:none; }
 /* Every section uses the same coffee-coloured editorial heading. */
 html body #page-title {
   display:block; width:100%; height:auto; margin:0; text-align:center;
-  font:500 clamp(42px,7vw,66px)/1.12 var(--display); letter-spacing:.015em;
+  font:500 var(--page-title-size)/1.12 var(--display); letter-spacing:.015em;
   color:var(--coffee); text-transform:uppercase; white-space:normal;
   min-width:0; overflow-wrap:anywhere;
   background:none; -webkit-text-fill-color:currentColor; -webkit-text-stroke:0;
@@ -70,10 +75,7 @@ html body #page-title {
 }
 /* Long names must fit above the shared control baseline, even on narrow phones. */
 html body[data-view=profile][data-section=devices] #page-title {
-  font-size:clamp(28px,4.5vw,58px);
-}
-@media(max-width:767px) {
-  html body[data-view=capture] #page-title { font-size:36px; }
+  font-size:var(--device-title-size);
 }
 /* Match the reference screen: visible title starts about 107px from the top. */
 @media(max-width:767px),(max-width:1023px) and (pointer:coarse) {
@@ -91,6 +93,9 @@ html body .topic-strip {
 }
 html body .diary-shell .day-widget .mini .nature-topic-image,
 html body .topic-editor-info .nature-topic-image { background-image:url('./assets/pearl-topics.webp'); }
+html body #diary-shell .day-widget .mini,html body #diary-shell #add-widget {
+  gap:var(--topic-label-gap);
+}
 html body .topic-editor-info .topic-editor-thumb {
   display:block; flex:0 0 32px; width:32px; height:32px; border-radius:50%;
   border:1px solid var(--glass-rim); box-shadow:inset 0 1px 2px #fff9eecc,0 2px 5px #79573f22;
@@ -251,7 +256,7 @@ html body .diary-shell #day-widgets #add-widget { padding:0; }
 /* One slim coffee oval contains the two equal profile destinations. */
 html body .profile-tabs {
   --profile-tab-height:23px;
-  display:block; margin:0; padding:0 clamp(8px,2vw,24px) 16px;
+  display:block; margin:0; padding:0 clamp(8px,2vw,24px) var(--profile-row-gap);
 }
 html body .profile-tab-control {
   position:relative; display:grid; grid-template-columns:repeat(2,minmax(0,1fr));

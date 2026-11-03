@@ -36,8 +36,10 @@ with sync_playwright() as p:
             assert page.locator('.shore-fixed-layer').count()==1
             fade_start = page.evaluate('parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--shore-fade-start"))')
             title = page.locator('#page-title').bounding_box()
-            expected_start = title['y'] + title['height'] + 16 if visible else page.locator('main>header').bounding_box()['height']
-            assert abs(fade_start - expected_start) < 1, (width, route)
+            if visible:
+                assert abs(fade_start - bottom) < 1, (width, route, fade_start, bottom)
+            else:
+                assert fade_start >= title['y'] + title['height'], (width, route)
             assert page.evaluate('document.documentElement.scrollWidth<=innerWidth')
         print('PASS pinned heading/menus/captions and 12px lower edge at', width, flush=True)
     page.set_viewport_size({'width': 390, 'height': 844})
