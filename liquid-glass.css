@@ -5,6 +5,7 @@
   --glass-clear:linear-gradient(160deg,#fffaf0cf,#e8e0d2b3 58%,#f9f2e8a8);
   --glass-rim:#fff8e8e6;
   --glass-shadow:inset 0 1px 2px #fffffff0,inset 0 -2px 5px #b58b6326,0 0 0 1px #fff1dc66,0 0 18px #ffd9ad80,0 6px 18px #79573f22;
+  --glass-text-glow:0 0 2px #fff9e5e6,0 0 10px #ffd9adcc,0 0 22px #ffd9ad99,0 0 34px #ffd9ad4d;
 }
 html body button[class],html body button:not([class]) {
   background:var(--glass-primary)!important; color:var(--glass-ink)!important; border:1px solid var(--glass-rim)!important;
@@ -34,6 +35,11 @@ body .bottom-nav a.active,body .bottom-nav a.active:hover { background:var(--gla
 /* The four visible slots scroll independently; Edit is always the fifth slot. */
 html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell { padding:12px 24px 24px; }
 .topic-strip { display:grid; grid-template-columns:minmax(0,1fr) clamp(70px,16vw,130px); align-items:start; gap:8px; min-width:0; }
+html body .topic-strip {
+  padding:10px 10px 8px; border:1px solid var(--glass-rim); border-radius:36px;
+  background:var(--glass-primary); box-shadow:var(--glass-shadow);
+  backdrop-filter:blur(18px) saturate(.8); -webkit-backdrop-filter:blur(18px) saturate(.8);
+}
 html body .diary-shell #day-widgets {
   display:flex; gap:8px; overflow-x:auto; overflow-y:hidden; min-width:0; padding:5px 0 6px;
   scroll-snap-type:x mandatory; scroll-padding-inline:0; scrollbar-width:none;
@@ -78,9 +84,9 @@ html body .topic-toggle:disabled .switch-track { opacity:.5; }
 html body #cycle .cycle-recommendations { padding:32px 18px calc(110px + env(safe-area-inset-bottom,0px)); }
 .glass-recommendation-body {
   padding:28px; border-radius:36px; border:1px solid #fffaf0d9;
-  background:linear-gradient(145deg,#eeeae066,#dfd8c947 55%,#f2ede35c);
+  background:linear-gradient(145deg,rgba(238,234,224,.5),rgba(223,216,201,.5) 55%,rgba(242,237,227,.5));
   box-shadow:inset 0 1px 2px #fffef5cc,inset 0 -1px 4px #8a77621a,0 12px 32px #69544224;
-  backdrop-filter:blur(28px) saturate(.65); -webkit-backdrop-filter:blur(28px) saturate(.65);
+  backdrop-filter:blur(20px) saturate(.75); -webkit-backdrop-filter:blur(20px) saturate(.75);
 }
 html body #cycle .glass-recommendation-body :is(h2,h3,h4,p,b,.fine,.muted,.callout,.tip p) { color:var(--glass-ink); }
 html body #cycle .glass-recommendation-body .pill { background:var(--glass-clear); color:var(--glass-ink); border:1px solid #ffffffc9; box-shadow:inset 0 1px 1px #ffffffd9; }
@@ -100,8 +106,11 @@ input[type=range]::-webkit-slider-thumb { border-radius:50%; box-shadow:inset 0 
   .glass-recommendation-body { padding:22px 18px; border-radius:30px; }
   html body #cycle .glass-recommendation-body .cycle-recommendation-heading h2 { font-size:32px; }
 }
+@media(max-width:360px) {
+  html body #diary-shell,html body[data-view=diary][data-section=cycle] #diary-shell { padding-inline:4px; }
+}
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))) {
-  .glass-recommendation-body { background:#f3e8d7; }
+  .glass-recommendation-body { background:rgba(243,232,215,.5); }
   body .bottom-nav { background:#f1e9db; }
   html body .switch-track { background-color:#d2c8bb; }
 }

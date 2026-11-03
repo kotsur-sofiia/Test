@@ -14,11 +14,8 @@ html body .section-navigation { background:transparent; box-shadow:none; }
 html body #page-title { color:var(--forest); }
 html body[data-view=diary]:not([data-section=profile]) #page-title {
   display:inline-flex; align-items:center; justify-content:center; width:auto;
-  font:600 24px/1.2 var(--sans); letter-spacing:0; white-space:normal;
-}
-html body .diary-title-button {
-  padding:13px 30px; min-height:50px; font:650 20px/1.2 var(--sans); letter-spacing:.055em;
-  text-transform:uppercase;
+  font:650 clamp(28px,5vw,40px)/1.2 var(--sans); letter-spacing:.055em; white-space:normal;
+  color:var(--glass-ink); text-shadow:var(--glass-text-glow);
 }
 html body .nature-dark { --muted:#60624c; color:var(--ink); }
 html body .nature-dark :is(h2,h3,h4,p,label,.fine,.muted,.tip b,.eyebrow,legend),
@@ -39,7 +36,7 @@ html body .cycle-dial-copy { position:absolute; inset:0; display:block; text-ali
 html body #cycle-dial-day {
   position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); margin:0;
   display:block; font:600 var(--day-size)/1 var(--sans); letter-spacing:-.045em;
-  color:var(--forest); font-variant-numeric:lining-nums tabular-nums;
+  color:var(--glass-ink); text-shadow:var(--glass-text-glow); font-variant-numeric:lining-nums tabular-nums;
   text-box-trim:trim-both; text-box-edge:cap alphabetic;
 }
 html body #cycle-dial-phase {

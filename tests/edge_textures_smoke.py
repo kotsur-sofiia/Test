@@ -14,9 +14,9 @@ with sync_playwright() as p:
   main=page.locator('.layout main');box=main.bounding_box();assert box['x']==0 and abs(box['width']-width)<1
   assert main.evaluate('(e)=>getComputedStyle(e).borderRadius')=='0px'
   assert main.evaluate('(e)=>getComputedStyle(e).boxShadow')=='none'
-  button=page.locator('.diary-title-button');button_box=button.bounding_box()
-  assert 140<=button_box['width']<=min(width*.8,250)
-  assert button_box['height']>=48
+  button=page.locator('#page-title');button_box=button.bounding_box()
+  assert 100<=button_box['width']<=min(width*.8,320)
+  assert page.locator('#page-title button').count()==0 and page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).textShadow')!='none'
   for selector in ['#diary-shell','.cycle-dial-card','.cycle-recommendations']:
    item=page.locator(selector);assert item.evaluate('(e)=>getComputedStyle(e,"::before").display')=='none'
    rect=item.bounding_box();assert rect['x']==0 and abs(rect['width']-width)<1,(width,selector,rect)

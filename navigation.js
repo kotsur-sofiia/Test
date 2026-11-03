@@ -23,10 +23,7 @@
     document.body.dataset.topic = route.topic;
     const titles={account:'Профиль',settings:'Настройки',subscription:'Подписка',devices:'Подключённые устройства',capture:'Голосовая запись',library:'Библиотека',friends:'Друзья'};
     const heading=$('#page-title');
-    if(route.area==='diary'&&section!=='profile'){
-      let button=heading.querySelector('.diary-title-button');
-      if(!button){button=textEl('button','Дневник','diary-title-button');button.type='button';button.setAttribute('aria-label','Открыть дневник');button.onclick=()=>{location.hash='home';window.scrollTo({top:0,behavior:'instant'});};heading.replaceChildren(button);}
-    }else heading.textContent=section==='profile'?'Обо мне':(titles[route.id]||titles[route.area]||'Профиль');
+    heading.textContent=route.area==='diary'&&section!=='profile'?'Дневник':section==='profile'?'Обо мне':(titles[route.id]||titles[route.area]||'Профиль');
     if(section!=='cycle')window.WomanPeriodEditor?.close();
     for (const panel of document.querySelectorAll('[data-main-view]')) {
       panel.hidden = panel.dataset.mainView !== route.area || panel.id !== (route.area === 'profile' ? route.profileSection : section);

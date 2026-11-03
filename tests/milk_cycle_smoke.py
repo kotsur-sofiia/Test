@@ -24,7 +24,7 @@ with sync_playwright() as p:
   assert page.locator('#cycle-phase-name').bounding_box()['y']<number['y']
   assert page.locator('.cycle-day-label').bounding_box()['y']>number['y']+number['height']
   assert 'sand-waterfall.webp' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
-  assert page.locator('.diary-title-button').bounding_box()['width']<250
+  assert page.locator('#page-title').bounding_box()['width']<250
   assert page.evaluate('document.documentElement.scrollWidth<=innerWidth'),width
  # Deactivation stays quiet on the diary and keeps personal notes.
  page.locator('#add-widget').click();page.locator('[data-topic=books] [role=switch]').click();page.locator('#widget-picker [data-close-dialog]').click()
@@ -36,8 +36,8 @@ with sync_playwright() as p:
  page.locator('#cycle-start-action').click();page.locator('#period-start').fill('04.11.2026');page.locator('#period-end').fill('');page.locator('#cycle-form button').click()
  assert page.locator('#cycle-dial-day').text_content()=='1' and page.locator('#cycle-phase-name').text_content()=='МЕНСТРУАЛЬНАЯ'
  assert page.evaluate('state.periodEnds["2026-10-01"]')=='2026-10-06'
- page.locator('.diary-title-button').click();assert page.evaluate('location.hash')=='#home'
+ page.locator('.bottom-nav [data-view=diary]').click();assert page.evaluate('location.hash')=='#home'
  c.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
  assert page.locator('#cycle-dial-day').text_content()=='1'
- assert page.evaluate('caches.match(new URL("./milk-sand.css?v=45",location.href)).then(Boolean)')
+ assert page.evaluate('caches.match(new URL("./milk-sand.css?v=47",location.href)).then(Boolean)')
  assert not errors,errors;b.close();print('PASS: continuous milk sand, compact glass heading, no obsolete labels, centred enlarged number, matching terracotta phase/marker, quiet deactivation, conditional luteal delay, midnight/reset and offline')

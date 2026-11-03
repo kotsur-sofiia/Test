@@ -45,7 +45,7 @@ with sync_playwright() as p:
  assert page.locator('#cycle-start-action').evaluate('(e)=>getComputedStyle(e).backgroundImage')!='none'
  assert 'blur' in page.locator('.glass-recommendation-body').evaluate('(e)=>getComputedStyle(e).backdropFilter')
  expected=ids();c.set_offline(True);page.reload();assert ids()==expected
- assert page.evaluate('caches.match(new URL("./liquid-glass.css?v=46",location.href)).then(Boolean)')
+ assert page.evaluate('caches.match(new URL("./liquid-glass.css?v=47",location.href)).then(Boolean)')
  assert not errors,errors;c.close()
  # The previous default updates to four without losing old water/notes; custom layouts stay personal.
  for order,expected in [(['cycle','food','water','skin','activity'],['cycle','food','skin','books']),(['skin','books','water'],['skin','books','water'])]:
