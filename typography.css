@@ -1,5 +1,9 @@
 /* Local, upright type. Regional Noto faces load only for the selected language. */
 @font-face {
+  font-family:'Cormorant Garamond'; font-style:normal; font-weight:300 700; font-display:swap;
+  src:url('./assets/fonts/CormorantGaramond.woff') format('woff');
+}
+@font-face {
   font-family:'Noto Serif'; font-style:normal; font-weight:400; font-display:swap;
   src:url('./assets/fonts/NotoSerif-Regular.woff') format('woff');
 }
@@ -103,6 +107,7 @@
 :root {
   --sans:'Inter',sans-serif;
   --display:'Noto Serif',serif;
+  --headline:'Cormorant Garamond','Noto Serif',serif;
   --numbers:'Noto Serif Display',serif;
 }
 /* Keep each script's native shapes, including the separate CJK regional forms. */
@@ -141,6 +146,10 @@
   --display:'Noto Serif KR','Noto Serif',serif;
   --numbers:'Noto Serif Display','Noto Serif KR',serif;
 }
+/* Preserve native headline shapes for scripts outside the Latin/Cyrillic set. */
+:lang(ar),:lang(fa),:lang(ur),:lang(he),:lang(yi),:lang(hi),:lang(mr),:lang(ne),:lang(zh),:lang(ja),:lang(ko) {
+  --headline:var(--display);
+}
 /* These typography rules intentionally replace weights in older visual layers. */
 html body,html body * {
   font-family:var(--sans)!important;
@@ -157,6 +166,12 @@ html body :is(#cycle-dial-day,.big-number,#water-total,.macro strong,.profile-bm
   font-family:var(--numbers)!important;
   font-variant-numeric:lining-nums tabular-nums;
 }
+/* Elegant high-contrast serif for principal titles and cycle phase names. */
+html body :is(h1,h2),html body :is(h1,h2) *,html body #cycle-phase-name {
+  font-family:var(--headline)!important;
+  font-weight:500!important;
+}
+html body #cycle-phase-name { font-weight:600!important; }
 html body #cycle-phase-name,html body #cycle-phase-word {
   color:var(--coffee);
 }

@@ -24,7 +24,7 @@ with sync_playwright() as p:
  page.goto(URL+'#cycle');page.wait_for_function('navigator.serviceWorker.controller!==null');page.evaluate('document.fonts.ready')
  assert page.locator('#cycle-dial-day').inner_text()=='21'
  assert page.locator('.app-backdrop,#today,#cycle-dial-date,#cycle-length,#period-length').count()==0
- assert 'Noto Serif' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('\"Cormorant Garamond\"')
  assert 'Inter' in page.locator('#cycle-form input').first.evaluate('(e)=>getComputedStyle(e).fontFamily')
  # One document canvas continues beneath every transparent section.
  assert 'shore-canvas.svg' in page.locator('body').evaluate('(e)=>getComputedStyle(e,"::before").backgroundImage')
@@ -47,9 +47,9 @@ with sync_playwright() as p:
    assert page.locator(selector).evaluate('(e)=>e.scrollWidth<=e.clientWidth+1'),(width,selector)
  assert page.evaluate('state.water.some(e=>e.id==="kept")')
  page.set_viewport_size({'width':390,'height':844});ctx.set_offline(True);page.reload();expect(page.locator('#cycle')).to_be_visible()
- for path in ['./nature-editorial.css?v=64','./milk-sand.css?v=96','./liquid-glass.css?v=47','./typography.css?v=73','./assets/fonts/Inter-Regular.woff','./assets/fonts/Inter-SemiBold.woff','./assets/fonts/NotoSerif-Regular.woff','./assets/fonts/NotoSerifDisplay-Regular.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/glass-sand-grain.svg','./assets/recommendation-shore.webp','./assets/recommendation-food.webp','./assets/recommendation-rest.webp','./assets/beach-sand-natural.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/sand-matched-cycle-pearl.webp','./assets/beach-water.webp','./assets/natural-sand-trail.webp','./assets/shore-canvas.svg?v=95']:
+ for path in ['./nature-editorial.css?v=64','./milk-sand.css?v=96','./liquid-glass.css?v=47','./typography.css?v=97','./assets/fonts/CormorantGaramond.woff','./assets/fonts/Inter-Regular.woff','./assets/fonts/Inter-SemiBold.woff','./assets/fonts/NotoSerif-Regular.woff','./assets/fonts/NotoSerifDisplay-Regular.woff','./assets/garden-spa.webp','./assets/clay-grain.svg','./assets/glass-sand-grain.svg','./assets/recommendation-shore.webp','./assets/recommendation-food.webp','./assets/recommendation-rest.webp','./assets/beach-sand-natural.webp','./assets/shoreline-water.webp','./assets/pearl-topics.webp','./assets/wild-pearl-diary.webp','./assets/sand-matched-cycle-pearl.webp','./assets/beach-water.webp','./assets/natural-sand-trail.webp','./assets/shore-canvas.svg?v=95']:
   assert page.evaluate('(path)=>caches.match(new URL(path,location.href)).then(Boolean)',path),path
- assert 'Noto Serif' in page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily')
+ assert page.locator('#page-title').evaluate('(e)=>getComputedStyle(e).fontFamily').startswith('\"Cormorant Garamond\"')
  assert page.evaluate('state.periodEnds["2026-10-13"]')=='2026-10-17'
  assert not errors,errors
  b.close();print('PASS: continuous milk-sand background, warm neutral controls and readable contrasts, Cyrillic editorial fonts, 10 routes at 5 viewport sizes, cycle text fits, unchanged data and complete offline design')
