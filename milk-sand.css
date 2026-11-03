@@ -3,7 +3,7 @@
 body { position:relative; isolation:isolate; min-height:100svh; background:transparent; }
 html body::before {
   display:block; content:''; position:absolute; inset:0; z-index:-1; pointer-events:none;
-  background:#f3eee5 url('./assets/shore-canvas.svg?v=87') center top/100% 100% no-repeat;
+  background:#f3eee5 url('./assets/shore-canvas.svg?v=88') center top/100% 100% no-repeat;
   box-shadow:none;
 }
 /* Keep the original sand canvas; only the water and foam stay above content. */
@@ -30,7 +30,7 @@ html body .layout main::before {
 html body .layout main>header::before {
   content:''; display:block; position:fixed; inset:0 0 auto; z-index:-1; pointer-events:none;
   width:100%; height:min(300vw,1000px);
-  background:url('./assets/shore-incoming-phone.webp') center top/100% 100% no-repeat;
+  background:url('./assets/shore-phone.webp') center top/100% 100% no-repeat;
   --shore-contour:url('./assets/shore-foam-phone.svg');
   /* Keep the sea opaque through the heading, then fade toward the shadow. */
   -webkit-mask-image:var(--shore-contour),linear-gradient(#000 0 var(--shore-fade-start),transparent var(--foam-bottom));
@@ -47,8 +47,8 @@ html body .layout main>header::before {
 @media(min-width:768px) {
   html { --foam-bottom:min(17.8vw,196px); }
   html body .layout main>header::before {
-    height:min(80vw,880px);
-    background-image:url('./assets/shore-incoming-desktop.webp');
+    height:min(100vw,1100px);
+    background-image:url('./assets/shore-desktop.webp');
     --shore-contour:url('./assets/shore-foam-desktop.svg');
   }
 }
